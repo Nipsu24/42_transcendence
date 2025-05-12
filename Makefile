@@ -5,14 +5,20 @@ Name = transcendence
 FRONTEND = ./frontend
 BACKEND = ./backend
 
-test_frontend:
+test_frontend: check_node_module_frontend
 	@ cd $(FRONTEND) && npm run fulltest
 
-test_frontend_server:
+test_frontend_server: check_node_module_frontend
 	@ cd $(FRONTEND) && npm run server
 
-test_frontend_ui:
-	@ cd $(FRONTEND) && npm run server
+test_frontend_ui: check_node_module_frontend
+	@ cd $(FRONTEND) && npm run dev
+
+check_node_module_frontend:
+	@if [ ! -f $(FRONTEND)/node_modules ]; then \
+		echo "install npm"; \
+		cd $(FRONTEND) && npm install; \
+	fi
 
 # all: check_env $(CERT_KEY) $(CERT_CRT)
 # 	@mkdir -p ~/data/mariadb
