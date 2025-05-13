@@ -1,0 +1,12 @@
+//Download VS Code REST CLIENT extension in order to use the requests below
+###
+GET http://localhost:3001/api/players
+
+###
+POST http://localhost:3001/api/players
+Content-Type: application/json
+
+{
+	"name": "anotherPlayer",
+	"password": "30984308"
+}

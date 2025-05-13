@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "<h1 align=\"center\">🤖+++WORK IN PROGRESS+++🤖</h1>",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "build:ui": "rm -rf dist && cd ../frontend && npm run build && cp -r dist ../backend",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nipsu24/42_transcendence.git"
+  },
+  "author": "Marius Meier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nipsu24/42_transcendence/issues"
+  },
+  "homepage": "https://github.com/Nipsu24/42_transcendence#readme",
+  "dependencies": {
+    "@prisma/client": "^6.7.0",
+    "dotenv": "^16.5.0",
+    "fastify": "^5.3.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "prisma": "^6.7.0"
+  }
+}
