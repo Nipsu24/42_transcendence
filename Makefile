@@ -25,6 +25,9 @@ check_node_module_frontend:
 test_backend_server: check_node_module_backend
 	@ cd $(BACKEND) && npm run dev
 
+test_backend_w_ui: check_node_module_backend check_node_module_frontend
+	@ cd $(BACKEND) && npm run build:ui && npm run dev
+
 check_node_module_backend:
 	@if [ ! -d $(BACKEND)/node_modules ]; then \
 		echo "install npm"; \
