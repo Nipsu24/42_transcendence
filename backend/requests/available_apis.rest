@@ -1,4 +1,5 @@
 //Download VS Code REST CLIENT extension in order to use the requests below
+//Backend needs to be up and running ('npm run dev' in backend directory)
 ###
 GET http://localhost:3001/api/players
 
@@ -7,6 +8,6 @@ POST http://localhost:3001/api/players
 Content-Type: application/json
 
 {
-	"name": "anotherPlayer",
+	"name": "Player 4",
 	"password": "30984308"
 }
