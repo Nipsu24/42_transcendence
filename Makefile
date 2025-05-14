@@ -31,6 +31,10 @@ check_node_module_backend:
 		( \
 			cd $(BACKEND) && \
 			npm install && \
+			echo install fastify v ^3 && \
+			npm install fastify@^3 && \
+			echo install fastify/static && \
+			npm i @fastify/static && \
 			npm install @prisma/client && \
 			echo "Pushing Prisma schema to the database..." && \
 			npx prisma db push && \

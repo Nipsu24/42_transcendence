@@ -2,6 +2,13 @@ require('dotenv').config()
 const fastify = require('fastify')({ logger: true });
 const Player = require('./models/player')
 const PORT = parseInt(process.env.PORT, 10) || 3000;
+const path = require('path');
+const fastifyStatic = require('fastify-static');
+
+fastify.register(fastifyStatic, {
+	root: path.join(__dirname, 'dist'),
+	prefix: '/',
+});
 
 fastify.get('/api/players', async (request, reply) => {
 	try {
