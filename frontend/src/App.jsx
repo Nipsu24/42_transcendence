@@ -1,33 +1,24 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import playerService from './services/players'
 import Notification from './components/Notification'
 import ErrMsg from './components/ErrorMsg'
 
-const Persons = ({ person, deletePerson }) => {
+//!!usually good practice to create individual files for each of the following 3 components in dir 'components'!!
+
+//Player component, called in RegisteredPlayers component
+const Player = ({ player, deletePlayer }) => {
 	return (
 		<div>
-			{person.name} {person.number} 
-			<button onClick={deletePerson}>
+			{player.name}
+			<button onClick={deletePlayer}>
 				delete
 			</button>
 		</div>
 	)
   }
 
-const Filter = (props) => {
-	return (
-		<form>
-			<div>
-				filter shown with <input
-				value={props.value}
-				onChange={props.onChange}/>
-			</div>
-		</form>
-	)
-}
-
-const PersonForm = (props) => {
+//Component which defines the two input fields on the website
+const PlayerForm = (props) => {
 	return (
 		<form onSubmit={props.onSubmit}>
 			<div>
@@ -37,8 +28,8 @@ const PersonForm = (props) => {
 			</div>
 			<div>
 				password: <input 
-				value={props.newNumber}
-				onChange={props.onNumberChange}/>
+				value={props.newPassword}
+				onChange={props.onPasswordChange}/>
 				</div>
 			<div>
 				<button type="submit">add</button>
@@ -47,61 +38,57 @@ const PersonForm = (props) => {
 	)
 }
 
+//displayes all registered players on website, map method used to loop through players array 
+// (map has different functionality in javascript as e.g. in c++)
+const RegisteredPlayers = ({players, deletePlayer}) => {
+	return (
+		<div>
+			{players.map(player => (
+				<Player 
+					key={player.id}
+					player={player}
+					deletePlayer={() => deletePlayer(player.id)}
+				/>
+			))}
+		</div>
+	)
+}
+
+//root component, manages overall structure and state of application
 const App = () => {
-	const [persons, setPersons] = useState([])
+	const [players, setPlayers] = useState([])
 	const [newName, setNewName] = useState('')
-	const [newNumber, setNewNumber] = useState('')
-	const [filter, setFilter] = useState('')
+	const [newPassword, setNewPassword] = useState('')
 	const [successMessage, setSuccessMessage] = useState(null)
-	const [ErrorMessage, setErrorMessage] = useState(null)
+	const [errorMessage, setErrorMessage] = useState(null)
 	
+	//Initially renders all available players, empty [] so that it only runs once
 	useEffect(() => {
 		playerService
 		.getAll()
-		.then(initialPersons => {
-			setPersons(initialPersons)
+		.then(initialPlayers => {
+			setPlayers(initialPlayers)
 		})
 	}, [])
 
-	const addName = (event) => {
+	//creates a new player object and sends it to backend via create (axios.post from players.js file)
+	//setPlayers triggers new rendering of displayed players / updates players state
+	const addPlayer = (event) => {
 		event.preventDefault()
-		for (let i = 0; i < persons.length; i++) {
-			if (newName === persons[i].name) {
-				const updatedPerson = { ...persons[i], number: newNumber}
-				playerService
-				.update(persons[i].id, updatedPerson)
-				.then(returnedPerson => {
-					setPersons(persons.map(p => (p.id === persons[i].id ? returnedPerson : p)))
-					setSuccessMessage(`Updated ${newName}.`)
-					setNewName('');
-                    setNewNumber('');
-				})
-				.catch(error => {
-					console.log(error.response.data.error)
-					setErrorMessage(error.response.data.error)
-					setTimeout(() => {
-						setErrorMessage(null)
-					}, 5000)
-				})
-				return ;
-			}
-		}
-		const newPersonObject = {
+		const newPlayerObject = {
 			name: newName,
-			important: true,
-			id: String(persons.length + 1),
-			number: newNumber,
+			password: newPassword,
 		}
 		playerService
-		.create(newPersonObject)
-		.then(returnedPerson => {
-			setPersons(persons.concat(returnedPerson))
+		.create(newPlayerObject)
+		.then(returnedPlayer => {
+			setPlayers(players.concat(returnedPlayer))
 			setSuccessMessage(`Added ${newName}.`)
 			setTimeout(() => {
 				setSuccessMessage(null)
 			}, 5000)
 			setNewName('')
-			setNewNumber('')
+			setNewPassword('')
 		})
 		.catch(error => {
 			console.log(error.response.data.error)
@@ -112,74 +99,54 @@ const App = () => {
 		})
 	}
 	
-	const handleFilterChange = (event) => {
-		setFilter(event.target.value)
-	}
-	
-	const filteredPersons = persons.filter(person =>
-		person.name.toLowerCase().includes(filter.toLowerCase())
-	)
-	
+	//triggers rerendering of name input field / updates newName state
 	const handleNameChange = (event) => {
 		console.log(event.target.value)
 		setNewName(event.target.value)
 	}
 	
-	const deletePerson = (id) => {
-		const person = persons.find(p => p.id === id)
-		if (window.confirm(`Delete ${person.name}?`)) {
+	//triggers rerendering of password input field / updates newPassword state
+	const handlePasswordChange = (event) => {
+		console.log(event.target.value)
+		setNewPassword(event.target.value)
+	}
+
+	//deletes player by using remove (axios.delete from players.js file)
+	const deletePlayer = (id) => {
+		const player = players.find(p => p.id === id)
+		if (window.confirm(`Delete ${player.name}?`)) {
 			playerService
 			.remove(id)
 			.then(() => {
-				setPersons(persons.filter(p => p.id != id))
+				setPlayers(players.filter(p => p.id != id))
 			})
 			.catch(error => {
-				setErrorMessage(`${person.name} was already deleted from the server`)
+				setErrorMessage(`${player.name} was already deleted from the server`)
 				setTimeout(() => {
 					setErrorMessage(null)
 				}, 5000)
-				setPersons(persons.filter(p => p.id !== id))
+				setPlayers(players.filter(p => p.id !== id))
 			})
 		}
-	}
-	
-	const handleNumberChange = (event) => {
-		console.log(event.target.value)
-		setNewNumber(event.target.value)
-	}
-
-	const ShownPersons = ({filteredPersons, deletePerson}) => {
-		return (
-			<div>
-				{filteredPersons.map(person => (
-					<Persons 
-						key={person.id}
-						person={person}
-						deletePerson={() => deletePerson(person.id)}
-					/>
-				))}
-			</div>
-		)
 	}
 
 	return (
 		<div>
 			<h1>Transcendental Pong</h1>
-			<h2>Players</h2>
 			<Notification message={successMessage} />
-			<ErrMsg message={ErrorMessage} />
-			<Filter value={filter} onChange={handleFilterChange} />
+			<ErrMsg message={errorMessage} />
 			<h2>register a new player</h2>
-			<PersonForm 
+			<PlayerForm 
 				newName={newName} 
 				onNameChange={handleNameChange} 
-				newNumber={newNumber} 
-				onNumberChange={handleNumberChange} 
-				onSubmit={addName}/>
+				newPassword={newPassword} 
+				onPasswordChange={handlePasswordChange} 
+				onSubmit={addPlayer}
+			/>
 			<h2>List of players</h2>
-			<ShownPersons 
-				filteredPersons={filteredPersons}
-				deletePerson={deletePerson} 
+			<RegisteredPlayers 
+				players={players}
+				deletePlayer={deletePlayer}
 			/>
 		</div>
 	)

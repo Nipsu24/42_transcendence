@@ -1,8 +1,15 @@
 import axios from 'axios'
+
+//COMMENT BASEURL IN/OUT DEPENDING ON TESTING
+//IF WORKING WITH REAL BACKEND, USE 'api/...' IF WORKING WITH JSON BACKEND USE OTHER
+
 const baseUrl = 'api/players'
 // const baseUrl = 'http://localhost:3001/players'
 // const baseUrl = 'http://localhost:3001/gamers'
 
+
+//Following are service functions that use the axios http client
+//These functions are used in the App.jsx file's app component in order to submit requests to the backend
 const getAll = () => {
 	const request = axios.get(baseUrl)
 	return request.then(response => response.data)
