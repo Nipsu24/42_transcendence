@@ -17,7 +17,8 @@
 </h2>
 
 ## About
-The repository contains a web-based pong game which runs in a containerised environment. 
+The repository contains a web-based pong game which runs in a containerised environment.  
+[View Miro Board](https://miro.com/app/board/uXjVI1VJGHY=/)
 
 ## Worksplit
 Erno:  
