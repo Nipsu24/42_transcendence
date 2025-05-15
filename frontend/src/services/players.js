@@ -1,15 +1,14 @@
 import axios from 'axios'
 
-//COMMENT BASEURL IN/OUT DEPENDING ON TESTING
-//IF WORKING WITH REAL BACKEND, USE 'api/...' IF WORKING WITH JSON BACKEND USE OTHER
-
-const baseUrl = 'api/players'
-// const baseUrl = 'http://localhost:3001/players'
-// const baseUrl = 'http://localhost:3001/gamers'
-
+// baseUrl gets automatically adjusted depending on makefile command.
+// URL is:
+// http://localhost:3001/players (for all frontend tests when testing with JSON-backend) or 
+// api/players (when testing with real backend in the backend tests section)
+const baseUrl = import.meta.env.VITE_APP_BASE_URL;
 
 //Following are service functions that use the axios http client
-//These functions are used in the App.jsx file's app component in order to submit requests to the backend
+//These functions are used in the App.jsx file's app component in order to submit
+// requests to the backend (or the JSON-server for testing purposes)
 const getAll = () => {
 	const request = axios.get(baseUrl)
 	return request.then(response => response.data)

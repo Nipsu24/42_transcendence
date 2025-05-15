@@ -15,7 +15,7 @@ const Player = ({ player, deletePlayer }) => {
 			</button>
 		</div>
 	)
-  }
+}
 
 //Component which defines the two input fields on the website
 const PlayerForm = (props) => {

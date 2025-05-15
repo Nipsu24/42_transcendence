@@ -7,13 +7,13 @@ BACKEND = ./backend
 
 ########################FRONTEND TESTING########################
 test_frontend: check_node_module_frontend
-	@ cd $(FRONTEND) && npm run fulltest
+	@ cd $(FRONTEND) && cp .env.frontend .env && npm run fulltest
 
 test_frontend_server: check_node_module_frontend
-	@ cd $(FRONTEND) && npm run server
+	@ cd $(FRONTEND) && cp .env.frontend .env && npm run server
 
 test_frontend_ui: check_node_module_frontend
-	@ cd $(FRONTEND) && npm run dev
+	@ cd $(FRONTEND) && cp .env.frontend .env && npm run dev
 
 check_node_module_frontend:
 	@if [ ! -d $(FRONTEND)/node_modules ]; then \
@@ -26,7 +26,7 @@ test_backend_server: check_node_module_backend
 	@ cd $(BACKEND) && npm run dev
 
 test_backend_w_ui: check_node_module_backend check_node_module_frontend
-	@ cd $(BACKEND) && npm run build:ui && npm run dev
+	@ cd $(BACKEND) && cp ../frontend/.env.backend ../frontend/.env && npm run build:ui && npm run dev
 
 check_node_module_backend:
 	@if [ ! -d $(BACKEND)/node_modules ]; then \
