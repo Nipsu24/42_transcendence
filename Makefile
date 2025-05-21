@@ -4,6 +4,9 @@ Name = transcendence
 
 FRONTEND = ./frontend
 BACKEND = ./backend
+CERT_DIR = ./nginx/tools/
+CERT_KEY = $(CERT_DIR)/transcendence.key
+CERT_CRT = $(CERT_DIR)/transcendence.crt
 
 ########################FRONTEND TESTING########################
 test_frontend: check_node_module_frontend
@@ -51,7 +54,7 @@ check_node_module_backend:
 ########################PROD ENVIRONMENT########################
 
 #nginx container, also containing the frontend dist folder (for serving static frontend files)
-nginx_frontend:
+nginx_frontend: $(CERT_KEY)  $(CERT_CRT)
 	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
 #	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build
 	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --no-deps --build nginx
@@ -59,8 +62,15 @@ nginx_frontend:
 backend_container: check_node_module_backend
 	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --no-deps --build fastify
 
-full_prod:
+full_prod: $(CERT_KEY)  $(CERT_CRT)
 	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build	
 
 down:
 	@docker-compose -f docker-compose.yml down
+
+$(CERT_KEY) $(CERT_CRT):
+	@mkdir -p $(CERT_DIR)
+	@openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+		-keyout $(CERT_KEY) \
+		-out $(CERT_CRT) \
+		-subj "/C=FI/ST=/L=Helsinki/O=Hive/OU=42/CN=transcendence/UID=transcendence"

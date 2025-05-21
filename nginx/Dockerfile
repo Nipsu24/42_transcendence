@@ -9,7 +9,10 @@ RUN mkdir -p /run/nginx
 
 # Copy nginx conf files for later modification into container
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+
 COPY ./dist /usr/share/nginx/html
+
+COPY ./tools /etc/nginx/ssl/
 
 RUN chmod -R 755 /etc/nginx
 
