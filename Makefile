@@ -9,6 +9,7 @@ CERT_KEY = $(CERT_DIR)/transcendence.key
 CERT_CRT = $(CERT_DIR)/transcendence.crt
 
 ########################FRONTEND TESTING########################
+
 # builds frontend test environemnt with 'mock' json-server
 test_frontend: check_node_module_frontend
 	@ cd $(FRONTEND) && cp .env.frontend .env && npm run fulltest
@@ -29,6 +30,7 @@ check_node_module_frontend:
 	fi
 
 ########################BACKEND TESTING########################
+
 # starts backend server, can be tested with e.g. requests dir or postman
 test_backend_server: check_node_module_backend
 	@ cd $(BACKEND) && npm run dev
@@ -85,3 +87,21 @@ $(CERT_KEY) $(CERT_CRT):
 		-keyout $(CERT_KEY) \
 		-out $(CERT_CRT) \
 		-subj "/C=FI/ST=/L=Helsinki/O=Hive/OU=42/CN=transcendence/UID=transcendence"
+
+fclean: down
+	@echo "remove frontend node_modules"
+	@rm -rf $(FRONTEND)/node_modules
+	@echo "remove backend node_modules"
+	@rm -rf $(BACKEND)/node_modules
+	@echo "remove frontend dist directory"
+	@rm -rf $(BACKEND)/dist
+	@echo "remove backend dist directory"
+	@rm -rf $(BACKEND)/dist
+	@echo "remove nginx dist directory"
+	@rm -rf ./nginx/dist
+	@echo "remove nginx certificates"
+	@rm -rf ./nginx/tools
+
+.PHONY: test_frontend test_frontend_server test_frontend_ui \
+		check_node_module_frontend test_backend_server test_backend_w_ui \
+		check_node_module_backend nginx_frontend backend_container prod down
