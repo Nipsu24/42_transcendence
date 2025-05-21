@@ -1,25 +1,27 @@
-# Use an official Node.js image as the base
+# Uses official Node.js image as the base
 FROM node:18-alpine
 
-# Set the working directory inside the container
+# Sets working directory inside the container
 WORKDIR /backend
 
-# Copy package.json and package-lock.json first to leverage Docker's caching
+# Copy first package.json and package-lock.json before npm install -
+# (can speed up npm install process if cached docker image layers are available -
+# prerequisite: no changes in copied files present)
 COPY package.json package-lock.json ./
 
-# Install dependencies
+# Installs dependencies
 RUN npm install
 
-# Copy the rest of the application files into the container
+# Copies rest of the application files into the container (except listed files in .dockerignore)
 COPY . .
 
-# Run Prisma commands to set up the database
+# Runs Prisma commands to set up the database !!should be altered for real prod built!!
 RUN npx prisma generate && \
     npx prisma db push && \
     npx prisma db seed
 
-# Expose the port the application will run on
+# Exposes the port the application will run on
 EXPOSE 3001
 
-# Start the application
+# Starts the application
 CMD ["node", "index.js"]
