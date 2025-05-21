@@ -1,0 +1,5 @@
+# Exclude the request directory
+request/
+
+# Exclude the dev.db file
+dev.db

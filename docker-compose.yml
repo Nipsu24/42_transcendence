@@ -1,0 +1,31 @@
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    image: nginx
+    ports:
+      - "8080:8080"
+    depends_on:
+      - fastify
+    networks:
+      - transcendence-network
+    restart: unless-stopped
+
+  fastify:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fastify_backend
+    image: fastify_backend
+    ports:
+      - "3001:3001"
+    networks:
+      - transcendence-network
+    restart: unless-stopped
+
+networks:
+   transcendence-network:
+     name: transcendence-network
+     driver: bridge

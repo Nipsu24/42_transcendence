@@ -48,4 +48,19 @@ check_node_module_backend:
 		); \
 	fi
 
+########################PROD ENVIRONMENT########################
 
+#nginx container, also containing the frontend dist folder (for serving static frontend files)
+nginx_frontend:
+	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
+#	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build
+	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --no-deps --build nginx
+
+backend_container: check_node_module_backend
+	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --no-deps --build fastify
+
+full_prod:
+	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build	
+
+down:
+	@docker-compose -f docker-compose.yml down
