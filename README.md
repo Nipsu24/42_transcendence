@@ -27,7 +27,7 @@ Katja:  Graphics module, monitoring, (optional assist with main game, game custo
 Marius: Backend with fastify framework, using SQLite DB, overall architecture (test and prod environment) - Module Count: 1 Major, 1 Minor
 Matti: Google Sign-in authentification (?), standard user management (backend) - Module Count: 1 Major  
 
-Overall Module Count: 5 Major, 1 Minor
+Overall Module Count: 7 Major in total
 
 ## Website
 TBD
