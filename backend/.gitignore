@@ -4,3 +4,4 @@ dist
 prisma/dev.db
 prisa/node_modules
 generated/
+requests/available_apis.rest

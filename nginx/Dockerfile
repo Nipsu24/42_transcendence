@@ -10,12 +10,14 @@ RUN mkdir -p /run/nginx
 # Copy nginx conf files for later modification into container
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
+# Dist contains static frontend files which are directly served by nginx
 COPY ./dist /usr/share/nginx/html
 
+# Used to copy created certificates into container
 COPY ./tools /etc/nginx/ssl/
 
 RUN chmod -R 755 /etc/nginx
 
-EXPOSE 8080
+EXPOSE 443
 
 CMD [ "nginx", "-g", "daemon off;" ]
