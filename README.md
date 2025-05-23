@@ -24,7 +24,7 @@ The repository contains a web-based pong game which runs in a containerised envi
 Erno: Pong-Game, Oponent AI, remote players (if more modules needed) - Module Count: 1 Major  
 Hanni: Front-End UI with tailwind, standard user management (frontend), support on all devices - Module Count: 1 Major, 2 Minor  
 Katja:  Graphics module, monitoring, (optional assist with main game, game customisation) - Module Count: 1 Major, 1 Minor  
-Marius: Backend with fastify framework, using SQLite DB, overall architecture (test and prod environment) - Module Count: 1 Major, 1 Minor
+Marius: Backend with fastify framework, using SQLite DB, overall architecture (test and prod environment) - Module Count: 1 Major, 1 Minor  
 Matti: Google Sign-in authentification (?), standard user management (backend) - Module Count: 1 Major  
 
 Overall Module Count: 7 Major in total
