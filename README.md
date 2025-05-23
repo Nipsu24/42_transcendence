@@ -40,10 +40,10 @@ TBD
 
 ### 1. Compiling the website
 
-tbd
+Install docker/docker-compose on your machine, navigate to the repository and build the project with:
 
 ```
-$ tbd 
+$ make 
 ```
 
 ### 2. Navigation on the website
