@@ -18,6 +18,6 @@ COPY ./tools /etc/nginx/ssl/
 
 RUN chmod -R 755 /etc/nginx
 
-EXPOSE 443
+EXPOSE 8443
 
 CMD [ "nginx", "-g", "daemon off;" ]
