@@ -1,23 +1,18 @@
 require('dotenv').config()
-const fastify = require('fastify')({
-  logger: true,
-  ajv: {
-    customOptions: {
-      removeAdditional: false // Ensures extra fields like "test" trigger validation errors
-    }
-  }
-});
+const fastify = require('fastify')({ logger: true });
 const Player = require('./models/player')
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 const path = require('path');
 const fastifyStatic = require('fastify-static');
 const { playerBodySchema } = require('./schemas/player');
 
+// needed for handling static frontend files in test environment (not needed for production)
 fastify.register(fastifyStatic, {
 	root: path.join(__dirname, 'dist'),
 	prefix: '/',
 });
 
+// handles get requests for player data
 fastify.get('/api/players', async (request, reply) => {
 	try {
 		const players = await Player.getAllPlayers({});
@@ -28,6 +23,9 @@ fastify.get('/api/players', async (request, reply) => {
 	}
 });
 
+// handles adding a new player to the database
+// uses player schema (from schemas dir) and automatically calls error handler function in case 
+// request body does not match with defined schema
 fastify.post('/api/players', {
 	schema: {
 		body: playerBodySchema
@@ -42,6 +40,7 @@ fastify.post('/api/players', {
 	}
 });
 
+// handles deletion of player
 fastify.delete('/api/players/:id', async (request, reply) => {
 	try {
 		const id = Number(request.params.id);
@@ -53,17 +52,18 @@ fastify.delete('/api/players/:id', async (request, reply) => {
 	}
 });
 
-
+// handles errors (e.g. if post request payload not according to schema)
+// does not throw error if additional fields not defined by schema are sent, as they are automatically ignored by fastify ajv
 fastify.setErrorHandler((error, request, reply) => {
-  // Check for validation errors
-  if (error.validation) {
-    reply.status(400).send({ error: 'Invalid player data: name and password are required, no extra fields allowed.' });
-  } else {
-    // Default error handling
-    reply.status(500).send({ error: 'An internal server error occurred.' });
-  }
+	if (error.validation) {
+		reply.status(400).send({ error: 'Invalid player data: name and password are required, no extra fields allowed.' });
+	} 
+	else {
+		reply.status(500).send({ error: 'An internal server error occurred.' });
+	}
 });
 
+// defines port on which backend is listening (taken from .env file)
 fastify.listen( {port: PORT}, (err, address) => {
 	if (err) {
 		fastify.log.error(err);
