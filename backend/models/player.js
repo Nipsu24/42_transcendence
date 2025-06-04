@@ -3,7 +3,16 @@ const prisma = new PrismaClient();
 
 // Function to get all players
 const getAllPlayers = async () => {
-	return await prisma.player.findMany();
+	return await prisma.player.findMany({
+        include: {
+            stats: {
+				include: {
+					matches: true
+				}
+			},
+			friends: true
+        }
+    });
 };
 
 // Function to create a new player

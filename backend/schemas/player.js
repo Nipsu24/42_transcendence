@@ -5,6 +5,7 @@ const playerBodySchema = {
 		name: { type: 'string' },
 		password: { type: 'string' },
 		e_mail: { type: 'string' },
+		online: { type: 'boolean'},
 		stats: {
 			type: 'object',
 			properties: {
@@ -16,12 +17,10 @@ const playerBodySchema = {
 						type: 'object',
 						properties: {
 							date: { type: 'string' },
-							opponent: { type: 'string' },
-							victory: { type: 'boolean' },
-							result: {
-								type: 'array',
-								items: { type: 'integer' }
-							},
+							playerOne: { type: 'integer'},
+							playerTwo: { type: 'integer'},
+							resultPlayerOne: { type: 'integer'},
+							resultPlayerTwo: { type: 'integer'},
 						},
 						additionalProperties: false
 					}

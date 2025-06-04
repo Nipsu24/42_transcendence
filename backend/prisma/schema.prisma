@@ -18,4 +18,29 @@ model Player {
   id       Int    @id @default(autoincrement())
   name     String
   password String
+  e_mail   String
+  online   Boolean
+  stats    Statistics @relation(fields: [statsId], references: [id]) //establishes 1-1 relationship
+  statsId  Int @unique
+  friends  Player[] @relation("PlayerFriends") // bidirectional relationship -
+  friendOf Player[] @relation("PlayerFriends") // player A is friend of player B and vice versa
+}
+
+model Statistics {
+  id        Int @id @default(autoincrement())
+  victories Int
+  defeats   Int
+  matches   Match[]
+  player    Player? @relation // refers back to Player using 1-1 relationship
+}
+
+model Match {
+  id              Int @id @default(autoincrement())
+  date            String
+  playerOne       Int
+  playerTwo       Int
+  resultPlayerOne Int
+  resultPlayerTwo Int
+  statisticsId    Int
+  statistics      Statistics @relation(fields: [statisticsId], references: [id])
 }
