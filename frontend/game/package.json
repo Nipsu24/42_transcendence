@@ -1,0 +1,17 @@
+{
+  "name": "pong-game",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "lite-server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "lite-server": "^2.6.1",
+    "typescript": "^5.8.3"
+  }
+}
