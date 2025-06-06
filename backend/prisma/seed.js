@@ -75,25 +75,31 @@ async function main() {
     data: { friends: { connect: [{ id: player2.id }, { id: player3.id }] } }
   });
 
-  await prisma.match.createMany({
-    data: [
-      {
-        date: '2024-06-04',
-        playerOne: player1.id,
-        playerTwo: player2.id,
-        resultPlayerOne: 9,
-        resultPlayerTwo: 11,
-        statisticsId: stats1.id
-      },
-      {
-        date: '2024-06-05',
-        playerOne: player1.id,
-        playerTwo: player3.id,
-        resultPlayerOne: 11,
-        resultPlayerTwo: 7,
-        statisticsId: stats1.id
+  //set-up match data
+  const match1 = await prisma.match.create({
+    data: {
+      date: '2024-06-04',
+      playerOne: player1.id,
+      playerTwo: player2.id,
+      resultPlayerOne: 9,
+      resultPlayerTwo: 11,
+      statistics: {
+        connect: [{ id: stats1.id }, { id: stats2.id }]
       }
-    ]
+    }
+  });
+
+  const match2 = await prisma.match.create({
+    data: {
+      date: '2024-06-05',
+      playerOne: player1.id,
+      playerTwo: player3.id,
+      resultPlayerOne: 11,
+      resultPlayerTwo: 7,
+      statistics: {
+        connect: [{ id: stats1.id }, { id: stats3.id }]
+      }
+    }
   });
 
 }

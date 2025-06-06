@@ -20,10 +20,24 @@ const createPlayer = async (data) => {
 	return await prisma.player.create({ data });
 };
 
-// Function to find a player by ID
 const findPlayerById = async (id) => {
-	return await prisma.player.findUnique({ where: { id: parseInt(id) } });
+    return await prisma.player.findUnique({
+        where: { id },
+        include: {
+            stats: {
+                include: {
+                    matches: true,
+                },
+            },
+            friends: true,
+        },
+    });
 };
+
+// Function to find a player by ID
+// const findPlayerById = async (id) => {
+// 	return await prisma.player.findUnique({ where: { id: parseInt(id) } });
+// };
 
 // Function to delete a player by ID
 const deletePlayerById = async (id) => {

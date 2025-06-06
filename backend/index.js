@@ -5,6 +5,7 @@ const PORT = parseInt(process.env.PORT, 10) || 3000;
 const path = require('path');
 const fastifyStatic = require('fastify-static');
 const { playerBodySchema } = require('./schemas/player');
+const { log } = require('console');
 
 // needed for handling static frontend files in test environment (not needed for production)
 fastify.register(fastifyStatic, {
@@ -13,13 +14,29 @@ fastify.register(fastifyStatic, {
 });
 
 // handles get requests for player data
-fastify.get('/api/players', async (request, reply) => {
+// fastify.get('/api/players', async (request, reply) => {
+// 	try {
+// 		const players = await Player.getAllPlayers({});
+// 		reply.send(players);
+// 	} 
+// 	catch (error) {
+// 		reply.status(500).send({ error: 'An error occurred while fetching players' });
+// 	}
+// });
+
+// handles get requests for player data
+fastify.get('/api/players/:id', async (request, reply) => {
 	try {
-		const players = await Player.getAllPlayers({});
-		reply.send(players);
+		const id = Number(request.params.id);
+		console.log('Fetched ID:', id);
+		const player = await Player.findPlayerById(id);
+		if (!player) {
+			return reply.status(404).send({ error: 'Player not found'});
+		}
+		reply.send(player);
 	} 
 	catch (error) {
-		reply.status(500).send({ error: 'An error occurred while fetching players' });
+		reply.status(500).send({ error: 'An error occurred while fetching the player' });
 	}
 });
 

@@ -22,7 +22,7 @@ model Player {
   online   Boolean
   stats    Statistics @relation(fields: [statsId], references: [id]) //establishes 1-1 relationship
   statsId  Int @unique
-  friends  Player[] @relation("PlayerFriends") // bidirectional relationship -
+  friends  Player[] @relation("PlayerFriends") // bidirectional relationship (many to many) -
   friendOf Player[] @relation("PlayerFriends") // player A is friend of player B and vice versa
 }
 
@@ -30,7 +30,7 @@ model Statistics {
   id        Int @id @default(autoincrement())
   victories Int
   defeats   Int
-  matches   Match[]
+  matches   Match[] // Implicit many-to-many relationship with matches
   player    Player? @relation // refers back to Player using 1-1 relationship
 }
 
@@ -41,6 +41,5 @@ model Match {
   playerTwo       Int
   resultPlayerOne Int
   resultPlayerTwo Int
-  statisticsId    Int
-  statistics      Statistics @relation(fields: [statisticsId], references: [id])
+  statistics      Statistics[] // Implicit many-to-many relationship with statistics
 }
