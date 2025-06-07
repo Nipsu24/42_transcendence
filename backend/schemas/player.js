@@ -21,6 +21,7 @@ const playerBodySchema = {
 							playerTwo: { type: 'integer'},
 							resultPlayerOne: { type: 'integer'},
 							resultPlayerTwo: { type: 'integer'},
+							aiOpponent: { type: 'boolean'},
 						},
 						additionalProperties: false
 					}

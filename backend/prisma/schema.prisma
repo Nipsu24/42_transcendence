@@ -18,9 +18,9 @@ model Player {
   id       Int    @id @default(autoincrement())
   name     String
   password String
-  e_mail   String
-  online   Boolean
-  stats    Statistics @relation(fields: [statsId], references: [id]) //establishes 1-1 relationship
+  e_mail   String?
+  online   Boolean?
+  stats    Statistics @relation(fields: [statsId], references: [id], onDelete: Cascade) //establishes 1-1 relationship, deletes stats if player is deleted
   statsId  Int @unique
   friends  Player[] @relation("PlayerFriends") // bidirectional relationship (many to many) -
   friendOf Player[] @relation("PlayerFriends") // player A is friend of player B and vice versa
@@ -38,8 +38,9 @@ model Match {
   id              Int @id @default(autoincrement())
   date            String
   playerOne       Int
-  playerTwo       Int
+  playerTwo       Int? // can be optional (in case of ai opponent)
   resultPlayerOne Int
   resultPlayerTwo Int
+  aiOpponent      Boolean
   statistics      Statistics[] // Implicit many-to-many relationship with statistics
 }
