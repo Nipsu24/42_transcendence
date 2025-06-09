@@ -33,7 +33,11 @@ run_game: # just for quick testing purposes
 check_node_module_frontend:
 	@if [ ! -d $(FRONTEND)/node_modules ]; then \
 		echo "install npm"; \
-		cd $(FRONTEND) && npm install; \
+		( \
+			cd $(FRONTEND) && \ 
+			npm install && \
+			npm install --save-dev jest \
+		); \
 	fi
 
 # chekcs if requirements for compiling game fulfilled
@@ -64,6 +68,7 @@ check_node_module_backend:
 			npm install fastify@^3 && \
 			echo install fastify/static && \
 			npm i @fastify/static && \
+			npm install --save-dev jest && \
 			npm install @prisma/client && \
 			echo "Pushing Prisma schema to the database..." && \
 			npx prisma db push && \
