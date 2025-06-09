@@ -14,14 +14,14 @@ jobs:
         run: make check_node_module_frontend
       - name: Install dependencies (backend)
         env:
-          DATABASE_URL_URL: ${{ vars.DATABASE_URL }}
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
           PORT: ${{ vars. PORT }}
         run: make check_node_module_backend
       - name: Build frontend
         run: make test_frontend
       - name: Build backend
         env:
-          DATABASE_URL_URL: ${{ vars.DATABASE_URL }}
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
           PORT: ${{ vars. PORT }}
         run: make test_backend_server
       - name: Run Makefile prod (optional, builds containers)
