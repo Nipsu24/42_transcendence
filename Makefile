@@ -4,6 +4,7 @@ Name = transcendence
 
 FRONTEND = ./frontend
 BACKEND = ./backend
+GAME = ./frontend/game
 CERT_DIR = ./nginx/tools/
 CERT_KEY = $(CERT_DIR)/transcendence.key
 CERT_CRT = $(CERT_DIR)/transcendence.crt
@@ -22,11 +23,24 @@ test_frontend_server: check_node_module_frontend
 test_frontend_ui: check_node_module_frontend
 	@ cd $(FRONTEND) && cp .env.frontend .env && npm run dev
 
+# builds only the game
+test_game: check_node_module_game
+	@ cd $(GAME) && npm run build
+run_game: # just for quick testing purposes
+	@ cd $(GAME) && npm start 
+	
 # chekcs if requirements for compiling frontend fullfilled
 check_node_module_frontend:
 	@if [ ! -d $(FRONTEND)/node_modules ]; then \
 		echo "install npm"; \
 		cd $(FRONTEND) && npm install; \
+	fi
+
+# chekcs if requirements for compiling game fulfilled
+check_node_module_game:
+	@if [ ! -d $(GAME)/node_modules ]; then \
+		echo "install npm"; \
+		cd $(GAME) && npm install; \
 	fi
 
 ########################BACKEND TESTING########################
@@ -91,6 +105,8 @@ $(CERT_KEY) $(CERT_CRT):
 fclean: down
 	@echo "remove frontend node_modules"
 	@rm -rf $(FRONTEND)/node_modules
+	@echo "remove game node_modules"
+	@rm -rf $(GAME)/node_modules
 	@echo "remove backend node_modules"
 	@rm -rf $(BACKEND)/node_modules
 	@echo "remove frontend dist directory"
@@ -104,4 +120,5 @@ fclean: down
 
 .PHONY: test_frontend test_frontend_server test_frontend_ui \
 		check_node_module_frontend test_backend_server test_backend_w_ui \
-		check_node_module_backend nginx_frontend backend_container prod down
+		check_node_module_backend nginx_frontend backend_container prod down \
+		test_game

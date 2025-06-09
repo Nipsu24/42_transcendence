@@ -1,13 +1,23 @@
 //Download VS Code REST CLIENT extension in order to use the requests below
 //Backend needs to be up and running ('npm run dev' in backend directory)
-###
+
+
+### Get all players
 GET http://localhost:3001/api/players
 
-###
+### Get single player
+GET http://localhost:3001/api/players/4
+
+### Create player
 POST http://localhost:3001/api/players
 Content-Type: application/json
 
 {
-	"name": "Player 4",
+	"name": "Player 1000",
 	"password": "30984308"
 }
+
+### Delete player
+Delete http://localhost:3001/api/players/4
+Content-Type: application/json
+
