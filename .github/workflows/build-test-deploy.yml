@@ -11,11 +11,13 @@ jobs:
         with:
           node-version: '18.x'
       - name: Load environment variables
+        env:
+          ENV_VARIABLES: ${{ secrets.ENV_VARIABLES }}
         run: |
              echo "$ENV_VARIABLES" > .env
              export $(cat .env | xargs)
-        env:
-          ENV_VARIABLES: ${{ secrets.ENV_VARIABLES }}
+      - name: Debug environment variables
+        run: printenv
       - name: Install dependencies (frontend)
         run: make check_node_module_frontend
       - name: Install dependencies (backend)
