@@ -1,19 +1,54 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Function to get all players
+// Retrieves data of all players
 const getAllPlayers = async () => {
-	return await prisma.player.findMany();
+	return await prisma.player.findMany({
+		include: {
+			stats: {
+				include: {
+					matches: true
+				}
+			},
+			friends: true
+        }
+    });
 };
 
-// Function to create a new player
+// Creates a new player
 const createPlayer = async (data) => {
-	return await prisma.player.create({ data });
+	const stats = await prisma.statistics.create({
+		data: {victories: 0, defeats: 0},
+	});
+	return await prisma.player.create({ 
+		data: {
+			...data,
+			statsId: stats.id,
+		},
+	});
 };
 
-// Function to find a player by ID
+// Returns data for a single player
 const findPlayerById = async (id) => {
-	return await prisma.player.findUnique({ where: { id: parseInt(id) } });
+	return await prisma.player.findUnique({
+		where: { id },
+		include: {
+			stats: {
+				include: {
+					matches: true,
+				},
+			},
+			friends: {
+				include: {
+					stats: {
+						include: {
+							matches: true,
+						},
+					},
+				},
+			},
+		},
+	});
 };
 
 // Function to delete a player by ID
