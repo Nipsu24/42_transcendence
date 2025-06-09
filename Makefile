@@ -34,7 +34,7 @@ check_node_module_frontend:
 	@if [ ! -d $(FRONTEND)/node_modules ]; then \
 		echo "install npm"; \
 		( \
-			cd $(FRONTEND) && \ 
+			cd $(FRONTEND) && \
 			npm install && \
 			npm install --save-dev jest \
 		); \
