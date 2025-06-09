@@ -10,6 +10,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
+        run: cp backend/.env.ci backend/.env
+      - name: Install dependencies (backend)
       - name: Install dependencies (frontend)
         run: make check_node_module_frontend
       - name: Install dependencies (backend)
@@ -33,8 +35,6 @@ jobs:
       - name: Install dependencies (frontend)
         run: make check_node_module_frontend
       - name: Copy .env for backend
-        run: cp backend/.env.ci backend/.env
-      - name: Install dependencies (backend)
         run: make check_node_module_backend
       - name: Run frontend tests (if any)
         run: cd frontend && npm test || echo "No frontend tests"
