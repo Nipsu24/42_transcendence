@@ -69,6 +69,8 @@ check_node_module_backend:
 			echo install fastify/static && \
 			npm i @fastify/static && \
 			npm install --save-dev jest && \
+			npm install supertest --save-dev && \
+			npm install sequelize sqlite3 && \
 			npm install @prisma/client && \
 			echo "Pushing Prisma schema to the database..." && \
 			npx prisma db push && \

@@ -20,6 +20,7 @@ model Player {
   password String
   e_mail   String?
   online   Boolean?
+  avatar   String?
   stats    Statistics @relation(fields: [statsId], references: [id], onDelete: Cascade) //establishes 1-1 relationship, deletes stats if player is deleted
   statsId  Int @unique
   friends  Player[] @relation("PlayerFriends") // bidirectional relationship (many to many) -

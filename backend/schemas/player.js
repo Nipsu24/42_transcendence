@@ -7,6 +7,7 @@ const playerBodySchema = {
 		password: { type: 'string' },
 		e_mail: { type: 'string' },
 		online: { type: 'boolean'},
+		avatar: { type: 'string' },
 		stats: {
 			type: 'object',
 			properties: {
