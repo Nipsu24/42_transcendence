@@ -20,6 +20,7 @@ async function main() {
 		password: '23213',
 		e_mail: 'one@example.com',
 		online: true,
+		avatar: './assets/img1.jpg',
 		statsId: stats1.id
 		}
 	});
@@ -29,6 +30,7 @@ async function main() {
 		password: 'password123',
 		e_mail: 'two@example.com',
 		online: false,
+		avatar: './assets/img2.jpg',
 		statsId: stats2.id
 		}
 	});
@@ -38,6 +40,7 @@ async function main() {
 		password: 'qwerty',
 		e_mail: 'three@example.com',
 		online: true,
+		avatar: './assets/img3.jpg',
 		statsId: stats3.id
 		}
 	});

@@ -2,13 +2,16 @@ const playerBodySchema = {
 	type: 'object',
 	required: ['name', 'password'],
 	properties: {
+		id: { type: 'integer' },
 		name: { type: 'string' },
 		password: { type: 'string' },
 		e_mail: { type: 'string' },
 		online: { type: 'boolean'},
+		avatar: { type: 'string' },
 		stats: {
 			type: 'object',
 			properties: {
+				id: { type: 'integer' },
 				victories: { type: 'integer' },
 				defeats: { type: 'integer' },
 				matches: {
@@ -16,6 +19,7 @@ const playerBodySchema = {
 					items: {
 						type: 'object',
 						properties: {
+							id: { type: 'integer'},
 							date: { type: 'string' },
 							playerOne: { type: 'integer'},
 							playerTwo: { type: 'integer'},
@@ -31,7 +35,13 @@ const playerBodySchema = {
 		},
 		friends: {
 			type: 'array',
-			items: { type: 'integer' }
+			items: { type: 'object',
+				properties: {
+					id: { type: 'integer' },
+					name: { type: 'string' },
+					online: { type: 'boolean' },
+				}
+			 }
 		},
 	},
 	additionalProperties: false

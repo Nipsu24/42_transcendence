@@ -24,6 +24,7 @@ const createPlayer = async (data) => {
 		data: {
 			...data,
 			statsId: stats.id,
+			avatar: './assets/pong_avatar.jpg',
 		},
 	});
 };
