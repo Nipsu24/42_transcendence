@@ -29,6 +29,7 @@ const createPlayer = async (data) => {
 	});
 };
 
+// Updates player statistics
 const updateStats = async (data) => {
 	return await prisma.statistics.update({
 		where: { id: data.id },

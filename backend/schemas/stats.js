@@ -1,3 +1,4 @@
+// defines structure of the statistic object (fetched within player's object)
 const statsBodySchema = {
 	type: 'object',
 	required: ['victories', 'defeats'],

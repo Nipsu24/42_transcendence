@@ -1,5 +1,6 @@
 const { playerBodySchema } = require('../schemas/player');
 const { statsBodySchema } = require('../schemas/stats');
+const { matchBodySchema } = require('../schemas/match');
 const Player = require('../models/player');
 const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema } = require('./schemaHelpers');
 
