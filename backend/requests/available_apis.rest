@@ -13,11 +13,21 @@ POST http://localhost:3001/api/players
 Content-Type: application/json
 
 {
-	"name": "Player 1000",
+	"name": "Player 3000",
 	"password": "30984308"
 }
 
 ### Delete player
 Delete http://localhost:3001/api/players/4
 Content-Type: application/json
+
+### Update player stats
+PUT http://localhost:3001/api/players/4/stats
+Content-Type: application/json
+
+{
+	"victories": 400,
+	"defeats": 20
+}
+
 

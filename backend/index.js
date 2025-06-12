@@ -19,7 +19,15 @@ fastify.register(playerRoutes);
 // does not throw error if additional fields not defined by schema are sent, as they are automatically ignored by fastify ajv
 fastify.setErrorHandler((error, request, reply) => {
 	if (error.validation) {
-		reply.status(400).send({ error: 'Invalid player data: name and password are required, no extra fields allowed.' });
+		if (request.routerPath === '/api/players' && request.method === 'POST') {
+			reply.status(400).send({ error: 'Invalid player data: name and password are required, no extra fields allowed.' });
+		}
+		else if (request.routerPath === '/api/players/:id/stats' && request.method === 'PUT') {
+			reply.status(400).send({ error: 'Invalid player data: victory and defeats are required, no extra fields allowed.' });
+		}
+		else {
+			reply.status(400).send({ error: 'Invalid request data.' });
+		}
 	} 
 	else {
 		reply.status(500).send({ error: 'An internal server error occurred.' });
