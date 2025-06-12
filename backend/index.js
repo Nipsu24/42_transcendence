@@ -23,7 +23,7 @@ fastify.setErrorHandler((error, request, reply) => {
 			reply.status(400).send({ error: 'Invalid player data: name and password are required, no extra fields allowed.' });
 		}
 		else if (request.routerPath === '/api/players/:id/stats' && request.method === 'PUT') {
-			reply.status(400).send({ error: 'Invalid player data: victory and defeats are required, no extra fields allowed.' });
+			reply.status(400).send({ error: 'Invalid player data: victory and defeats are required, min. 0, max 1000' });
 		}
 		else {
 			reply.status(400).send({ error: 'Invalid request data.' });
