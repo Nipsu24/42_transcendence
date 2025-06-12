@@ -34,7 +34,7 @@ const updateStats = async (data) => {
 		where: { id: data.id },
 		data: { 
 			victories: data.victories,
-			defeats: data.defeats
+			defeats: data.defeats,
 		 },
 	});
 }
