@@ -20,12 +20,12 @@ const playerBodySchema = {
 					items: {
 						type: 'object',
 						properties: {
-							id: { type: 'integer'},
+							id: { type: 'integer', minimum: 1},
 							date: { type: 'string' },
-							playerOne: { type: 'integer'},
-							playerTwo: { type: 'integer'},
-							resultPlayerOne: { type: 'integer'},
-							resultPlayerTwo: { type: 'integer'},
+							playerOne: { type: 'integer', minimum: 1},
+							playerTwo: { type: ['integer', 'null'], minimum: 1 },
+							resultPlayerOne: { type: 'integer', minimum: 0, maximum: 10},
+							resultPlayerTwo: { type: 'integer', minimum: 0, maximum: 10},
 							aiOpponent: { type: 'boolean'},
 						},
 						additionalProperties: false

@@ -35,9 +35,19 @@ const postReqResSchema = (itemSchema) => ({
 	}
 })
 
+// helper function validating request body and response which vary from each other (e.g. used in
+// create match where request does not need to contain playerTwo, but response return it as null)
+const postDivReqResSchema = (reqSchema, resSchema) => ({
+	schema: {
+		body: reqSchema,
+		response: { 201: resSchema}
+	}
+})
+
 module.exports = {
 	arrayResponseSchema,
 	objectResponseSchema,
 	putReqResSchema,
-	postReqResSchema
+	postReqResSchema,
+	postDivReqResSchema
 };

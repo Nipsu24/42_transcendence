@@ -1,10 +1,11 @@
 const { playerBodySchema } = require('../schemas/player');
 const { statsBodySchema } = require('../schemas/stats');
-const { matchBodySchema } = require('../schemas/match');
+const { matchRequestBodySchema } = require('../schemas/match');
+const { matchResponseSchema } = require('../schemas/match');
 const Player = require('../dataAccess/player');
 const Stats = require('../dataAccess/stats');
 const Match = require('../dataAccess/match');
-const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema } = require('./schemaHelpers');
+const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema, postDivReqResSchema } = require('./schemaHelpers');
 
 // imports player apis from './routes/playerRoutes.js'
 async function playerRoutes(fastify, options) {
@@ -87,9 +88,9 @@ fastify.put('/api/players/:id/stats', putReqResSchema(statsBodySchema), async (r
 
 /*######################################## Match ######################################## */
 
-// creates new match recrods and 'attaches' this to the players' statistics -
+// creates new match record and 'attaches' this to the participating players' statistics
 // playerOne ID is retrieved from the params, whereby playerTwo ID is to be provided in the request body
-fastify.post('/api/players/:id/matches', async (request, reply) => {
+fastify.post('/api/players/:id/matches', postDivReqResSchema(matchRequestBodySchema, matchResponseSchema), async (request, reply) => {
 	try {
 		const playerOneId = Number(request.params.id);
 		const player = await Player.findPlayerById(playerOneId);

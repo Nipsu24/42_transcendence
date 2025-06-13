@@ -25,6 +25,9 @@ fastify.setErrorHandler((error, request, reply) => {
 		else if (request.routerPath === '/api/players/:id/stats' && request.method === 'PUT') {
 			reply.status(400).send({ error: 'Invalid player data: victory and defeats are required, min. 0, max 1000' });
 		}
+		else if (request.routerPath === '/api/players/:id/matches' && request.method === 'POST') {
+			reply.status(400).send({ error: 'Invalid match data: date, resultPlayerOne, resultPlayerTwo and aiOpponent are required' });
+		}
 		else {
 			reply.status(400).send({ error: 'Invalid request data.' });
 		}

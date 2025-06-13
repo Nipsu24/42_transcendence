@@ -15,7 +15,7 @@ const createMatch = async (playerOneId, data) => {
 		}
 	});
 
-	// attaches game to player one stats
+	// attaches game to PlayerOne stats
 	const playerOne = await findPlayerById(playerOneId);
 	if (playerOne && playerOne.stats) {
 		await prisma.statistics.update({
@@ -28,7 +28,7 @@ const createMatch = async (playerOneId, data) => {
 		});
 	}
 
-	// attaches match to player two stat's, if player two provided
+	// attaches match to PlayerTwo stat's (if PlayerTwo provided)
 	if (data.playerTwo) {
 		const playerTwo = findPlayerById(data.playerTwo);
 		if (playerTwo && playerTwo.stats) {
