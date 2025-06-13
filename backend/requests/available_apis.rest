@@ -6,7 +6,7 @@
 GET http://localhost:3001/api/players
 
 ### Get single player
-GET http://localhost:3001/api/players/4
+GET http://localhost:3001/api/players/1
 
 ### Create player
 POST http://localhost:3001/api/players
@@ -26,8 +26,31 @@ PUT http://localhost:3001/api/players/4/stats
 Content-Type: application/json
 
 {
-	"victories": 400,
+	"victories": 800,
 	"defeats": 20
+}
+
+### Create match record - PvP
+POST http://localhost:3001/api/players/1/matches
+Content-Type: application/json
+
+{
+	"date": "2022-01-01",
+	"playerTwo": 2,
+	"resultPlayerOne": 10,
+	"resultPlayerTwo": 5,
+	"aiOpponent": false
+}
+
+### Create match record - PvAi
+POST http://localhost:3001/api/players/1/matches
+Content-Type: application/json
+
+{
+	"date": "2022-01-01",
+	"resultPlayerOne": 10,
+	"resultPlayerTwo": 2,
+	"aiOpponent": true
 }
 
 

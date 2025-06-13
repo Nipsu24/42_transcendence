@@ -3,10 +3,13 @@ const { statsBodySchema } = require('../schemas/stats');
 const { matchBodySchema } = require('../schemas/match');
 const Player = require('../dataAccess/player');
 const Stats = require('../dataAccess/stats');
+const Match = require('../dataAccess/match');
 const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema } = require('./schemaHelpers');
 
 // imports player apis from './routes/playerRoutes.js'
 async function playerRoutes(fastify, options) {
+
+/*######################################## Player ######################################## */
 
 // retrieves data from all available players
 fastify.get('/api/players', arrayResponseSchema(playerBodySchema), async (request, reply) => {
@@ -59,13 +62,15 @@ fastify.delete('/api/players/:id', async (request, reply) => {
 	}
 });
 
+/*######################################## Stats ######################################## */
+
 // updates stats of a single player
 fastify.put('/api/players/:id/stats', putReqResSchema(statsBodySchema), async (request, reply) => {
 	try {
 		const id = Number(request.params.id);
 		const player = await Player.findPlayerById(id);
 		if (!player) {
-			return reply.status(404).send({ error: 'Player not found'});
+			return reply.status(404).send({ error: 'Player not found' });
 		}
 		const { victories, defeats } = request.body;
 		const updateStats = await Stats.updateStats({
@@ -79,6 +84,32 @@ fastify.put('/api/players/:id/stats', putReqResSchema(statsBodySchema), async (r
 		reply.status(500).send({ error: 'An error occured while updating the statistics' });
 	}
 });
+
+/*######################################## Match ######################################## */
+
+// creates new match recrods and 'attaches' this to the players' statistics -
+// playerOne ID is retrieved from the params, whereby playerTwo ID is to be provided in the request body
+fastify.post('/api/players/:id/matches', async (request, reply) => {
+	try {
+		const playerOneId = Number(request.params.id);
+		const player = await Player.findPlayerById(playerOneId);
+		if (!player) {
+			return reply.status(404).send({ error: 'Player not found' });
+		}
+		const { date, playerTwo, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
+		const newMatch = await Match.createMatch(playerOneId, {
+			date,  
+			playerTwo, 
+			resultPlayerOne, 
+			resultPlayerTwo, 
+			aiOpponent
+		})
+		reply.status(201).send(newMatch);
+	}
+	catch (error) {
+		reply.status(500).send({ error: 'An error occured while creating the match records' });
+	}
+})
 
 }
 

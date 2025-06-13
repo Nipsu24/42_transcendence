@@ -62,5 +62,4 @@ module.exports = {
 	createPlayer,
 	findPlayerById,
 	deletePlayerById,
-	// updateStats,
 };

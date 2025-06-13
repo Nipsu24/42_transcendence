@@ -5,10 +5,10 @@ const matchBodySchema = {
 	properties: {
 		id: { type: 'integer', minimum: 1},
 		date: { type: 'string' },
-		playerOne: { type: 'integer'},
-		playerTwo: { type: 'integer'},
-		resultPlayerOne: { type: 'integer', minimum: 0},
-		resultPlayerTwo: { type: 'integer', minimum: 0},
+		playerOne: { type: 'integer', minimum: 1},
+		playerTwo: { type: 'integer', minimum: 0},
+		resultPlayerOne: { type: 'integer', minimum: 0, maximum: 10},
+		resultPlayerTwo: { type: 'integer', minimum: 0, maximum: 10},
 		aiOpponent: { type: 'boolean'},
 	},
 	additionalProperties: false
