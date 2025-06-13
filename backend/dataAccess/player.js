@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 // Retrieves data of all players
 const getAllPlayers = async () => {
-	return await prisma.player.findMany({
+	return prisma.player.findMany({
 		include: {
 			stats: {
 				include: {
@@ -20,7 +20,7 @@ const createPlayer = async (data) => {
 	const stats = await prisma.statistics.create({
 		data: {victories: 0, defeats: 0},
 	});
-	return await prisma.player.create({ 
+	return prisma.player.create({ 
 		data: {
 			...data,
 			statsId: stats.id,
@@ -31,7 +31,7 @@ const createPlayer = async (data) => {
 
 // Returns data for a single player
 const findPlayerById = async (id) => {
-	return await prisma.player.findUnique({
+	return prisma.player.findUnique({
 		where: { id },
 		include: {
 			stats: {
