@@ -1,7 +1,8 @@
 const { playerBodySchema } = require('../schemas/player');
 const { statsBodySchema } = require('../schemas/stats');
 const { matchBodySchema } = require('../schemas/match');
-const Player = require('../models/player');
+const Player = require('../dataAccess/player');
+const Stats = require('../dataAccess/stats');
 const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema } = require('./schemaHelpers');
 
 // imports player apis from './routes/playerRoutes.js'
@@ -67,7 +68,7 @@ fastify.put('/api/players/:id/stats', putReqResSchema(statsBodySchema), async (r
 			return reply.status(404).send({ error: 'Player not found'});
 		}
 		const { victories, defeats } = request.body;
-		const updateStats = await Player.updateStats({
+		const updateStats = await Stats.updateStats({
 			id: player.stats.id,
 			victories,
 			defeats

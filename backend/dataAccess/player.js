@@ -29,17 +29,6 @@ const createPlayer = async (data) => {
 	});
 };
 
-// Updates player statistics
-const updateStats = async (data) => {
-	return await prisma.statistics.update({
-		where: { id: data.id },
-		data: { 
-			victories: data.victories,
-			defeats: data.defeats,
-		 },
-	});
-}
-
 // Returns data for a single player
 const findPlayerById = async (id) => {
 	return await prisma.player.findUnique({
@@ -73,5 +62,5 @@ module.exports = {
 	createPlayer,
 	findPlayerById,
 	deletePlayerById,
-	updateStats,
+	// updateStats,
 };
