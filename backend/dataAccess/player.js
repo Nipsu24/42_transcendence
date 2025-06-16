@@ -66,9 +66,21 @@ const findPlayerByName = async (name) => {
 	});
 };
 
-// Function to delete a player by ID
+// Function to delete a player by ID 
+// and deletes any matches where all players have been already deleted
 const deletePlayerById = async (id) => {
-	return await prisma.player.delete({ where: { id: parseInt(id) } });
+	await prisma.player.delete({ where: { id: parseInt(id) } });
+	const existingPlayers = await prisma.player.findMany({ select: { name: true } });
+	const allPlayerNames = existingPlayers.map(p => p.name);
+	await prisma.match.deleteMany({
+		where: {
+			AND: [
+				{ playerOneName: { notIn: allPlayerNames } },
+				{ playerTwoName: { notIn: allPlayerNames } },
+			],
+		},
+	});
+	return
 };
 
 module.exports = {

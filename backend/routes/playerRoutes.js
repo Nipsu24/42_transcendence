@@ -55,6 +55,10 @@ fastify.post('/api/players', postReqResSchema(playerBodySchema), async (request,
 fastify.delete('/api/players/:id', async (request, reply) => {
 	try {
 		const id = Number(request.params.id);
+		const player = await Player.findPlayerById(id);
+		if (!player) {
+			return reply.status(404).send({ error: 'Player not found'});
+		}
 		await Player.deletePlayerById(id);
 		reply.status(204).send();
 	}
