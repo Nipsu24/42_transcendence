@@ -57,7 +57,8 @@ fastify.post('/api/players', postReqResSchema(playerBodySchema), async (request,
 	}
 });
 
-// handles deletion of player
+// handles deletion of player (also removes friends connections 
+// and resp. match stats in case no other player of the match exists anymore)
 fastify.delete('/api/players/:id', async (request, reply) => {
 	try {
 		const id = Number(request.params.id);
@@ -124,6 +125,8 @@ fastify.post('/api/players/:id/matches', postDivReqResSchema(matchRequestBodySch
 		reply.status(500).send({ error: 'An error occured while creating the match records' });
 	}
 })
+
+/*######################################## Friends ######################################## */
 
 // adds friend to array of friends (for both sides -  player and friend)
 // takes friend name as argument, checks if friend is existing and not yet added as friend

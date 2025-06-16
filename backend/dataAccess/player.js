@@ -69,6 +69,30 @@ const findPlayerByName = async (name) => {
 // Function to delete a player by ID 
 // and deletes any matches where all players have been already deleted
 const deletePlayerById = async (id) => {
+	
+	const player = await findPlayerById(id);
+	// removes friends' friend connection
+	for (const friend of player.friends) {
+		await prisma.player.update({
+			where: { id: friend.id },
+			data: {
+				friends: {
+					disconnect: { id: player.id },
+				},
+			},
+		});
+	}
+
+	// removes 'own' friends connections using 'set: []'
+	await prisma.player.update({
+		where: { id: parseInt(id) },
+		data: {
+			friends: {
+				set: [],
+			},
+		},
+	});
+	
 	await prisma.player.delete({ where: { id: parseInt(id) } });
 	const existingPlayers = await prisma.player.findMany({ select: { name: true } });
 	const allPlayerNames = existingPlayers.map(p => p.name);
