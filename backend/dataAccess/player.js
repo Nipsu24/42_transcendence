@@ -83,10 +83,52 @@ const deletePlayerById = async (id) => {
 	return
 };
 
+// adds friend to the friend list (for both player and friend)
+const addFriend = async (playerId, friendId) => {
+	await prisma.player.update({
+		where: { id: playerId },
+		data: { 
+			friends: {
+				connect: { id: friendId }
+			}
+		}
+	})
+	await prisma.player.update({
+		where: { id: friendId },
+		data: { 
+			friends: {
+				connect: { id: playerId }
+			}
+		}
+	})
+}
+
+// deletes a friend from the list of friends (for both player and friend)
+const deleteFriend = async (playerId, friendId) => {
+	await prisma.player.update({
+		where: { id: playerId },
+		data: { 
+			friends: {
+				disconnect: { id: friendId }
+			}
+		}
+	})
+	await prisma.player.update({
+		where: { id: friendId },
+		data: { 
+			friends: {
+				disconnect: { id: playerId }
+			}
+		}
+	})
+}
+
 module.exports = {
 	getAllPlayers,
 	createPlayer,
 	findPlayerById,
 	findPlayerByName,
+	addFriend,
+	deleteFriend,
 	deletePlayerById,
 };
