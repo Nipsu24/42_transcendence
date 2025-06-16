@@ -6,7 +6,7 @@
 GET http://localhost:3001/api/players
 
 ### Get single player
-GET http://localhost:3001/api/players/1
+GET http://localhost:3001/api/players/2
 
 ### Create player
 POST http://localhost:3001/api/players
@@ -17,10 +17,6 @@ Content-Type: application/json
 	"password": "30984308"
 }
 
-### Delete player
-Delete http://localhost:3001/api/players/4
-Content-Type: application/json
-
 ### Update player stats
 PUT http://localhost:3001/api/players/4/stats
 Content-Type: application/json
@@ -30,13 +26,17 @@ Content-Type: application/json
 	"defeats": 20
 }
 
+### Delete player
+Delete http://localhost:3001/api/players/4
+Content-Type: application/json
+
 ### Create match record - PvP
 POST http://localhost:3001/api/players/1/matches
 Content-Type: application/json
 
 {
 	"date": "2022-01-01",
-	"playerTwo": 2,
+	"playerTwoName": "Player Two",
 	"resultPlayerOne": 10,
 	"resultPlayerTwo": 5,
 	"aiOpponent": false
@@ -47,10 +47,7 @@ POST http://localhost:3001/api/players/1/matches
 Content-Type: application/json
 
 {
-	"date": "2022-01-01",
 	"resultPlayerOne": 10,
 	"resultPlayerTwo": 2,
 	"aiOpponent": true
 }
-
-

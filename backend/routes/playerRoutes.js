@@ -89,18 +89,23 @@ fastify.put('/api/players/:id/stats', putReqResSchema(statsBodySchema), async (r
 /*######################################## Match ######################################## */
 
 // creates new match record and 'attaches' this to the participating players' statistics
-// playerOne ID is retrieved from the params, whereby playerTwo ID is to be provided in the request body
+// playerOne name is retrieved via player id, whereby playerTwoName is to be provided in the request body
 fastify.post('/api/players/:id/matches', postDivReqResSchema(matchRequestBodySchema, matchResponseSchema), async (request, reply) => {
 	try {
 		const playerOneId = Number(request.params.id);
-		const player = await Player.findPlayerById(playerOneId);
-		if (!player) {
-			return reply.status(404).send({ error: 'Player not found' });
+		const playerOne = await Player.findPlayerById(playerOneId);
+		if (!playerOne) {
+			return reply.status(404).send({ error: 'PlayerOne not found' });
 		}
-		const { date, playerTwo, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
-		const newMatch = await Match.createMatch(playerOneId, {
-			date,  
-			playerTwo, 
+		if (request.body.playerTwoName) {
+			const playerTwo = await Player.findPlayerByName(request.body.playerTwoName);
+			if (!playerTwo) {
+				return reply.status(404).send({ error: 'PlayerTwo not found' });
+			}
+		}
+		const { playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
+		const newMatch = await Match.createMatch(playerOne.name, {
+			playerTwoName, 
 			resultPlayerOne, 
 			resultPlayerTwo, 
 			aiOpponent

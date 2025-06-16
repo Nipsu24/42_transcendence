@@ -29,7 +29,7 @@ const createPlayer = async (data) => {
 	});
 };
 
-// Returns data for a single player
+// Returns data for a single player when passing the player's id
 const findPlayerById = async (id) => {
 	return prisma.player.findUnique({
 		where: { id },
@@ -52,6 +52,20 @@ const findPlayerById = async (id) => {
 	});
 };
 
+// Returns data for a single player when passing the player's name
+const findPlayerByName = async (name) => {
+	return prisma.player.findUnique({
+		where: { name },
+		include: {
+			stats: {
+				include: {
+					matches: true,
+				},
+			},
+		}
+	});
+};
+
 // Function to delete a player by ID
 const deletePlayerById = async (id) => {
 	return await prisma.player.delete({ where: { id: parseInt(id) } });
@@ -61,5 +75,6 @@ module.exports = {
 	getAllPlayers,
 	createPlayer,
 	findPlayerById,
+	findPlayerByName,
 	deletePlayerById,
 };

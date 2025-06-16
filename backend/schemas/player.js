@@ -22,8 +22,8 @@ const playerBodySchema = {
 						properties: {
 							id: { type: 'integer', minimum: 1},
 							date: { type: 'string' },
-							playerOne: { type: 'integer', minimum: 1},
-							playerTwo: { type: ['integer', 'null'], minimum: 1 },
+							playerOneName: { type: 'string' },
+							playerTwoName: { type: ['string', 'null'] },
 							resultPlayerOne: { type: 'integer', minimum: 0, maximum: 10},
 							resultPlayerTwo: { type: 'integer', minimum: 0, maximum: 10},
 							aiOpponent: { type: 'boolean'},
