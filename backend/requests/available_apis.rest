@@ -6,18 +6,77 @@
 GET http://localhost:3001/api/players
 
 ### Get single player
-GET http://localhost:3001/api/players/4
+GET http://localhost:3001/api/players/2
 
 ### Create player
 POST http://localhost:3001/api/players
 Content-Type: application/json
 
 {
-	"name": "Player 1000",
+	"name": "Player 3000",
 	"password": "30984308"
+}
+
+### Update player stats (ai match)
+PUT http://localhost:3001/api/players/1/stats
+Content-Type: application/json
+
+{
+	"victories": 600,
+	"defeats": 20
+}
+
+### Update player stats and opponent's stats
+PUT http://localhost:3001/api/players/1/stats
+Content-Type: application/json
+
+{
+	"victories": 700,
+	"defeats": 20,
+	"opponentName": "Player Two",
+	"opponentVictories": 5,
+	"opponentDefeats": 4
 }
 
 ### Delete player
 Delete http://localhost:3001/api/players/4
 Content-Type: application/json
+
+### Create match record - PvP
+POST http://localhost:3001/api/players/1/matches
+Content-Type: application/json
+
+{
+	"date": "2022-01-01",
+	"playerTwoName": "Player Two",
+	"resultPlayerOne": 10,
+	"resultPlayerTwo": 5,
+	"aiOpponent": false
+}
+
+### Create match record - PvAi
+POST http://localhost:3001/api/players/1/matches
+Content-Type: application/json
+
+{
+	"resultPlayerOne": 10,
+	"resultPlayerTwo": 2,
+	"aiOpponent": true
+}
+
+### Adds friend to friend array (vice versa)
+POST http://localhost:3001/api/players/2/friends
+Content-Type: application/json
+
+{
+	"name": "Player Three"
+}
+
+### Deletes friend from friend array (vice versa)
+Delete http://localhost:3001/api/players/2/friends
+Content-Type: application/json
+
+{
+	"name": "Player Three"
+}
 

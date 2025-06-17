@@ -54,9 +54,8 @@ async function main() {
 	// Seeds match data
 	const match1 = await prisma.match.create({
 		data: {
-		date: '2024-06-04',
-		playerOne: player1.id,
-		playerTwo: player2.id,
+		playerOneName: player1.name,
+		playerTwoName: player2.name,
 		resultPlayerOne: 9,
 		resultPlayerTwo: 11,
 		aiOpponent: false,
@@ -68,9 +67,8 @@ async function main() {
 
 	const match2 = await prisma.match.create({
 		data: {
-		date: '2024-06-05',
-		playerOne: player1.id,
-		playerTwo: player3.id,
+		playerOneName: player1.name,
+		playerTwoName: player3.name,
 		resultPlayerOne: 11,
 		resultPlayerTwo: 7,
 		aiOpponent: false,

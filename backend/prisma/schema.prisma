@@ -16,7 +16,7 @@ datasource db {
 
 model Player {
   id       Int    @id @default(autoincrement())
-  name     String
+  name     String @unique
   password String
   e_mail   String?
   online   Boolean?
@@ -37,9 +37,9 @@ model Statistics {
 
 model Match {
   id              Int @id @default(autoincrement())
-  date            String
-  playerOne       Int
-  playerTwo       Int? // can be optional (in case of ai opponent)
+  date            DateTime @default(now())
+  playerOneName   String
+  playerTwoName   String? // can be optional (in case of ai opponent)
   resultPlayerOne Int
   resultPlayerTwo Int
   aiOpponent      Boolean

@@ -19,11 +19,19 @@ fastify.register(playerRoutes);
 // does not throw error if additional fields not defined by schema are sent, as they are automatically ignored by fastify ajv
 fastify.setErrorHandler((error, request, reply) => {
 	if (error.validation) {
-		reply.status(400).send({ error: 'Invalid player data: name and password are required, no extra fields allowed.' });
+		if (request.routerPath === '/api/players' && request.method === 'POST')
+			reply.status(400).send({ error: 'Invalid player data: name and password are required, no extra fields allowed.' });
+		else if (request.routerPath === '/api/players/:id/stats' && request.method === 'PUT')
+			reply.status(400).send({ error: 'Invalid player data: victory and defeats are required, min. 0, max 1000' });
+		else if (request.routerPath === '/api/players/:id/matches' && request.method === 'POST')
+			reply.status(400).send({ error: 'Invalid match data: resultPlayerOne, resultPlayerTwo and aiOpponent are required. Results need to be <= 10' });
+		else if (request.routerPath === '/api/players/:id/friends' && request.method === 'POST')
+			reply.status(400).send({ error: 'Invalid friend data: "name" required.' });
+		else
+			reply.status(400).send({ error: 'Invalid request data.' });
 	} 
-	else {
+	else
 		reply.status(500).send({ error: 'An internal server error occurred.' });
-	}
 });
 
 // defines port on which backend is listening (taken from .env file)

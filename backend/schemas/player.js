@@ -1,8 +1,9 @@
+// defines structure of the player object
 const playerBodySchema = {
 	type: 'object',
 	required: ['name', 'password'],
 	properties: {
-		id: { type: 'integer' },
+		id: { type: 'integer', minimum: 1 },
 		name: { type: 'string' },
 		password: { type: 'string' },
 		e_mail: { type: 'string' },
@@ -11,20 +12,20 @@ const playerBodySchema = {
 		stats: {
 			type: 'object',
 			properties: {
-				id: { type: 'integer' },
-				victories: { type: 'integer' },
-				defeats: { type: 'integer' },
+				id: { type: 'integer', minimum: 1 },
+				victories: { type: 'integer', minimum: 0, maximum: 1000 },
+				defeats: { type: 'integer', minimum: 0, maximum: 1000 },
 				matches: {
 					type: 'array',
 					items: {
 						type: 'object',
 						properties: {
-							id: { type: 'integer'},
+							id: { type: 'integer', minimum: 1},
 							date: { type: 'string' },
-							playerOne: { type: 'integer'},
-							playerTwo: { type: 'integer'},
-							resultPlayerOne: { type: 'integer'},
-							resultPlayerTwo: { type: 'integer'},
+							playerOneName: { type: 'string' },
+							playerTwoName: { type: ['string', 'null'] },
+							resultPlayerOne: { type: 'integer', minimum: 0, maximum: 10},
+							resultPlayerTwo: { type: 'integer', minimum: 0, maximum: 10},
 							aiOpponent: { type: 'boolean'},
 						},
 						additionalProperties: false
