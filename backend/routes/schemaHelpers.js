@@ -44,10 +44,18 @@ const postDivReqResSchema = (reqSchema, resSchema) => ({
 	}
 })
 
+const putDivReqResSchema = (reqSchema, resSchema) => ({
+	schema: {
+		body: reqSchema,
+		response: { 201: resSchema}
+	}
+})
+
 module.exports = {
 	arrayResponseSchema,
 	objectResponseSchema,
 	putReqResSchema,
 	postReqResSchema,
-	postDivReqResSchema
+	postDivReqResSchema,
+	putDivReqResSchema
 };

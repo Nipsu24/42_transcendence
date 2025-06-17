@@ -17,13 +17,25 @@ Content-Type: application/json
 	"password": "30984308"
 }
 
-### Update player stats
-PUT http://localhost:3001/api/players/4/stats
+### Update player stats (ai match)
+PUT http://localhost:3001/api/players/1/stats
 Content-Type: application/json
 
 {
-	"victories": 800,
+	"victories": 600,
 	"defeats": 20
+}
+
+### Update player stats and opponent's stats
+PUT http://localhost:3001/api/players/1/stats
+Content-Type: application/json
+
+{
+	"victories": 700,
+	"defeats": 20,
+	"opponentName": "Player Two",
+	"opponentVictories": 5,
+	"opponentDefeats": 4
 }
 
 ### Delete player
@@ -51,3 +63,20 @@ Content-Type: application/json
 	"resultPlayerTwo": 2,
 	"aiOpponent": true
 }
+
+### Adds friend to friend array (vice versa)
+POST http://localhost:3001/api/players/2/friends
+Content-Type: application/json
+
+{
+	"name": "Player Three"
+}
+
+### Deletes friend from friend array (vice versa)
+Delete http://localhost:3001/api/players/2/friends
+Content-Type: application/json
+
+{
+	"name": "Player Three"
+}
+
