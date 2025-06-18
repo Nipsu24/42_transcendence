@@ -63,11 +63,10 @@ check_node_module_backend:
 		echo "install npm"; \
 		( \
 			cd $(BACKEND) && \
-			npm install && \
-			echo install fastify v ^3 && \
-			npm install fastify@^3 && \
+			npm install fastify@^5.0.0 && \
 			echo install fastify/static && \
-			npm i @fastify/static && \
+			npm install @fastify/static@8 && \
+			npm i @fastify/multipart && \
 			npm install --save-dev jest && \
 			npm install supertest --save-dev && \
 			npm install sequelize sqlite3 && \

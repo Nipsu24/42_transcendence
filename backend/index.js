@@ -2,9 +2,10 @@ require('dotenv').config()
 const fastify = require('fastify')({ logger: true });
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 const path = require('path');
-const fastifyStatic = require('fastify-static');
+const fastifyStatic = require('@fastify/static');
 const playerRoutes = require('./routes/playerRoutes');
 const { log } = require('console');
+const multipart = require('@fastify/multipart');
 
 // needed for handling static frontend files in test environment (not needed for production)
 fastify.register(fastifyStatic, {
@@ -13,6 +14,7 @@ fastify.register(fastifyStatic, {
 });
 
 //imports code from the player apis (./routes/playerRoutes.js)
+fastify.register(multipart);
 fastify.register(playerRoutes);
 
 // handles errors (e.g. if post request payload not according to schema)
@@ -31,6 +33,7 @@ fastify.setErrorHandler((error, request, reply) => {
 			reply.status(400).send({ error: 'Invalid request data.' });
 	} 
 	else
+		console.log('error:', (error));
 		reply.status(500).send({ error: 'An internal server error occurred.' });
 });
 

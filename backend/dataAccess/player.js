@@ -147,6 +147,16 @@ const deleteFriend = async (playerId, friendId) => {
 	})
 }
 
+// updates the avatar image path of the player's avatar field
+const updateAvatar = async (id, filePath) => {
+	await prisma.player.update({
+		where: {id: id},
+		data: {
+			avatar: filePath,
+		},
+	})
+}
+
 module.exports = {
 	getAllPlayers,
 	createPlayer,
@@ -155,4 +165,5 @@ module.exports = {
 	addFriend,
 	deleteFriend,
 	deletePlayerById,
+	updateAvatar
 };
