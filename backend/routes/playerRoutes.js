@@ -8,6 +8,12 @@ const Player = require('../dataAccess/player');
 const Stats = require('../dataAccess/stats');
 const Match = require('../dataAccess/match');
 const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema, postDivReqResSchema, putDivReqResSchema } = require('./schemaHelpers');
+//used for image upload:
+const fs = require('fs');
+const util = require('util');
+const { pipeline } = require('stream');
+//
+
 
 // imports player apis from './routes/playerRoutes.js'
 async function playerRoutes(fastify, options) {
@@ -182,6 +188,29 @@ fastify.delete('/api/players/:id/friends', async (request, reply) => {
 		reply.status(500).send({ error: 'An error occured while deleting a friend' });
 	}
 })
+
+/*######################################## Avatar ######################################## */
+
+// enables upload of avatar image into './assets' folder
+fastify.post('/api/players/:id/upload', async (request, reply) => {
+	try {
+		const pump = util.promisify(pipeline);
+		const id = Number(request.params.id);
+		const player = await Player.findPlayerById(id);
+		if (!player)
+			return reply.status(404).send({ error: 'Player not found' });
+		
+		const data = await request.file();
+		const filePath = `./assets/${data.filename}`;
+        await pump(data.file, fs.createWriteStream(filePath));
+		return reply.status(200).send({ message: 'Upload successful' })
+	}
+	catch (error) {
+		console.log('error:', (error));
+		reply.status(500).send({ error: 'An error occured while uploading the image' });
+	}
+})
+
 
 }
 
