@@ -192,6 +192,7 @@ fastify.delete('/api/players/:id/friends', async (request, reply) => {
 /*######################################## Avatar ######################################## */
 
 // enables upload of avatar image into './assets' folder
+// using request.file() instead for e.g. request.file('avatar') accepts any name for field name
 fastify.post('/api/players/:id/upload', async (request, reply) => {
 	try {
 		const pump = util.promisify(pipeline);
@@ -201,8 +202,10 @@ fastify.post('/api/players/:id/upload', async (request, reply) => {
 			return reply.status(404).send({ error: 'Player not found' });
 		
 		const data = await request.file();
+		console.log('request body:', (data));
 		const filePath = `./assets/${data.filename}`;
         await pump(data.file, fs.createWriteStream(filePath));
+		await Player.updateAvatar(id, filePath);
 		return reply.status(200).send({ message: 'Upload successful' })
 	}
 	catch (error) {
