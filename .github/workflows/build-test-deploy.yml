@@ -42,4 +42,7 @@ jobs:
       - name: Run frontend tests (if any)
         run: cd frontend && npm test || echo "No frontend tests"
       - name: Run backend tests (if any)
-        run: cd backend && npm test || echo "No backend tests"
+        env:
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
+          PORT: ${{ vars. PORT }}
+        run: cd backend && npm test
