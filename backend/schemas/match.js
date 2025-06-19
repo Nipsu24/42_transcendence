@@ -3,7 +3,7 @@ const matchRequestBodySchema = {
 	type: 'object',
 	required: ['resultPlayerOne', 'resultPlayerTwo', 'aiOpponent'],
 	properties: {
-		playerTwoName: { type: ['string', 'null'], minimum: 1}, // can be left away in case of Ai matches
+		playerTwoName: { type: ['string', 'null'] }, // can be left away in case of Ai matches
 		resultPlayerOne: { type: 'integer', minimum: 0, maximum: 10},
 		resultPlayerTwo: { type: 'integer', minimum: 0, maximum: 10},
 		aiOpponent: { type: 'boolean'},
