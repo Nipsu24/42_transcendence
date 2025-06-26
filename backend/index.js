@@ -38,7 +38,7 @@ fastify.setErrorHandler((error, request, reply) => {
 });
 
 // defines port on which backend is listening (taken from .env file)
-fastify.listen( {port: PORT}, (err, address) => {
+fastify.listen( {port: PORT, host:'0.0.0.0'}, (err, address) => {
 	if (err) {
 		fastify.log.error(err);
 		process.exit(1);
