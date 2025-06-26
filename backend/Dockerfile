@@ -1,6 +1,14 @@
 # Uses official Node.js image as the base
 FROM node:18-alpine
 
+# # Accept build arguments
+# ARG DATABASE_URL
+# ARG PORT
+
+# # Set environment variables during build
+# ENV DATABASE_URL=${DATABASE_URL}
+# ENV PORT=${PORT}
+
 # Sets working directory inside the container
 WORKDIR /backend
 
