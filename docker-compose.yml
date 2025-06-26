@@ -17,6 +17,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - PORT=${PORT}
     container_name: fastify_backend
     image: fastify_backend
     ports:
