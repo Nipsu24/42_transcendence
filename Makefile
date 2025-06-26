@@ -94,7 +94,11 @@ backend_container: check_node_module_backend
 # full production environment, building both nginx (frontend) and backend container
 prod: $(CERT_KEY)  $(CERT_CRT) check_node_module_frontend
 	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
-	@ COMPOSE_BAKE=true docker-compose --env-file ./backend/.env  -f docker-compose.yml up -d --build	
+	 @if [ -f ./backend/.env ]; then \
+        COMPOSE_BAKE=true docker-compose --env-file ./backend/.env -f docker-compose.yml up -d --build; \
+    else \
+        COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build; \
+    fi	
 
 # removes all built containers
 down:
