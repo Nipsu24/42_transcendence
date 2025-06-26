@@ -10,18 +10,39 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-      - name: Install dependencies (frontend)
-        run: make check_node_module_frontend
-      - name: Install dependencies (backend)
+      # - name: Install dependencies (frontend)
+      #   run: make check_node_module_frontend
+      - name: Build production
         env:
           DATABASE_URL: ${{ vars.DATABASE_URL }}
           PORT: ${{ vars. PORT }}
-        run: make check_node_module_backend
-      - name: Build backend
-        env:
-          DATABASE_URL: ${{ vars.DATABASE_URL }}
-          PORT: ${{ vars. PORT }}
-        run: cd ./backend && cp ../frontend/.env.backend ../frontend/.env && npm run build:ui
+        run: make prod
+      # - name: Build backend
+      #   env:
+      #     DATABASE_URL: ${{ vars.DATABASE_URL }}
+      #     PORT: ${{ vars. PORT }}
+      #   run: cd ./backend && cp ../frontend/.env.backend ../frontend/.env && npm run build:ui
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps: 
+  #     - name: checkout repo
+  #       uses: actions/checkout@v3
+  #     - name: use node.js
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '18.x'
+  #     - name: Install dependencies (frontend)
+  #       run: make check_node_module_frontend
+  #     - name: Install dependencies (backend)
+  #       env:
+  #         DATABASE_URL: ${{ vars.DATABASE_URL }}
+  #         PORT: ${{ vars. PORT }}
+  #       run: make check_node_module_backend
+  #     - name: Build backend
+  #       env:
+  #         DATABASE_URL: ${{ vars.DATABASE_URL }}
+  #         PORT: ${{ vars. PORT }}
+  #       run: cd ./backend && cp ../frontend/.env.backend ../frontend/.env && npm run build:ui
   test: 
     needs: build
     runs-on: ubuntu-latest
@@ -39,9 +60,9 @@ jobs:
           DATABASE_URL: ${{ vars.DATABASE_URL }}
           PORT: ${{ vars. PORT }}
         run: make check_node_module_backend
-      - name: Run frontend tests (if any)
+      - name: Run frontend tests
         run: cd frontend && npm test || echo "No frontend tests"
-      - name: Run backend tests (if any)
+      - name: Run backend tests
         env:
           DATABASE_URL: ${{ vars.DATABASE_URL }}
           PORT: ${{ vars. PORT }}
