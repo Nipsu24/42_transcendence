@@ -16,17 +16,22 @@ jobs:
           sudo apt-get install -y docker-compose
       # - name: Install dependencies (frontend)
       #   run: make check_node_module_frontend
+      - name: Create .env file in existing directory
+        run: |
+          echo "DATABASE_URL=${{ vars.DATABASE_URL }}" >> ./backend/.env
+          echo "PORT=${{ vars.PORT }}" >> ./backend/.env
       - name: Build frontend
         run: make nginx_frontend
       - name: Build backend
-        env:
-          DATABASE_URL: ${{ vars.DATABASE_URL }}
-          PORT: ${{ vars.PORT }}
-        run: |
-          COMPOSE_BAKE=true docker-compose build \
-            --build-arg DATABASE_URL=${DATABASE_URL} \
-            --build-arg PORT=${PORT}
-          COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build
+        run: make prod
+        # env:
+        #   DATABASE_URL: ${{ vars.DATABASE_URL }}
+        #   PORT: ${{ vars.PORT }}
+        # run: |
+        #   COMPOSE_BAKE=true docker-compose build \
+        #     --build-arg DATABASE_URL=${DATABASE_URL} \
+        #     --build-arg PORT=${PORT}
+        #   COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build
       
       # - name: Build backend
       #   env:
