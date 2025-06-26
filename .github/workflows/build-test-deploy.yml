@@ -10,6 +10,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
+      - name: Install docker-compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
       # - name: Install dependencies (frontend)
       #   run: make check_node_module_frontend
       - name: Build production
@@ -17,6 +21,7 @@ jobs:
           DATABASE_URL: ${{ vars.DATABASE_URL }}
           PORT: ${{ vars. PORT }}
         run: make prod
+      
       # - name: Build backend
       #   env:
       #     DATABASE_URL: ${{ vars.DATABASE_URL }}
