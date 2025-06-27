@@ -3,9 +3,10 @@ const prisma = new PrismaClient();
 
 async function clearDatabase() {
     await prisma.$executeRaw`PRAGMA foreign_keys=OFF;`;
-    await prisma.$executeRaw`DELETE FROM Player;`;
     await prisma.$executeRaw`DELETE FROM Statistics;`;
+    await prisma.$executeRaw`DELETE FROM Player;`;
     await prisma.$executeRaw`DELETE FROM Match;`;
+	await prisma.$executeRaw`DELETE FROM _PlayerFriends;`
 
     // Reset auto-increment counters
     await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'Player';`;

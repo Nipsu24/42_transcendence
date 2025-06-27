@@ -23,39 +23,37 @@ const validateFriendSchema = ajv.compile(friendsBodySchema);
 
 let request; // Supertest instance
 
+// registers player routes, starts fastify server an initialises Supertest
 beforeAll(async () => {
-    // Register routes
     await fastify.register(playerRoutes);
-
-    // Start Fastify server
     await fastify.listen({ port: 3001, host: '127.0.0.1' });
-
-    // Initialize Supertest with Fastify server
     request = supertest(fastify.server);
-	
+});
+
+// Clears and seeds the database before each single test execution
+beforeEach(async () => {
 	await clearDatabase();
-	await seedDatabase(); 
-});
+	await seedDatabase();
+})
 
+// Ensures Fastify server is closed and prisma client disconnects after all tests are conducted
 afterAll(async () => {
-	await fastify.close(); // Ensure Fastify server is closed
-	await prisma.$disconnect(); // Disconnect Prisma client
+	await fastify.close();
+	await prisma.$disconnect();
 });
 
 
-// tests GET for single player
+// tests GET for single player, uses Supertest instance via 'request'
+// validates response against defined schema
 test('GET /api/players/:id should return single player', async () => {
-	const response = await request.get('/api/players/1'); // Use Supertest instance
-
+	const response = await request.get('/api/players/1');
 	expect(response.status).toBe(200);
-	// console.log('response body:', response.body);
 
-	// Validate the response against the schema
 	const isValid = validatePlayerBody(response.body);
 	if (!isValid) {
-		console.error(validatePlayerBody.errors); // Log validation errors
+		console.error(validatePlayerBody.errors);
 	}
-	expect(isValid).toBe(true); // Assert that the response matches the schema
+	expect(isValid).toBe(true);
 });
 
 
@@ -153,8 +151,8 @@ test('POST /api/players/:id/friends should return added friend object', async ()
 	};
 	const response = await request.post('/api/players/2/friends').
 	send(newFriend).set('Accept', 'application/json');
-
 	expect(response.status).toBe(201);
+	
 	const isValid = validateFriendSchema(response.body);
 	if (!isValid) {
 		console.error(validateFriendSchema.errors); 
