@@ -1,3 +1,4 @@
+#test via github actions whether prod build compiles
 name: build-test-deploy
 on: push
 jobs: 
@@ -14,8 +15,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
-      # - name: Install dependencies (frontend)
-      #   run: make check_node_module_frontend
       - name: Create .env file in existing directory
         run: |
           echo "DATABASE_URL=${{ vars.DATABASE_URL }}" >> ./backend/.env
@@ -24,41 +23,8 @@ jobs:
         run: make nginx_frontend
       - name: Build backend
         run: make prod
-        # env:
-        #   DATABASE_URL: ${{ vars.DATABASE_URL }}
-        #   PORT: ${{ vars.PORT }}
-        # run: |
-        #   COMPOSE_BAKE=true docker-compose build \
-        #     --build-arg DATABASE_URL=${DATABASE_URL} \
-        #     --build-arg PORT=${PORT}
-        #   COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build
-      
-      # - name: Build backend
-      #   env:
-      #     DATABASE_URL: ${{ vars.DATABASE_URL }}
-      #     PORT: ${{ vars. PORT }}
-      #   run: cd ./backend && cp ../frontend/.env.backend ../frontend/.env && npm run build:ui
-  # build:
-  #   runs-on: ubuntu-latest
-  #   steps: 
-  #     - name: checkout repo
-  #       uses: actions/checkout@v3
-  #     - name: use node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: '18.x'
-  #     - name: Install dependencies (frontend)
-  #       run: make check_node_module_frontend
-  #     - name: Install dependencies (backend)
-  #       env:
-  #         DATABASE_URL: ${{ vars.DATABASE_URL }}
-  #         PORT: ${{ vars. PORT }}
-  #       run: make check_node_module_backend
-  #     - name: Build backend
-  #       env:
-  #         DATABASE_URL: ${{ vars.DATABASE_URL }}
-  #         PORT: ${{ vars. PORT }}
-  #       run: cd ./backend && cp ../frontend/.env.backend ../frontend/.env && npm run build:ui
+  #runs api integration tests for backend and database in github actions via 'npm test' using jest and supertest
+  #'needs:' not really necessary in this context as the tests are not run with the prod build
   test: 
     needs: build
     runs-on: ubuntu-latest
