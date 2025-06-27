@@ -1,3 +1,4 @@
+#test via github actions whether prod build compiles
 name: build-test-deploy
 on: push
 jobs: 
@@ -10,19 +11,21 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18.x'
-      - name: Install dependencies (frontend)
-        run: make check_node_module_frontend
-      - name: Install dependencies (backend)
-        env:
-          DATABASE_URL: ${{ vars.DATABASE_URL }}
-          PORT: ${{ vars. PORT }}
-        run: make check_node_module_backend
+      - name: Install docker-compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+      - name: Create .env file in existing directory
+        run: |
+          echo "DATABASE_URL=${{ vars.DATABASE_URL }}" >> ./backend/.env
+          echo "PORT=${{ vars.PORT }}" >> ./backend/.env
+      - name: Build frontend
+        run: make nginx_frontend
       - name: Build backend
-        env:
-          DATABASE_URL: ${{ vars.DATABASE_URL }}
-          PORT: ${{ vars. PORT }}
-        run: cd ./backend && cp ../frontend/.env.backend ../frontend/.env && npm run build:ui
-  test: 
+        run: make prod
+  #runs api integration tests for backend and database in github actions via 'npm test' using jest and supertest
+  #'needs:' not really necessary in this context as the tests are not run with the prod build
+  tests: 
     needs: build
     runs-on: ubuntu-latest
     steps: 
@@ -39,7 +42,10 @@ jobs:
           DATABASE_URL: ${{ vars.DATABASE_URL }}
           PORT: ${{ vars. PORT }}
         run: make check_node_module_backend
-      - name: Run frontend tests (if any)
+      - name: Run frontend tests
         run: cd frontend && npm test || echo "No frontend tests"
-      - name: Run backend tests (if any)
-        run: cd backend && npm test || echo "No backend tests"
+      - name: Run backend tests
+        env:
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
+          PORT: ${{ vars. PORT }}
+        run: cd backend && npm test

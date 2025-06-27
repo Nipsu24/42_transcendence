@@ -40,7 +40,6 @@ Content-Type: application/json
 
 ### Delete player
 Delete http://localhost:3001/api/players/4
-Content-Type: application/json
 
 ### Create match record - PvP
 POST http://localhost:3001/api/players/1/matches

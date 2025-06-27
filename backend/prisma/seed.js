@@ -1,8 +1,27 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+async function clearDatabase() {
+    await prisma.$executeRaw`PRAGMA foreign_keys=OFF;`;
+    await prisma.$executeRaw`DELETE FROM Statistics;`;
+    await prisma.$executeRaw`DELETE FROM Player;`;
+    await prisma.$executeRaw`DELETE FROM Match;`;
+	await prisma.$executeRaw`DELETE FROM _PlayerFriends;`
+
+    // Reset auto-increment counters
+    await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'Player';`;
+    await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'Statistics';`;
+    await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'Match';`;
+
+	// Re-enable foreign keys
+    await prisma.$executeRaw`PRAGMA foreign_keys=ON;`;
+}
+
 async function main() {
-  // Create statistics records
+	// clears existing data
+	await clearDatabase();
+
+	// Create statistics records
 	const stats1 = await prisma.statistics.create({
 		data: { victories: 5, defeats: 2 }
 	});
@@ -57,7 +76,7 @@ async function main() {
 		playerOneName: player1.name,
 		playerTwoName: player2.name,
 		resultPlayerOne: 9,
-		resultPlayerTwo: 11,
+		resultPlayerTwo: 10,
 		aiOpponent: false,
 		statistics: {
 			connect: [{ id: stats1.id }, { id: stats2.id }]
@@ -69,7 +88,7 @@ async function main() {
 		data: {
 		playerOneName: player1.name,
 		playerTwoName: player3.name,
-		resultPlayerOne: 11,
+		resultPlayerOne: 10,
 		resultPlayerTwo: 7,
 		aiOpponent: false,
 		statistics: {
@@ -79,8 +98,11 @@ async function main() {
 	});
 }
 
+
 main()
-  .catch(e => console.error(e))
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+.catch(e => console.error(e))
+.finally(async () => {
+	await prisma.$disconnect();
+});
+
+module.exports = { main, clearDatabase };
