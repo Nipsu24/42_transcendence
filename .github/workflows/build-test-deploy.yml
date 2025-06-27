@@ -2,7 +2,7 @@
 name: build-test-deploy
 on: push
 jobs: 
-  build:
+  build (prod):
     runs-on: ubuntu-latest
     steps: 
       - name: checkout repo
@@ -25,7 +25,7 @@ jobs:
         run: make prod
   #runs api integration tests for backend and database in github actions via 'npm test' using jest and supertest
   #'needs:' not really necessary in this context as the tests are not run with the prod build
-  test: 
+  tests (npm test): 
     needs: build
     runs-on: ubuntu-latest
     steps: 
