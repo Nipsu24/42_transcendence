@@ -11,8 +11,9 @@ import LoginPage     from './pages/LoginPage'
 import SignUpPage    from './pages/SignupPage';
 import MyMenuPage    from './pages/MyMenuPage'
 import MyPage        from './pages/MyPage'
-import MyEditPage from './pages/MyEditPage'
+import MyEditPage    from './pages/MyEditPage'
 import FriendsPage   from './pages/FriendsPage'
+import SearchFriendsPage   from './pages/SearchFriendsPage'
 
 export default function App() {
   const [loading, setLoading] = useState(true)
@@ -38,6 +39,7 @@ export default function App() {
       <Route path="/login"  element={<LoginPage />} />
 	  <Route path="/signup" element={<SignUpPage />} />
       <Route path="/friends" element={<FriendsPage />} />
+	  <Route path="/search" element={<SearchFriendsPage />} />
       <Route path="*"       element={<Navigate to="/" replace />} />
     </Routes>
   )

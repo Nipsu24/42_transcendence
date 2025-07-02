@@ -58,10 +58,10 @@ export default function FriendsPage() {
           </h2>
           <p className="font-body text-gray-600">{email}</p>
           <button
-            onClick={() => navigate('/me')}
+            onClick={() => navigate('/search')}
             className="font-body tracking-wider mt-4 px-6 py-2 bg-gray-800 hover:bg-[#26B2C5] text-white font-medium rounded-lg transition"
           >
-            View Profile
+            Search Friend
           </button>
         </div>
 
