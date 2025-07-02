@@ -1,29 +1,58 @@
 {
   "players": [
     {
+      "id": "1",
       "name": "Player One",
-      "password": "fadfgegq",
-      "id": "1"
+      "email": "one@example.com",
+      "password": "fadfgegq"
     },
     {
+      "id": "2",
       "name": "Player Two",
-      "password": "lkpjj;o",
-      "id": "2"
+      "email": "two@example.com",
+      "password": "lkpjj;o"
     },
     {
+      "id": "3",
       "name": "Player Three",
-      "password": "923ln92ln",
-      "id": "3"
+      "email": "three@example.com",
+      "password": "923ln92ln"
     },
     {
+      "id": "4",
       "name": "Player Four",
-      "password": "39-23-6423122",
-      "id": "4"
+      "email": "four@example.com",
+      "password": "39-23-6423122"
     },
     {
       "id": "c166",
       "name": "Player Five",
+      "email": "five@example.com",
       "password": "23434"
+    },
+    {
+      "id": "7217",
+      "name": "Player One",
+      "password": "fadfgegq",
+      "e_mail": "one@example.com"
+    },
+    {
+      "id": "f4b2",
+      "name": "Player One",
+      "password": "fadfgegq",
+      "e_mail": "one@example.com"
+    },
+    {
+      "id": "11c7",
+      "name": "Player One",
+      "password": "fadfgegq",
+      "e_mail": "one@example.com"
+    },
+    {
+      "id": "ea08",
+      "name": "Player One",
+      "password": "fadfgegq",
+      "e_mail": "one@example.com"
     }
   ]
 }

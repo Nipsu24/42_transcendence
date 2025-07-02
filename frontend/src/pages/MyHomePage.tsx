@@ -1,0 +1,43 @@
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import Header           from '../components/Header'
+import BackgroundBall   from '../components/BackgroundBall'
+import DominoGrid       from '../components/DominoGrid'
+import StartGameCallout from '../components/StartGame'
+import ThePongTitle     from '../components/ThePongTitle'
+
+export default function LandingPage() {
+  const navigate = useNavigate()
+  const isLoggedIn = Boolean(localStorage.getItem('authToken'))
+
+  return (
+    <div className="relative w-full h-screen overflow-hidden bg-[#fffffe]">
+      <BackgroundBall />
+    <header className="site-header relative">
+      <div className="inner">
+        <div className="flex-1" />
+      </div>
+      <nav className="font-body tracking-wide absolute bottom-[0.6rem] right-[2vw] flex gap-6 sm:gap-8 font-medium text-sm sm:text-base z-30">
+        <button
+          onClick={() => navigate('/gamemenu')}
+          className="hover:underline transition relative top-[3px]"
+        >
+          Game
+        </button>
+        <button
+          onClick={() => navigate('/mymenu')}
+          className="mymenu-btn"
+        >
+          My menu
+        </button>
+      </nav>
+
+      <div className="absolute bottom-0 left-[2vw] right-[2vw] border-b border-[var(--border-color)] h-px" />
+    </header>
+
+      <ThePongTitle />
+      <DominoGrid />
+      <StartGameCallout onClick={() => navigate('/game')} />
+    </div>
+  )
+}

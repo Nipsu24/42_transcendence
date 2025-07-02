@@ -29,14 +29,25 @@ test_game: check_node_module_game
 run_game: # just for quick testing purposes
 	@ cd $(GAME) && npm start 
 	
-# chekcs if requirements for compiling frontend fullfilled
+# chekcs if requirements for compiling frontend fullfilled (Added tailwindcss)
 check_node_module_frontend:
 	@if [ ! -d $(FRONTEND)/node_modules ]; then \
 		echo "install npm"; \
 		( \
 			cd $(FRONTEND) && \
 			npm install && \
-			npm install --save-dev jest \
+			npm install react-router-dom && \
+			npm install --save-dev \
+				typescript \
+				@types/react \
+				@types/react-dom \
+				vite \
+				@vitejs/plugin-react \
+				tailwindcss@latest \
+				postcss \
+ 				autoprefixer \
+ 				@tailwindcss/vite@latest \
+				jest ; \
 		); \
 	fi
 
