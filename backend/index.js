@@ -29,6 +29,8 @@ fastify.setErrorHandler((error, request, reply) => {
 			reply.status(400).send({ error: 'Invalid match data: resultPlayerOne, resultPlayerTwo and aiOpponent are required. Results need to be <= 10' });
 		else if (request.routerPath === '/api/players/:id/friends' && request.method === 'POST')
 			reply.status(400).send({ error: 'Invalid friend data: "name" required.' });
+		else if (request.routerPath === '/api/players/:id' && request.method === 'PUT')
+			reply.status(400).send({ error: 'Invalid player info data: "name" and/or "e-mail" required.' });
 		else
 			reply.status(400).send({ error: 'Invalid request data.' });
 	} 

@@ -48,4 +48,18 @@ const playerBodySchema = {
 	additionalProperties: false
 };
 
-module.exports = { playerBodySchema };
+// defines request schema for updating player's name and e-mail
+// only one of the properties is allowed per request, updating both at
+// the same time is not permitted
+const playerReqInfoSchema = {
+	type: 'object',
+	properties: {
+		name: { type: 'string'},
+		e_mail: { type: 'string'},
+	},
+	minProperties: 1,
+	maxProperties: 1,
+	additionalProperties: false
+}
+
+module.exports = { playerBodySchema, playerReqInfoSchema };
