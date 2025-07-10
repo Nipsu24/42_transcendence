@@ -10,36 +10,46 @@ import { Button } from './Button.js';
 
 export function startMenu(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
   let y = 200;
-  const space: number = 80;
+  const space = 80;
+
   const buttons: Button[] = [
     new Button(300, y, 200, 50, '1 Player', () => alert('1 player')),
-    new Button(300, y += space, 200, 50, '2 Players', () => launchGame()),
+    new Button(300, y += space, 200, 50, '2 Players', () => {
+      cleanup();
+      launchGame();
+    }),
     new Button(300, y += space, 200, 50, 'Tournament', () => alert('tournament')),
-    new Button(300, y += space, 200, 50, 'Quit', () => alert('quit')),
+    new Button(300, y += space, 200, 50, 'Quit', () => alert('Quit')),
   ];
 
-  drawMenu();
-
-  canvas.addEventListener('click', (e) => {
+  const handleClick = (e: MouseEvent) => {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     buttons.forEach(button => {
       if (button.isClicked(x, y)) button.onClick();
     });
-  });
+  };
 
-  canvas.addEventListener('mousemove', (e) => {
-  const rect = canvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
+  const handleMouseMove = (e: MouseEvent) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
 
-  buttons.forEach(button => {
-    button.hovered = button.isHovered(mx, my);
-  });
+    buttons.forEach(button => {
+      button.hovered = button.isHovered(mx, my);
+    });
 
-  drawMenu();
-});
+    drawMenu();
+  };
+
+  canvas.addEventListener('click', handleClick);
+  canvas.addEventListener('mousemove', handleMouseMove);
+
+  function cleanup() {
+    canvas.removeEventListener('click', handleClick);
+    canvas.removeEventListener('mousemove', handleMouseMove);
+  }
 
   function drawMenu() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -50,4 +60,6 @@ export function startMenu(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext
 
     buttons.forEach(button => button.draw(ctx));
   }
+
+  drawMenu();
 }
