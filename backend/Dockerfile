@@ -17,7 +17,8 @@ COPY . .
 
 # Runs Prisma commands to set up the database !!should be altered for real prod built!!
 RUN npx prisma generate && \
-    npx prisma db push
+    npx prisma db push && \
+    npx prisma db seed
 
 # Exposes the port the application will run on
 EXPOSE 3001

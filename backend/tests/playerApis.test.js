@@ -30,15 +30,10 @@ beforeAll(async () => {
     request = supertest(fastify.server);
 });
 
-// Clears and seeds the database before each single test execution
-beforeEach(async () => {
-	// await clearDatabase();
-	await seedDatabase();
-})
-
+// clears and seeds database after each test run (initial seeding done in Dockerfile)
 afterEach(async () => {
 	await clearDatabase();
-	// await seedDatabase();
+	await seedDatabase();
 })
 
 // Ensures Fastify server is closed and prisma client disconnects after all tests are conducted
