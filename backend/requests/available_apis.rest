@@ -6,7 +6,7 @@
 GET http://localhost:3001/api/players
 
 ### Get single player
-GET http://localhost:3001/api/players/1
+GET http://localhost:3001/api/players/2
 
 ### Create player
 POST http://localhost:3001/api/players
@@ -15,6 +15,22 @@ Content-Type: application/json
 {
 	"name": "Player 3000",
 	"password": "30984308"
+}
+
+### Update player info (name only)
+PUT http://localhost:3001/api/players/1
+Content-Type: application/json
+
+{
+	"name": "Player 1"
+}
+
+### Update player info (e-mail only)
+PUT http://localhost:3001/api/players/1
+Content-Type: application/json
+
+{
+	"e_mail": "testmail@test.com"
 }
 
 ### Update player stats (ai match)

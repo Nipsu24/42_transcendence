@@ -1,4 +1,5 @@
 const { playerBodySchema } = require('../schemas/player');
+const { playerReqInfoSchema} = require('../schemas/player');
 const { statsResSchema } = require('../schemas/stats');
 const { statsReqSchema } = require('../schemas/stats');
 const { matchRequestBodySchema } = require('../schemas/match');
@@ -77,6 +78,44 @@ fastify.delete('/api/players/:id', async (request, reply) => {
 		reply.status(500).send({ error: 'An error occurred while deleting the player' });
 	}
 });
+
+// updates player info (name or e-mail, both at the same time not possible)
+fastify.put('/api/players/:id', putDivReqResSchema(playerReqInfoSchema, playerBodySchema), async (request, reply) => {
+	try {
+		const id = Number(request.params.id);
+		const player = await Player.findPlayerById(id);
+		if (!player)
+			return reply.status(404).send({ error: 'Player not found' });
+		const { name, e_mail } = request.body;
+		if (name) {
+			const foundPlayerByName = await Player.findPlayerByName(name);
+			if (!foundPlayerByName || foundPlayerByName.id === player.id) {
+				const updatedPlayerInfo = await Player.updatePlayerInfo({
+					id: player.id,
+					name
+				})
+				reply.send(updatedPlayerInfo);
+			}
+			else
+				return reply.status(404).send({ error: 'Name is not available anymore' });
+		}
+		if (e_mail) {
+			const foundPlayerByEMail = await Player.findPlayerByEMail(e_mail);
+			if (!foundPlayerByEMail || foundPlayerByEMail.id === player.id) {
+				const updatedPlayerInfo = await Player.updatePlayerInfo({
+					id: player.id,
+					e_mail
+				})
+				reply.send(updatedPlayerInfo);
+			}
+			else
+				return reply.status(404).send({ error: 'E-mail is not available anymore' });
+		}
+	}
+	catch (error) {
+		reply.status(500).send({ error: 'An error occured while updating the player information' });
+	}
+})
 
 /*######################################## Stats ######################################## */
 

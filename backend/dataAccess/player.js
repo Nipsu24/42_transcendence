@@ -66,6 +66,20 @@ const findPlayerByName = async (name) => {
 	});
 };
 
+// Returns data for a single player when passing the player's e-mail
+const findPlayerByEMail = async (e_mail) => {
+	return prisma.player.findUnique({
+		where: { e_mail },
+		include: {
+			stats: {
+				include: {
+					matches: true,
+				},
+			},
+		}
+	});
+};
+
 // Function to delete a player by ID 
 // and deletes any matches where all players have been already deleted
 const deletePlayerById = async (id) => {
@@ -157,6 +171,19 @@ const updateAvatar = async (id, filePath) => {
 	})
 }
 
+// updates the player info (name or e-mail)
+const updatePlayerInfo = async (data) => {
+	const updateData = {};
+	if (data.name !== undefined) 
+		updateData.name = data.name;
+	if (data.e_mail !== undefined)
+		updateData.e_mail = data.e_mail;
+	return await prisma.player.update({
+		where: {id: data.id },
+		data: updateData,
+	});
+}
+
 module.exports = {
 	getAllPlayers,
 	createPlayer,
@@ -165,5 +192,7 @@ module.exports = {
 	addFriend,
 	deleteFriend,
 	deletePlayerById,
-	updateAvatar
+	updateAvatar,
+	findPlayerByEMail,
+	updatePlayerInfo
 };
