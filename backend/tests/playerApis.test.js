@@ -32,8 +32,13 @@ beforeAll(async () => {
 
 // Clears and seeds the database before each single test execution
 beforeEach(async () => {
-	await clearDatabase();
+	// await clearDatabase();
 	await seedDatabase();
+})
+
+afterEach(async () => {
+	await clearDatabase();
+	// await seedDatabase();
 })
 
 // Ensures Fastify server is closed and prisma client disconnects after all tests are conducted
