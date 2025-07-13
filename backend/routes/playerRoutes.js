@@ -8,6 +8,7 @@ const { friendsBodySchema } = require('../schemas/friend');
 const Player = require('../dataAccess/player');
 const Stats = require('../dataAccess/stats');
 const Match = require('../dataAccess/match');
+const { authenticate } = require('./login');
 const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema, postDivReqResSchema, putDivReqResSchema } = require('./schemaHelpers');
 //used for image upload:
 const fs = require('fs');
@@ -16,9 +17,10 @@ const { pipeline } = require('stream');
 //
 
 
-// imports player apis from './routes/playerRoutes.js'
+// imports player apis from './routes/playerRoutes.js, 
+// hook for checking each api call for valid JWT token via 'authenticate' function
 async function playerRoutes(fastify, options) {
-
+	fastify.addHook('onRequest', authenticate);
 /*######################################## Player ######################################## */
 
 // retrieves data from all available players
@@ -32,10 +34,10 @@ fastify.get('/api/players', arrayResponseSchema(playerBodySchema), async (reques
 	}
 });
 
-// retrieves data for one particular player
-fastify.get('/api/players/:id', objectResponseSchema(playerBodySchema), async (request, reply) => {
+// retrieves data for one particular logged in player
+fastify.get('/api/players/me', objectResponseSchema(playerBodySchema), async (request, reply) => {
 	try {
-		const id = Number(request.params.id);
+		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found'});
@@ -45,6 +47,21 @@ fastify.get('/api/players/:id', objectResponseSchema(playerBodySchema), async (r
 		reply.status(500).send({ error: 'An error occurred while fetching the player' });
 	}
 });
+
+
+// retrieves data for one particular player
+// fastify.get('/api/players/:id', objectResponseSchema(playerBodySchema), async (request, reply) => {
+// 	try {
+// 		const id = Number(request.params.id);
+// 		const player = await Player.findPlayerById(id);
+// 		if (!player)
+// 			return reply.status(404).send({ error: 'Player not found'});
+// 		reply.send(player);
+// 	} 
+// 	catch (error) {
+// 		reply.status(500).send({ error: 'An error occurred while fetching the player' });
+// 	}
+// });
 
 // handles adding a new player to the database
 // uses player schema (from schemas dir) and automatically calls 

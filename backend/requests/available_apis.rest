@@ -1,9 +1,23 @@
 //Download VS Code REST CLIENT extension in order to use the requests below
 //Backend needs to be up and running ('npm run dev' in backend directory)
 
+### Send login request for generating jwt token
+# @name login
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "e_mail": "one@example.com",
+  "password": "23213"
+}
+
+### Get info for the logged-in player (JWT protected)
+GET http://localhost:3001/api/players/me
+Authorization: Bearer {{login.response.body.token}}
 
 ### Get all players
 GET http://localhost:3001/api/players
+Authorization: Bearer {{login.response.body.token}}
 
 ### Get single player
 GET http://localhost:3001/api/players/2
