@@ -1,9 +1,12 @@
 const Player = require('../dataAccess/player');
+const { postDivReqResSchema } = require('./schemaHelpers');
+const { LoginReqSchema } = require('../schemas/login');
+const { LoginResSchema } = require('../schemas/login');
 
-// Handes login of registered users, returns jwt token for further api calls
+// Handes login of registered users, returns player object and jwt token for further api calls
 async function userLogin(fastify, options) {
 
-fastify.post('/api/login', async (request, reply) => {
+fastify.post('/api/login', postDivReqResSchema(LoginReqSchema, LoginResSchema), async (request, reply) => {
 	const { e_mail, password } = request.body;
 	const user = await Player.findPlayerByEMail(e_mail);
 	if (!user || user.password !== password) {
@@ -11,7 +14,7 @@ fastify.post('/api/login', async (request, reply) => {
 	}
 	const token = fastify.jwt.sign({ id: user.id, name: user.name }, { expiresIn: '1h' });
 	await Player.setPlayerOnline(user);
-	reply.send({ token });
+	reply.send({ ...user, token });
 });
 
 }

@@ -19,13 +19,14 @@ Authorization: Bearer {{login.response.body.token}}
 GET http://localhost:3001/api/players
 Authorization: Bearer {{login.response.body.token}}
 
-### Create player - NEEDS TO BE ADJUSTED!!!!
-POST http://localhost:3001/api/players
+### registers a new player
+POST http://localhost:3001/api/registration
 Content-Type: application/json
 
 {
 	"name": "Player 3000",
-	"password": "30984308"
+	"password": "30984308",
+	"e_mail": "testmail.com"
 }
 
 ### Update player info (name only)
@@ -108,7 +109,7 @@ Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
-	"name": "Player Three"
+	"names": "Player Three"
 }
 
 ### Uploads Avatar image to './assets' folder - png

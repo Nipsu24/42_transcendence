@@ -1,5 +1,5 @@
 const { playerBodySchema } = require('../schemas/player');
-const { playerReqInfoSchema} = require('../schemas/player');
+const { playerReqInfoSchema } = require('../schemas/player');
 const { statsResSchema } = require('../schemas/stats');
 const { statsReqSchema } = require('../schemas/stats');
 const { matchRequestBodySchema } = require('../schemas/match');
@@ -45,23 +45,6 @@ fastify.get('/api/players/me', objectResponseSchema(playerBodySchema), async (re
 	} 
 	catch (error) {
 		reply.status(500).send({ error: 'An error occurred while fetching the player' });
-	}
-});
-
-// handles adding a new player to the database
-// uses player schema (from schemas dir) and automatically calls 
-// error handler function in case request body does not match with defined schema
-fastify.post('/api/players', postReqResSchema(playerBodySchema), async (request, reply) => {
-	try {
-		const allPlayers = await Player.getAllPlayers();
-		if (allPlayers.some(p => p.name === request.body.name))
-			return reply.status(404).send({ error: 'Name is not available anymore' });
-		const newPlayer = await Player.createPlayer(request.body);
-		reply.status(201).send(newPlayer);
-	} 
-	catch (error) {
-		console.log('error:', (error));
-		reply.status(500).send({ error: 'An error occurred while creating the player' });
 	}
 });
 
