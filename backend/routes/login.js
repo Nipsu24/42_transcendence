@@ -10,6 +10,7 @@ fastify.post('/api/login', async (request, reply) => {
 		return reply.status(401).send({ error: 'Invalid e-mail or password' });
 	}
 	const token = fastify.jwt.sign({ id: user.id, name: user.name }, { expiresIn: '1h' });
+	await Player.setPlayerOnline(user);
 	reply.send({ token });
 });
 

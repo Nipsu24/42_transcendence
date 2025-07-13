@@ -38,7 +38,7 @@ async function main() {
 		name: 'Player One',
 		password: '23213',
 		e_mail: 'one@example.com',
-		online: true,
+		online: false,
 		avatar: './assets/img1.jpg',
 		statsId: stats1.id
 		}

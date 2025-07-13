@@ -184,6 +184,15 @@ const updatePlayerInfo = async (data) => {
 	});
 }
 
+const setPlayerOnline = async (data) => {
+	await prisma.player.update({
+		where: {id: data.id},
+		data: {
+			online: true,
+		},
+	});
+}
+
 module.exports = {
 	getAllPlayers,
 	createPlayer,
@@ -194,5 +203,6 @@ module.exports = {
 	deletePlayerById,
 	updateAvatar,
 	findPlayerByEMail,
-	updatePlayerInfo
+	updatePlayerInfo,
+	setPlayerOnline
 };
