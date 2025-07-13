@@ -19,10 +19,7 @@ Authorization: Bearer {{login.response.body.token}}
 GET http://localhost:3001/api/players
 Authorization: Bearer {{login.response.body.token}}
 
-### Get single player
-GET http://localhost:3001/api/players/2
-
-### Create player
+### Create player - NEEDS TO BE ADJUSTED!!!!
 POST http://localhost:3001/api/players
 Content-Type: application/json
 
@@ -32,7 +29,8 @@ Content-Type: application/json
 }
 
 ### Update player info (name only)
-PUT http://localhost:3001/api/players/1
+PUT http://localhost:3001/api/players/me
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -40,7 +38,8 @@ Content-Type: application/json
 }
 
 ### Update player info (e-mail only)
-PUT http://localhost:3001/api/players/1
+PUT http://localhost:3001/api/players/me
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -48,7 +47,8 @@ Content-Type: application/json
 }
 
 ### Update player stats (ai match)
-PUT http://localhost:3001/api/players/1/stats
+PUT http://localhost:3001/api/players/me/stats
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -57,7 +57,8 @@ Content-Type: application/json
 }
 
 ### Update player stats and opponent's stats
-PUT http://localhost:3001/api/players/1/stats
+PUT http://localhost:3001/api/players/me/stats
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -68,15 +69,12 @@ Content-Type: application/json
 	"opponentDefeats": 4
 }
 
-### Delete player
-Delete http://localhost:3001/api/players/4
-
 ### Create match record - PvP
-POST http://localhost:3001/api/players/1/matches
+POST http://localhost:3001/api/players/me/matches
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
-	"date": "2022-01-01",
 	"playerTwoName": "Player Two",
 	"resultPlayerOne": 10,
 	"resultPlayerTwo": 5,
@@ -84,7 +82,8 @@ Content-Type: application/json
 }
 
 ### Create match record - PvAi
-POST http://localhost:3001/api/players/1/matches
+POST http://localhost:3001/api/players/me/matches
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -93,16 +92,19 @@ Content-Type: application/json
 	"aiOpponent": true
 }
 
-### Adds friend to friend array (vice versa)
-POST http://localhost:3001/api/players/2/friends
+
+### Deletes friend from friend array (vice versa)
+Delete http://localhost:3001/api/players/me/friends
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
 	"name": "Player Three"
 }
 
-### Deletes friend from friend array (vice versa)
-Delete http://localhost:3001/api/players/2/friends
+### Adds friend to friend array (vice versa)
+POST http://localhost:3001/api/players/me/friends
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -110,24 +112,30 @@ Content-Type: application/json
 }
 
 ### Uploads Avatar image to './assets' folder - png
-POST http://localhost:3001/api/players/1/upload
+POST http://localhost:3001/api/players/me/upload
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="image"; filename="download.png"
 Content-Type: image/png
 
-< /home/mmeier/transcendence/filesForUpload/download.png
+< /Users/mariusmeier/transcendence/filesForUpload/download.png
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 
 ### Uploads Avatar image to './assets' folder - jpeg
-POST http://localhost:3001/api/players/1/upload
+POST http://localhost:3001/api/players/me/upload
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="image"; filename="beer-pong.jpeg"
 Content-Type: image/jpeg
 
-< /home/mmeier/transcendence/filesForUpload/beer-pong.jpeg
+< /Users/mariusmeier/transcendence/filesForUpload/beer-pong.jpeg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Delete player
+Delete http://localhost:3001/api/players/me
+Authorization: Bearer {{login.response.body.token}}
