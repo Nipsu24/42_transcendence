@@ -25,6 +25,7 @@ const createPlayer = async (data) => {
 			...data,
 			statsId: stats.id,
 			avatar: './assets/pong_avatar.jpg',
+			online: true,
 		},
 	});
 };
@@ -184,6 +185,15 @@ const updatePlayerInfo = async (data) => {
 	});
 }
 
+const setPlayerOnline = async (data) => {
+	await prisma.player.update({
+		where: {id: data.id},
+		data: {
+			online: true,
+		},
+	});
+}
+
 module.exports = {
 	getAllPlayers,
 	createPlayer,
@@ -194,5 +204,6 @@ module.exports = {
 	deletePlayerById,
 	updateAvatar,
 	findPlayerByEMail,
-	updatePlayerInfo
+	updatePlayerInfo,
+	setPlayerOnline
 };

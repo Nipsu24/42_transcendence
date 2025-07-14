@@ -1,5 +1,5 @@
 const { playerBodySchema } = require('../schemas/player');
-const { playerReqInfoSchema} = require('../schemas/player');
+const { playerReqInfoSchema } = require('../schemas/player');
 const { statsResSchema } = require('../schemas/stats');
 const { statsReqSchema } = require('../schemas/stats');
 const { matchRequestBodySchema } = require('../schemas/match');
@@ -8,6 +8,7 @@ const { friendsBodySchema } = require('../schemas/friend');
 const Player = require('../dataAccess/player');
 const Stats = require('../dataAccess/stats');
 const Match = require('../dataAccess/match');
+const { authenticate } = require('./login');
 const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema, postDivReqResSchema, putDivReqResSchema } = require('./schemaHelpers');
 //used for image upload:
 const fs = require('fs');
@@ -16,9 +17,10 @@ const { pipeline } = require('stream');
 //
 
 
-// imports player apis from './routes/playerRoutes.js'
+// imports player apis from './routes/playerRoutes.js, 
+// hook for checking each api call for valid JWT token via 'authenticate' function
 async function playerRoutes(fastify, options) {
-
+	fastify.addHook('onRequest', authenticate);
 /*######################################## Player ######################################## */
 
 // retrieves data from all available players
@@ -32,10 +34,10 @@ fastify.get('/api/players', arrayResponseSchema(playerBodySchema), async (reques
 	}
 });
 
-// retrieves data for one particular player
-fastify.get('/api/players/:id', objectResponseSchema(playerBodySchema), async (request, reply) => {
+// retrieves data for one particular logged in player
+fastify.get('/api/players/me', objectResponseSchema(playerBodySchema), async (request, reply) => {
 	try {
-		const id = Number(request.params.id);
+		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found'});
@@ -46,28 +48,11 @@ fastify.get('/api/players/:id', objectResponseSchema(playerBodySchema), async (r
 	}
 });
 
-// handles adding a new player to the database
-// uses player schema (from schemas dir) and automatically calls 
-// error handler function in case request body does not match with defined schema
-fastify.post('/api/players', postReqResSchema(playerBodySchema), async (request, reply) => {
-	try {
-		const allPlayers = await Player.getAllPlayers();
-		if (allPlayers.some(p => p.name === request.body.name))
-			return reply.status(404).send({ error: 'Name is not available anymore' });
-		const newPlayer = await Player.createPlayer(request.body);
-		reply.status(201).send(newPlayer);
-	} 
-	catch (error) {
-		console.log('error:', (error));
-		reply.status(500).send({ error: 'An error occurred while creating the player' });
-	}
-});
-
 // handles deletion of player (also removes friends connections 
 // and resp. match stats in case no other player of the match exists anymore)
-fastify.delete('/api/players/:id', async (request, reply) => {
+fastify.delete('/api/players/me', async (request, reply) => {
 	try {
-		const id = Number(request.params.id);
+		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found'});
@@ -80,9 +65,9 @@ fastify.delete('/api/players/:id', async (request, reply) => {
 });
 
 // updates player info (name or e-mail, both at the same time not possible)
-fastify.put('/api/players/:id', putDivReqResSchema(playerReqInfoSchema, playerBodySchema), async (request, reply) => {
+fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBodySchema), async (request, reply) => {
 	try {
-		const id = Number(request.params.id);
+		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found' });
@@ -120,9 +105,9 @@ fastify.put('/api/players/:id', putDivReqResSchema(playerReqInfoSchema, playerBo
 /*######################################## Stats ######################################## */
 
 // updates stats of a single player and the player's opponent
-fastify.put('/api/players/:id/stats', putDivReqResSchema(statsReqSchema, statsResSchema), async (request, reply) => {
+fastify.put('/api/players/me/stats', putDivReqResSchema(statsReqSchema, statsResSchema), async (request, reply) => {
 	try {
-		const id = Number(request.params.id);
+		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found' });
@@ -153,9 +138,9 @@ fastify.put('/api/players/:id/stats', putDivReqResSchema(statsReqSchema, statsRe
 
 // creates new match record and 'attaches' this to the participating players' statistics
 // playerOne name is retrieved via player id, whereby playerTwoName is to be provided in the request body
-fastify.post('/api/players/:id/matches', postDivReqResSchema(matchRequestBodySchema, matchResponseSchema), async (request, reply) => {
+fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySchema, matchResponseSchema), async (request, reply) => {
 	try {
-		const playerOneId = Number(request.params.id);
+		const playerOneId = request.user.id;
 		const playerOne = await Player.findPlayerById(playerOneId);
 		if (!playerOne) {
 			return reply.status(404).send({ error: 'PlayerOne not found' });
@@ -185,9 +170,9 @@ fastify.post('/api/players/:id/matches', postDivReqResSchema(matchRequestBodySch
 // adds friend to array of friends (for both sides -  player and friend)
 // takes friend name as argument, checks if friend is existing and not yet added as friend
 // and then calls resp. data access function
-fastify.post('/api/players/:id/friends', postReqResSchema(friendsBodySchema), async (request, reply) => {
+fastify.post('/api/players/me/friends', postReqResSchema(friendsBodySchema), async (request, reply) => {
 	try {
-		const id = Number(request.params.id);
+		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found' });
@@ -209,9 +194,9 @@ fastify.post('/api/players/:id/friends', postReqResSchema(friendsBodySchema), as
 })
 
 // deletes friend from friend array (for both sides - player and friend)
-fastify.delete('/api/players/:id/friends', async (request, reply) => {
+fastify.delete('/api/players/me/friends', async (request, reply) => {
 	try {
-		const id = Number(request.params.id);
+		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found' });
@@ -232,10 +217,10 @@ fastify.delete('/api/players/:id/friends', async (request, reply) => {
 
 // enables upload of avatar image into './assets' folder
 // using request.file() instead for e.g. request.file('avatar') accepts any name for field name
-fastify.post('/api/players/:id/upload', async (request, reply) => {
+fastify.post('/api/players/me/upload', async (request, reply) => {
 	try {
 		const pump = util.promisify(pipeline);
-		const id = Number(request.params.id);
+		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found' });
@@ -252,7 +237,6 @@ fastify.post('/api/players/:id/upload', async (request, reply) => {
 		reply.status(500).send({ error: 'An error occured while uploading the image' });
 	}
 })
-
 
 }
 

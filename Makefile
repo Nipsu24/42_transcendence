@@ -66,6 +66,8 @@ check_node_module_backend:
 			npm install fastify@^5.0.0 && \
 			echo install fastify/static && \
 			npm install @fastify/static@8 && \
+			echo install fastify/jwt && \
+			npm install @fastify/jwt && \
 			npm i @fastify/multipart && \
 			npm install --save-dev jest && \
 			npm install supertest --save-dev && \
