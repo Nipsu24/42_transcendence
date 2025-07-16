@@ -3,19 +3,40 @@ import { Link } from 'react-router-dom'
 import { AuthForm }      from './AuthForm'
 import { PrimaryButton }  from './PrimaryButton'
 
-interface LoginViewProps {
-  email: string
-  password: string
-  errors: { email?: string; password?: string }
-  serverError: string | null
-  loading: boolean
-  onChange: React.ChangeEventHandler<HTMLInputElement>
-  onSubmit: React.FormEventHandler<HTMLFormElement>
-  onClose: () => void
+interface LoginForm {
+	email: string
+	password: string
+  }
+  
+  type FormErrors = {
+	email?: string
+	password?: string
+  }
+  
+  interface LoginViewProps {
+	email: string
+	password: string
+	errors: FormErrors
+	serverError: string | null
+	loading: boolean
+	onChange: React.ChangeEventHandler<HTMLInputElement>
+	onSubmit: React.FormEventHandler<HTMLFormElement>
+	onClose: () => void
+	onOAuthClick?: () => void
+	oauthLoading?: boolean
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({
-  email, password, errors, serverError, loading, onChange, onSubmit, onClose
+  email, 
+  password, 
+  errors, 
+  serverError, 
+  loading, 
+  onChange, 
+  onSubmit, 
+  onClose,  
+  onOAuthClick = () => {},
+  oauthLoading = false,
 }) => (
   <div className="relative bg-gray-700 min-h-screen flex items-center justify-center px-4">
     {/* Close */}
@@ -46,7 +67,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
     	<PrimaryButton
 			type="submit"
 			loading={loading}
-			className="font-nody tracking-wider bg-[#0489C2] hover:bg-[#26B2C5] w-full mt-4"
+			className="font-body tracking-wider bg-[#0489C2] hover:bg-[#26B2C5] w-full mt-4"
       >
         Log In
       </PrimaryButton>
@@ -64,16 +85,22 @@ export const LoginView: React.FC<LoginViewProps> = ({
         <hr className="flex-grow border-[#334155]" />
       </div>
 
-      <PrimaryButton
-        type="button"
-        loading={false}
-        className="w-full inline-flex items-center justify-center gap-0.5 py-0.05 bg-[#26B2C5] hover:bg-[#55CFD4] text-gray-100"
-        onClick={() => {
-          /* Google OAuth flow */
-        }}
-      >
-        Sign in with<img src={new URL('../assets/google.svg', import.meta.url).href} alt="Google logo" className="my-0.05 1w-15 h-15 ml-0.5" />
-      </PrimaryButton>
+	  <PrimaryButton
+		type="button"
+		loading={oauthLoading}
+		onClick={() => {
+			/* Google OAuth flow */
+		}}
+		className="w-full h-[52px] px-4 bg-[#26B2C5] hover:bg-[#55CFD4] text-white text-base font-body flex items-center justify-center gap-2 mt-4"
+		>
+		<span className="leading-none">Sign in with </span>
+		<img
+			src={new URL('../assets/google.svg', import.meta.url).href}
+			alt="Google logo"
+			className="h-18 w-18"
+		/>
+		</PrimaryButton>
+
     </div>
   </div>
 )

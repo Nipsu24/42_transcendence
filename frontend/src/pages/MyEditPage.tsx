@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom' 
 import { AvatarSelector } from '../components/AvatarSelector'
 
@@ -10,11 +10,11 @@ import avatar4 from '../assets/Avatars/4.png'
 import avatar5 from '../assets/Avatars/5.png'
 import avatar6 from '../assets/Avatars/6.png'
 import avatar7 from '../assets/Avatars/7.png'
-import avatar8 from '../assets/Avatars/8.png'
 
-const AVATAR_OPTIONS = [
+
+const AVATAR_OPTIONS: string[] = [
   avatar1, avatar2, avatar3, avatar4,
-  avatar5, avatar6, avatar7, avatar8,
+  avatar5, avatar6, avatar7, defaultAvatar,
 ]
 
 interface Stats {
@@ -34,12 +34,12 @@ export default function MyEditPage() {
   const [stats] = useState<Stats>({ wins: 12, losses: 8, matches: 20 })
 
    // When the user selects a new avatar, update state (and later persist to backend)
-  const handleAvatarSelect = (url: string) => {
+  const handleAvatarSelect = (url: string):void => {
     setAvatar(url)
   }
 
   // Save all changes (name, email, avatar) back to the server
-  const handleSave = () => {
+  const handleSave = (): void => {
     console.log({ name, email, avatar })
     navigate('/me')  // After saving, navigate back to the profile view
   }
@@ -71,7 +71,7 @@ export default function MyEditPage() {
               <input
                 type="text"
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200"
               />
             </div>
@@ -80,13 +80,15 @@ export default function MyEditPage() {
               <input
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200"
               />
             </div>
             <div>
-              <p><span className="font-medium">Wins:</span> {stats.wins}</p>
-              <p><span className="font-medium">Losses:</span> {stats.losses}</p>
+              <p><span className="font-medium">Wins:</span> {' '}
+                <span className="text-green-600">{stats.wins}</span></p>
+              <p><span className="font-medium">Losses:</span> {' '}
+                <span className="text-red-500">{stats.losses}</span></p>
               <p><span className="font-medium">Total Matches:</span> {stats.matches}</p>
             </div>
           </div>

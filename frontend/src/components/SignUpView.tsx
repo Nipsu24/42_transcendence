@@ -1,18 +1,28 @@
-// src/components/SignUpView.tsx
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { InputField }   from './InputField'
 import { AuthForm }     from './AuthForm'
 import { PrimaryButton } from './PrimaryButton'
 
+interface SignUpForm {
+	name: string
+	email: string
+	password: string
+  }
+  
+  type FormErrors = {
+	name?: string
+	email?: string
+	password?: string
+  }
 interface SignUpViewProps {
-  form: { email: string; password: string; name: string }
-  errors: { email?: string; password?: string; name?: string }
-  serverError: string | null
-  loading: boolean
-  onChange: React.ChangeEventHandler<HTMLInputElement>
-  onSubmit: React.FormEventHandler
-  onClose: () => void
+	form: SignUpForm
+	errors: FormErrors
+	serverError: string | null
+	loading: boolean
+	onChange: React.ChangeEventHandler<HTMLInputElement>
+	onSubmit: React.FormEventHandler<HTMLFormElement>
+	onClose: () => void
 }
 
 export const SignUpView: React.FC<SignUpViewProps> = ({

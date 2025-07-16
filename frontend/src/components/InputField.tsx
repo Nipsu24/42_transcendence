@@ -12,7 +12,13 @@ interface InputFieldProps {
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
-  id, label, type = 'text', placeholder, value, error, onChange
+  id, 
+  label, 
+  type = 'text', 
+  placeholder = '', 
+  value, 
+  error, 
+  onChange
 }) => (
   <div className="mb-4">
     {label && <label htmlFor={id} className="block mb-1 text-gray-700 font-medium">{label}</label>}

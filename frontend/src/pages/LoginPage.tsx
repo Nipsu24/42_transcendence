@@ -1,23 +1,34 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LoginView }     from '../components/LoginView'
-import playerService     from '../services/players'
+import { LoginView } from '../components/LoginView'
+import playerService from '../services/players'
 
-export default function LoginPage() {
+interface LoginForm {
+  email: string
+  password: string
+}
+
+type FormErrors = {
+  email?: string
+  password?: string
+}
+
+export default function LoginPage(){
   const navigate = useNavigate()
-  const [form, setForm]     = useState({ email: '', password: '' })
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
-  const [serverError, setServerError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const [form, setForm] = useState<LoginForm>({ email: '', password: '' })
+  const [errors, setErrors] = useState<FormErrors>({})
+  const [serverError, setServerError] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(false)
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target
     setForm(f => ({ ...f, [name]: value }))
     setErrors(prev => ({ ...prev, [name]: undefined }))
   }
 
-  const validate = () => {
-    const errs: typeof errors = {}
+  const validate = (): FormErrors => {
+    const errs: FormErrors = {}
     if (!form.email) errs.email = 'Email is required'
     else if (!/^\S+@\S+\.\S+$/.test(form.email)) errs.email = 'Invalid email'
     if (!form.password) errs.password = 'Password is required'
@@ -25,12 +36,12 @@ export default function LoginPage() {
     return errs
   }
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     setServerError(null)
 
     const ve = validate()
-    if (Object.keys(ve).length) {
+    if (Object.keys(ve).length > 0) {
       setErrors(ve)
       return
     }
@@ -51,8 +62,10 @@ export default function LoginPage() {
       setLoading(false)
     }
   }
-
-  const handleClose = () => navigate('/')
+  
+  const handleClose = (): void => {
+    navigate('/')
+  }
 
   return (
     <LoginView
@@ -67,5 +80,3 @@ export default function LoginPage() {
     />
   )
 }
-
-

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect} from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PongLoader    from './components/PongLoader'
 import LandingPage   from './pages/LandingPage'
@@ -6,7 +6,7 @@ import MyHomePage    from './pages/MyHomePage'
 import GameMenuPage  from './pages/GameMenuPage'
 import GamePage      from './pages/GamePage'
 import AboutPage     from './pages/AboutPage'
-import MatchPage     from './pages/MatchPage'
+import TournamentPage     from './pages/TournamentPage'
 import LoginPage     from './pages/LoginPage'
 import SignUpPage    from './pages/SignupPage';
 import MyMenuPage    from './pages/MyMenuPage'
@@ -16,7 +16,7 @@ import FriendsPage   from './pages/FriendsPage'
 import SearchFriendsPage   from './pages/SearchFriendsPage'
 
 export default function App() {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 2200)
@@ -35,7 +35,7 @@ export default function App() {
       <Route path="/me/edit" element={<MyEditPage />} /> 
       <Route path="/game"   element={<GamePage />} />
       <Route path="/about"  element={<AboutPage />} />
-      <Route path="/match"  element={<MatchPage />} />
+      <Route path="/tournament"  element={<TournamentPage />} />
       <Route path="/login"  element={<LoginPage />} />
 	  <Route path="/signup" element={<SignUpPage />} />
       <Route path="/friends" element={<FriendsPage />} />

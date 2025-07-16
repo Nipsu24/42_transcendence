@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 
 export default function BackgroundBall() {
-  const ballRef = useRef<HTMLDivElement>(null);
+  const ballRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const updateBounceHeight = () => {
-      const height = window.innerHeight;
-      const max = height * 0.98 - 16; // -16px safety margin
+    const updateBounceHeight = (): void => {
+      const height: number = window.innerHeight;
+      const max: number = height * 0.98 - 16; // -16px safety margin
       if (ballRef.current) {
         ballRef.current.style.setProperty('--ball-bounce-max', `${max}px`);
       }
@@ -14,7 +14,7 @@ export default function BackgroundBall() {
 
     updateBounceHeight();
     window.addEventListener('resize', updateBounceHeight);
-    return () => window.removeEventListener('resize', updateBounceHeight);
+    return (): void => window.removeEventListener('resize', updateBounceHeight);
   }, []);
 
   return (

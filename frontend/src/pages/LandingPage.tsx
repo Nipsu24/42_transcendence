@@ -8,9 +8,9 @@ import ThePongTitle     from '../components/ThePongTitle'
 
 export default function LandingPage() {
   const navigate = useNavigate()
-  const isLoggedIn = Boolean(localStorage.getItem('authToken'))
+  const isLoggedIn: boolean = Boolean(localStorage.getItem('authToken'))
 
-  const handleStart = () => {
+  const handleStart = (): void => {
     isLoggedIn ? navigate('/game') : navigate('/login')
   }
 

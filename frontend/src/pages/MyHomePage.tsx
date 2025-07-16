@@ -8,7 +8,7 @@ import ThePongTitle     from '../components/ThePongTitle'
 
 export default function LandingPage() {
   const navigate = useNavigate()
-  const isLoggedIn = Boolean(localStorage.getItem('authToken'))
+  const isLoggedIn: boolean = Boolean(localStorage.getItem('authToken'))
 
   return (
     <div className="relative w-full h-screen overflow-hidden bg-[#fffffe]">

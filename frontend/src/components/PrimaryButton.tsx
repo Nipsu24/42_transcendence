@@ -1,17 +1,17 @@
-import React from 'react';
+import React, { ReactNode } from 'react'
 
 interface PrimaryButtonProps {
 	onClick?: () => void;
 	type?: 'button' | 'submit';
 	loading?: boolean;
-	children: React.ReactNode;
+	children: ReactNode;
 	className?: string;   
   }
   
   export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 	onClick,
 	type = 'button',
-	loading,
+	loading = false,
 	children,
 	className = '',       
   }) => (

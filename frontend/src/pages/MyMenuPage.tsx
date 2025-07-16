@@ -1,36 +1,41 @@
-// src/pages/MyMenuPage.tsx
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../services/authService'
 
-const MY_ITEMS = [
-	{
-	  label: 'ME',
-	  route: '/me',
-	  color: 'bg-[#AEE7EE] hover:bg-[#55CFD4]',  
-	  textColor: 'text-gray-800',
-	},
-	{
-	  label: 'FRIENDS',
-	  route: '/friends',
-	  color: 'bg-[#82C5CB] hover:bg-[#26B2C5]', 
-	  textColor: 'text-white',
-	},
-	{
-	  label: 'LOG OUT',
-	  route: '/',
-	  color: 'bg-[#3FA0C1] hover:bg-[#0489C2]',  
-	  textColor: 'text-white',
-	},
-  ]
+interface MenuItem {
+  label: string
+  route: string
+  color: string
+  textColor: string
+}
 
+const MY_ITEMS: MenuItem[] = [
+  {
+    label: 'ME',
+    route: '/me',
+    color: 'bg-[#AEE7EE] hover:bg-[#55CFD4]',
+    textColor: 'text-gray-800',
+  },
+  {
+    label: 'FRIENDS',
+    route: '/friends',
+    color: 'bg-[#82C5CB] hover:bg-[#26B2C5]',
+    textColor: 'text-white',
+  },
+  {
+    label: 'LOG OUT',
+    route: '/',
+    color: 'bg-[#3FA0C1] hover:bg-[#0489C2]',
+    textColor: 'text-white',
+  },
+]
 
 export default function MyMenuPage() {
   const navigate = useNavigate()
 
-  const handleLogout = () => {
-    logout()             // 1) removes authToken
-    navigate('/')        // 2) sends user to home/login
+  const handleLogout = (): void => {
+    logout()      // 1) removes authToken
+    navigate('/') // 2) sends user to home/login
   }
 
   return (
@@ -43,7 +48,7 @@ export default function MyMenuPage() {
       </button>
 
       {/* MY / FRIENDS / LOG OUT */}
-      {MY_ITEMS.map((item) => {
+      {MY_ITEMS.map((item: MenuItem) => {
         const onClick = item.label === 'LOG OUT'
           ? handleLogout
           : () => navigate(item.route)
