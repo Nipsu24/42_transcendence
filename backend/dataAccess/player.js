@@ -25,6 +25,7 @@ const createPlayer = async (data) => {
 			...data,
 			statsId: stats.id,
 			avatar: './assets/pong_avatar.jpg',
+			online: true,
 		},
 	});
 };
@@ -56,6 +57,20 @@ const findPlayerById = async (id) => {
 const findPlayerByName = async (name) => {
 	return prisma.player.findUnique({
 		where: { name },
+		include: {
+			stats: {
+				include: {
+					matches: true,
+				},
+			},
+		}
+	});
+};
+
+// Returns data for a single player when passing the player's e-mail
+const findPlayerByEMail = async (e_mail) => {
+	return prisma.player.findUnique({
+		where: { e_mail },
 		include: {
 			stats: {
 				include: {
@@ -157,6 +172,28 @@ const updateAvatar = async (id, filePath) => {
 	})
 }
 
+// updates the player info (name or e-mail)
+const updatePlayerInfo = async (data) => {
+	const updateData = {};
+	if (data.name !== undefined) 
+		updateData.name = data.name;
+	if (data.e_mail !== undefined)
+		updateData.e_mail = data.e_mail;
+	return await prisma.player.update({
+		where: {id: data.id },
+		data: updateData,
+	});
+}
+
+const setPlayerOnline = async (data) => {
+	await prisma.player.update({
+		where: {id: data.id},
+		data: {
+			online: true,
+		},
+	});
+}
+
 module.exports = {
 	getAllPlayers,
 	createPlayer,
@@ -165,5 +202,8 @@ module.exports = {
 	addFriend,
 	deleteFriend,
 	deletePlayerById,
-	updateAvatar
+	updateAvatar,
+	findPlayerByEMail,
+	updatePlayerInfo,
+	setPlayerOnline
 };

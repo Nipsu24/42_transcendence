@@ -1,24 +1,55 @@
 //Download VS Code REST CLIENT extension in order to use the requests below
 //Backend needs to be up and running ('npm run dev' in backend directory)
 
+### Send login request for generating jwt token
+# @name login
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "e_mail": "one@example.com",
+  "password": "23213"
+}
+
+### Get info for the logged-in player (JWT protected)
+GET http://localhost:3001/api/players/me
+Authorization: Bearer {{login.response.body.token}}
 
 ### Get all players
 GET http://localhost:3001/api/players
+Authorization: Bearer {{login.response.body.token}}
 
-### Get single player
-GET http://localhost:3001/api/players/1
-
-### Create player
-POST http://localhost:3001/api/players
+### registers a new player
+POST http://localhost:3001/api/registration
 Content-Type: application/json
 
 {
 	"name": "Player 3000",
-	"password": "30984308"
+	"password": "30984308",
+	"e_mail": "testmail.com"
+}
+
+### Update player info (name only)
+PUT http://localhost:3001/api/players/me
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+	"name": "Player 1"
+}
+
+### Update player info (e-mail only)
+PUT http://localhost:3001/api/players/me
+Authorization: Bearer {{login.response.body.token}}
+Content-Type: application/json
+
+{
+	"e_mail": "testmail@test.com"
 }
 
 ### Update player stats (ai match)
-PUT http://localhost:3001/api/players/1/stats
+PUT http://localhost:3001/api/players/me/stats
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -27,7 +58,8 @@ Content-Type: application/json
 }
 
 ### Update player stats and opponent's stats
-PUT http://localhost:3001/api/players/1/stats
+PUT http://localhost:3001/api/players/me/stats
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -38,15 +70,12 @@ Content-Type: application/json
 	"opponentDefeats": 4
 }
 
-### Delete player
-Delete http://localhost:3001/api/players/4
-
 ### Create match record - PvP
-POST http://localhost:3001/api/players/1/matches
+POST http://localhost:3001/api/players/me/matches
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
-	"date": "2022-01-01",
 	"playerTwoName": "Player Two",
 	"resultPlayerOne": 10,
 	"resultPlayerTwo": 5,
@@ -54,7 +83,8 @@ Content-Type: application/json
 }
 
 ### Create match record - PvAi
-POST http://localhost:3001/api/players/1/matches
+POST http://localhost:3001/api/players/me/matches
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
@@ -63,41 +93,50 @@ Content-Type: application/json
 	"aiOpponent": true
 }
 
-### Adds friend to friend array (vice versa)
-POST http://localhost:3001/api/players/2/friends
+
+### Deletes friend from friend array (vice versa)
+Delete http://localhost:3001/api/players/me/friends
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
 	"name": "Player Three"
 }
 
-### Deletes friend from friend array (vice versa)
-Delete http://localhost:3001/api/players/2/friends
+### Adds friend to friend array (vice versa)
+POST http://localhost:3001/api/players/me/friends
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
-	"name": "Player Three"
+	"names": "Player Three"
 }
 
 ### Uploads Avatar image to './assets' folder - png
-POST http://localhost:3001/api/players/1/upload
+POST http://localhost:3001/api/players/me/upload
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="image"; filename="download.png"
 Content-Type: image/png
 
-< /home/mmeier/transcendence/filesForUpload/download.png
+< /Users/mariusmeier/transcendence/filesForUpload/download.png
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 
 ### Uploads Avatar image to './assets' folder - jpeg
-POST http://localhost:3001/api/players/1/upload
+POST http://localhost:3001/api/players/me/upload
+Authorization: Bearer {{login.response.body.token}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
 Content-Disposition: form-data; name="image"; filename="beer-pong.jpeg"
 Content-Type: image/jpeg
 
-< /home/mmeier/transcendence/filesForUpload/beer-pong.jpeg
+< /Users/mariusmeier/transcendence/filesForUpload/beer-pong.jpeg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Delete player
+Delete http://localhost:3001/api/players/me
+Authorization: Bearer {{login.response.body.token}}

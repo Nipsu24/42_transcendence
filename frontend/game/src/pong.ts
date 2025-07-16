@@ -62,7 +62,8 @@ export function startPong(canvas: HTMLCanvasElement, context: CanvasRenderingCon
   function resetBall() {
     ball.x = WIDTH / 2;
     ball.y = HEIGHT / 2;
-    ball.dx = -ball.dx;
+    const initialSpeed = 6;
+    ball.dx = Math.random() < 0.5 ? -initialSpeed : initialSpeed;
 
     // Avoid near-zero vertical angles
     let angle = 0;

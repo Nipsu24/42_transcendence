@@ -30,8 +30,8 @@ beforeAll(async () => {
     request = supertest(fastify.server);
 });
 
-// Clears and seeds the database before each single test execution
-beforeEach(async () => {
+// clears and seeds database after each test run (initial seeding done in Dockerfile)
+afterEach(async () => {
 	await clearDatabase();
 	await seedDatabase();
 })

@@ -18,7 +18,7 @@ model Player {
   id       Int    @id @default(autoincrement())
   name     String @unique
   password String
-  e_mail   String?
+  e_mail   String? @unique
   online   Boolean?
   avatar   String?
   stats    Statistics @relation(fields: [statsId], references: [id], onDelete: Cascade) //establishes 1-1 relationship, deletes stats if player is deleted
