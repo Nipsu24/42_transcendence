@@ -13,7 +13,7 @@ POST http://localhost:3001/api/players
 Content-Type: application/json
 
 {
-	"name": "Player 1000",
+	"name": "Player 55543",
 	"password": "30984308"
 }
 

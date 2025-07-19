@@ -1,62 +1,69 @@
 const { playerBodySchema } = require('../schemas/player');
 const Player = require('../models/player');
+const bcrypt = require('bcrypt');
+
 
 async function playerRoutes(fastify, options) {
 
-// retrieves data from all available players
-fastify.get('/api/players', async (request, reply) => {
-	try {
-		const players = await Player.getAllPlayers({});
-		reply.send(players);
-	} 
-	catch (error) {
-		reply.status(500).send({ error: 'An error occurred while fetching players' });
-	}
-});
-
-// retrieves data for one particular player
-fastify.get('/api/players/:id', async (request, reply) => {
-	try {
-		const id = Number(request.params.id);
-		const player = await Player.findPlayerById(id);
-		if (!player) {
-			return reply.status(404).send({ error: 'Player not found'});
+	// retrieves data from all available players
+	fastify.get('/api/players', async (request, reply) => {
+		try {
+			const players = await Player.getAllPlayers({});
+			reply.send(players);
 		}
-		reply.send(player);
-	} 
-	catch (error) {
-		reply.status(500).send({ error: 'An error occurred while fetching the player' });
-	}
-});
+		catch (error) {
+			reply.status(500).send({ error: 'An error occurred while fetching players' });
+		}
+	});
 
-// handles adding a new player to the database
-// uses player schema (from schemas dir) and automatically calls 
-// error handler function in case request body does not match with defined schema
-fastify.post('/api/players', {
-	schema: {
-		body: playerBodySchema
-	}
-}, async (request, reply) => {
-	try {
-		const newPlayer = await Player.createPlayer(request.body);
-		reply.status(201).send(newPlayer);
-	} 
-	catch (error) {
-		reply.status(500).send({ error: 'An error occurred while creating the player' });
-	}
-});
+	// retrieves data for one particular player
+	fastify.get('/api/players/:id', async (request, reply) => {
+		try {
+			const id = Number(request.params.id);
+			const player = await Player.findPlayerById(id);
+			if (!player) {
+				return reply.status(404).send({ error: 'Player not found' });
+			}
+			reply.send(player);
+		}
+		catch (error) {
+			reply.status(500).send({ error: 'An error occurred while fetching the player' });
+		}
+	});
 
-// handles deletion of player
-fastify.delete('/api/players/:id', async (request, reply) => {
-	try {
-		const id = Number(request.params.id);
-		await Player.deletePlayerById(id);
-		reply.status(204).send();
-	}
-	catch (error) {
-		reply.status(500).send({ error: 'An error occurred while deleting the player' });
-	}
-});
+	// handles adding a new player to the database
+	// uses player schema (from schemas dir) and automatically calls
+	// error handler function in case request body does not match with defined schema
+	fastify.post('/api/players', {
+		schema: {
+			body: playerBodySchema
+		}
+	}, async (request, reply) => {
+		try {
+			const salt = await bcrypt.genSalt();
+			const hashedPassword = await bcrypt.hash(request.body.password, salt);
+			request.body.password = hashedPassword;
+			console.log('Salt :', salt);
+			console.log('Hashed Password :', hashedPassword);
+			const newPlayer = await Player.createPlayer(request.body);
+			reply.status(201).send(newPlayer);
+		}
+		catch (error) {
+			reply.status(500).send({ error: 'An error occurred while creating the player' });
+		}
+	});
+
+	// handles deletion of player
+	fastify.delete('/api/players/:id', async (request, reply) => {
+		try {
+			const id = Number(request.params.id);
+			await Player.deletePlayerById(id);
+			reply.status(204).send();
+		}
+		catch (error) {
+			reply.status(500).send({ error: 'An error occurred while deleting the player' });
+		}
+	});
 }
 
 module.exports = playerRoutes;
