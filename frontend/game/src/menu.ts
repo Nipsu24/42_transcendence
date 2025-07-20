@@ -1,5 +1,6 @@
 import { launchGame } from './main.js';
 import { Button } from './Button.js';
+import { startTournamentMenu } from './tournamentMenu.js';
 
 /**
  * Starts the main menu, rendering buttons and handling interaction.
@@ -18,7 +19,10 @@ export function startMenu(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext
       cleanup();
       launchGame();
     }),
-    new Button(300, y += space, 200, 50, 'Tournament', () => alert('tournament')),
+    new Button(300, y += space, 200, 50, 'Tournament', () => {
+      cleanup();
+      startTournamentMenu(canvas, ctx);
+    }),
     new Button(300, y += space, 200, 50, 'Quit', () => alert('Quit')),
   ];
 

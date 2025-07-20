@@ -1,5 +1,5 @@
 import { startMenu } from './menu.js';
-import { startPong, stopPong } from './pong.js';
+import { startPongMatch, stopPong } from './pong.js';
 
 const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
@@ -16,9 +16,12 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// This is called from menu.js when game starts
 export function launchGame() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
   inGame = true;
-  startPong(canvas, ctx);
+
+  startPongMatch(canvas, ctx, 'Player 1', 'Player 2', (winner) => {
+    inGame = false;
+    alert(`${winner} wins!`);
+    startMenu(canvas, ctx);
+  });
 }
