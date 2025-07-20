@@ -1,7 +1,8 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LoginView } from '../components/LoginView'
-import playerService from '../services/players'
+import { login } from '../services/auth'
+import { getMe } from '../services/players'
 
 interface LoginForm {
   email: string
@@ -13,7 +14,7 @@ type FormErrors = {
   password?: string
 }
 
-export default function LoginPage(){
+export default function LoginPage() {
   const navigate = useNavigate()
 
   const [form, setForm] = useState<LoginForm>({ email: '', password: '' })
@@ -40,6 +41,7 @@ export default function LoginPage(){
     e.preventDefault()
     setServerError(null)
 
+    // Keep the input validation as-is
     const ve = validate()
     if (Object.keys(ve).length > 0) {
       setErrors(ve)
@@ -48,21 +50,25 @@ export default function LoginPage(){
 
     setLoading(true)
     try {
-      const allPlayers = await playerService.getAll()
-      const match = allPlayers.find(
-        p => p.email === form.email && p.password === form.password
-      )
-      if (!match) throw new Error('Invalid credentials')
+      // Call login API: POST /api/login
+      // Inside the service function, store JWT in localStorage and axios.defaults
+      await login({ e_mail: form.email, password: form.password })
 
-      localStorage.setItem('authToken', 'dummy-token')
+      // After successful login, get my info: GET /api/players/me
+      // Token is automatically included in the header, so no additional params needed
+      const me = await getMe()
+      console.log('현재 로그인 유저:', me)
+
+      // Navigate to home screen
       navigate('/myhome')
     } catch (err) {
+      // Handle network/auth errors
       setServerError((err as Error).message)
     } finally {
       setLoading(false)
     }
   }
-  
+
   const handleClose = (): void => {
     navigate('/')
   }

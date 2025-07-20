@@ -1,72 +1,104 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import defaultAvatar from '../assets/Avatars/default.png'
-import avatar1 from '../assets/Avatars/1.png'
-import avatar2 from '../assets/Avatars/2.png'
-import avatar3 from '../assets/Avatars/3.png'
-import avatar4 from '../assets/Avatars/4.png'
-import avatar5 from '../assets/Avatars/5.png'
-import avatar6 from '../assets/Avatars/6.png'
-import avatar7 from '../assets/Avatars/7.png'
+import defaultAvatar from '../assets/default.png'
 import { FriendCard } from '../components/FriendCard'
 
+import {
+  getMe,
+  removeFriend,
+  // optionally add addFriend here
+} from '../services/players'
+
 interface Friend {
-  id: string
+  id: number
   name: string
   avatar: string
   online: boolean
 }
 
+interface MeResponse {
+	id: number
+	name: string
+	e_mail: string
+	avatar: string
+	friends: Friend[]
+  }
+
 export default function FriendsPage() {
   const navigate = useNavigate()
 
-  // dummy
-  const [friends, setFriends] = useState<Friend[]>([
-    { id: 'f1', name: 'Strawberry', avatar: avatar4, online: true },
-    { id: 'f2', name: 'Blueberry',  avatar: avatar2, online: true },
-    { id: 'f3', name: 'Apple',      avatar: defaultAvatar, online: true },
-    { id: 'f4', name: 'Banana',     avatar: avatar7, online: false },
-    { id: 'f5', name: 'Watermelon', avatar: avatar3, online: false },
-  ])
+  const [friends, setFriends] = useState<Friend[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [serverError, setServerError] = useState<string | null>(null)
+  const [avatar, setAvatar] = useState<string | undefined>(undefined)
 
-  const total    = friends.length
+  // load friends on mount
+
+useEffect(() => {
+	const fetchMe = async () => {
+	  try {
+		const me:MeResponse = await getMe()
+		setAvatar(me.avatar ?? defaultAvatar)
+		setFriends(me.friends ?? [])
+	  } catch (err) {
+		console.error(err)
+		setServerError((err as Error).message)
+	  }setLoading(false)
+	}
+	fetchMe()
+  }, [])
+
+  const total = friends.length
   const onlineCnt = friends.filter(f => f.online).length
 
-  const handleRemove = (id: string) => {
-	alert(`${id} Are you sure?`) 
-    setFriends(current => current.filter(f => f.id !== id))
+  const handleRemove = async (name: string) => {
+    if (!window.confirm('Remove this friend?')) return
+    setServerError(null)
+    try {
+      await removeFriend(name)
+      setFriends(current => current.filter(f => f.name !== name))
+    } catch (err) {
+      setServerError((err as Error).message)
+    }
   }
-
-//   const handleInvite = (name: string) => {
-//     alert(`${name}!`) 
-//   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-5">
-      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-md p-5 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <button
+      {serverError && (
+        <div className="mb-4 text-red-500 text-center">{serverError}</div>
+      )}
+	    <button
           onClick={() => navigate('/mymenu')}
-          className="font-body absolute top-4 right-6 z-50 text-black text-sm sm:text-base font-medium hover:opacity-60 transition"
+          className="absolute top-4 right-6 z-50 text-black text-sm sm:text-base font-medium hover:opacity-60 transition"
         >
           × MENU
         </button>
+      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-md p-5 grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+
         <div className="flex flex-col items-center space-y-6 my-18">
           <img
-            src={defaultAvatar}
-            alt="Your avatar"
+			src={avatar}
+			alt="Your avatar"
+			onError={(e) => {
+			  const target = e.currentTarget
+			  if (target.src !== defaultAvatar) {
+				target.src = defaultAvatar
+			  }
+			}}
             className="w-32 h-32 rounded-3xl bg-gray-100 object-cover"
           />
-          <h2 className="text-3xl font-heading font-bold text-gray-800">
-            Hi Gugu!
+          <h2 className="text-3xl font-heading font-medium tracking-wider text-gray-700">
+		  Good to see your crew!
           </h2>
-          <p className="font-body text-gray-600">gugu@example.com</p>
           <button
             onClick={() => navigate('/search')}
-            className="font-body tracking-wider mt-4 px-6 py-2 bg-gray-800 hover:bg-[#26B2C5] text-white font-medium rounded-lg transition"
+            disabled={loading}
+            className="font-body tracking-wider mt-4 px-6 py-2 bg-gray-800 hover:bg-[#26B2C5] text-white font-medium rounded-lg transition disabled:opacity-50"
           >
-            Search Friend
+            {loading ? 'Loading…' : 'Search Friend'}
           </button>
         </div>
+
         <div className="space-y-4">
           <h3 className="flex items-baseline text-2xl font-heading font-semibold text-gray-800">
             <span>Friends</span>
@@ -76,15 +108,18 @@ export default function FriendsPage() {
           </h3>
           <div className="space-y-2 overflow-y-auto max-h-[60vh]">
             {friends.map(f => (
+				
               <FriendCard
                 key={f.id}
                 name={f.name}
-                avatarUrl={f.avatar}
+                avatar={f.avatar ?? defaultAvatar}
                 online={f.online}
-                onDelete={() => handleRemove(f.id)}
-                // onInvite={() => handleInvite(f.name)} 
+                onDelete={() => handleRemove(f.name)}
               />
             ))}
+            {!loading && friends.length === 0 && (
+              <p className="text-center text-gray-500">No friends yet.</p>
+            )}
           </div>
         </div>
       </div>

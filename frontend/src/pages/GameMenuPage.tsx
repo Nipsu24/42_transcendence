@@ -1,6 +1,5 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { logout } from '../services/authService'
 
 interface MenuItem {
   label: string
@@ -23,8 +22,8 @@ const MENU_ITEMS: MenuItem[] = [
     textColor: 'text-white',
   },
   {
-    label: 'TOURNAMENT',
-    route: '/tournament',
+    label: 'HAVE FUN :)',
+    route: '/havefun',
     color: 'bg-[#FF7561] hover:bg-[#FF4F1A]',
     textColor: 'text-white',
   },
@@ -34,7 +33,7 @@ export default function GameMenuPage() {
   const navigate = useNavigate()
 
   const handleClose = (): void => {
-    const isLoggedInNow: boolean = Boolean(localStorage.getItem('authToken'))
+    const isLoggedInNow: boolean = Boolean(localStorage.getItem('jwtToken'))
     navigate(isLoggedInNow ? '/myhome' : '/')
   }
 
@@ -42,7 +41,7 @@ export default function GameMenuPage() {
     if (route === '/about') {
       navigate('/about')
     } else {
-      const isLoggedInNow: boolean = Boolean(localStorage.getItem('authToken'))
+      const isLoggedInNow: boolean = Boolean(localStorage.getItem('jwtToken'))
       navigate(isLoggedInNow ? route : '/login')
     }
   }

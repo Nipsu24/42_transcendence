@@ -71,7 +71,7 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 		const player = await Player.findPlayerById(id);
 		if (!player)
 			return reply.status(404).send({ error: 'Player not found' });
-		const { name, e_mail } = request.body;
+		const { name, e_mail, avatar } = request.body;
 		if (name) {
 			const foundPlayerByName = await Player.findPlayerByName(name);
 			if (!foundPlayerByName || foundPlayerByName.id === player.id) {
@@ -95,6 +95,15 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 			}
 			else
 				return reply.status(404).send({ error: 'E-mail is not available anymore' });
+		}
+		// NEW!! 
+		// new added code for updating avatar
+		if (avatar) {
+			const updatedPlayerInfo = await Player.updatePlayerInfo({
+				id: player.id,
+				avatar
+			})
+			reply.send(updatedPlayerInfo);
 		}
 	}
 	catch (error) {
@@ -215,7 +224,9 @@ fastify.delete('/api/players/me/friends', async (request, reply) => {
 
 /*######################################## Avatar ######################################## */
 
-// enables upload of avatar image into './assets' folder
+// MODIFIED!! 
+// create 'uploads' folder in backend side (with 'assets' name somehow coundn't make it work)..
+// enables upload of avatar image into './uploads' folder - new code for this part in index.js too 
 // using request.file() instead for e.g. request.file('avatar') accepts any name for field name
 fastify.post('/api/players/me/upload', async (request, reply) => {
 	try {
@@ -227,10 +238,10 @@ fastify.post('/api/players/me/upload', async (request, reply) => {
 		
 		const data = await request.file();
 		console.log('request body:', (data));
-		const filePath = `./assets/${data.filename}`;
+		const filePath = `./uploads/${data.filename}`;
         await pump(data.file, fs.createWriteStream(filePath));
 		await Player.updateAvatar(id, filePath);
-		return reply.status(200).send({ message: 'Upload successful' })
+		return reply.status(200).send({url: `/uploads/${data.filename}`})
 	}
 	catch (error) {
 		console.log('error:', (error));

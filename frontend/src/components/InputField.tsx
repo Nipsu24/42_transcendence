@@ -3,6 +3,7 @@ import { ErrorBanner } from './ErrorBanner';
 
 interface InputFieldProps {
   id: string;
+  name: string;
   label?: string;
   type?: string;
   placeholder?: string;
@@ -12,7 +13,8 @@ interface InputFieldProps {
 }
 
 export const InputField: React.FC<InputFieldProps> = ({
-  id, 
+  id,
+  name, 
   label, 
   type = 'text', 
   placeholder = '', 
@@ -24,7 +26,7 @@ export const InputField: React.FC<InputFieldProps> = ({
     {label && <label htmlFor={id} className="block mb-1 text-gray-700 font-medium">{label}</label>}
     <input
       id={id}
-      name={id}
+      name={name}
       type={type}
       placeholder={placeholder}
       value={value}

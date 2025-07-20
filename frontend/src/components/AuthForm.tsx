@@ -27,7 +27,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({
     {serverError && <ErrorBanner message={serverError} />}
     <form onSubmit={onSubmit} noValidate>
       <InputField
-        id="email"
+	  	id="email"
+        name="email"
         type="email"
         placeholder="Email"
         value={email}
@@ -35,7 +36,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         onChange={onChange}
       />
       <InputField
-        id="password"
+	  	id="password"
+        name="password"
         type="password"
         placeholder="Password"
         value={password}

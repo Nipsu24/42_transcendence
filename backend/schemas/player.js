@@ -40,6 +40,10 @@ const playerBodySchema = {
 				properties: {
 					id: { type: 'integer' },
 					name: { type: 'string' },
+					// NEW!! 
+					// new code for enable the friends pages's avatars 
+					avatar: { type: 'string'},
+					//
 					online: { type: 'boolean' },
 				}
 			 }
@@ -51,11 +55,15 @@ const playerBodySchema = {
 // defines request schema for updating player's name and e-mail
 // only one of the properties is allowed per request, updating both at
 // the same time is not permitted
+// added field for updating avatar
 const playerReqInfoSchema = {
 	type: 'object',
 	properties: {
 		name: { type: 'string'},
 		e_mail: { type: 'string'},
+		// NEW!!
+		// new code for updating avatar field
+		avatar: { type: 'string'}
 	},
 	minProperties: 1,
 	maxProperties: 1,

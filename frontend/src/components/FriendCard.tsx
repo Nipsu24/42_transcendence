@@ -1,8 +1,9 @@
 import React from 'react'
+import defaultAvatar from '../assets/default.png'
 
 interface FriendCardProps {
   name: string
-  avatarUrl: string
+  avatar: string
   online: boolean
   onDelete: () => void
   onInvite?: () => void
@@ -10,7 +11,7 @@ interface FriendCardProps {
 
 export const FriendCard: React.FC<FriendCardProps> = ({
   name,
-  avatarUrl,
+  avatar,
   online,
   onDelete,
   onInvite,
@@ -18,8 +19,14 @@ export const FriendCard: React.FC<FriendCardProps> = ({
   <div className="flex items-center justify-between p-4 bg-gray-100 rounded-lg shadow-sm">
     <div className="flex items-center space-x-4">
       <img
-        src={avatarUrl}
+        src={avatar}
         alt={`${name}'s avatar`}
+		onError={(e) => {
+			const target = e.currentTarget
+			if (target.src !== defaultAvatar) {
+			  target.src = defaultAvatar
+			}
+		}}	
         className="w-12 h-12 rounded-full object-cover"
       />
       <p className="font-body font-medium text-gray-800">{name}</p>

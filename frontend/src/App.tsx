@@ -6,9 +6,9 @@ import MyHomePage    from './pages/MyHomePage'
 import GameMenuPage  from './pages/GameMenuPage'
 import GamePage      from './pages/GamePage'
 import AboutPage     from './pages/AboutPage'
-import TournamentPage     from './pages/TournamentPage'
+import HaveFunPage   from './pages/HaveFunPage'
 import LoginPage     from './pages/LoginPage'
-import SignUpPage    from './pages/SignupPage';
+import SignUpPage    from './pages/SignupPage'
 import MyMenuPage    from './pages/MyMenuPage'
 import MyPage        from './pages/MyPage'
 import MyEditPage    from './pages/MyEditPage'
@@ -34,8 +34,10 @@ export default function App() {
 	  <Route path="/me"     element={<MyPage />} />
       <Route path="/me/edit" element={<MyEditPage />} /> 
       <Route path="/game"   element={<GamePage />} />
+	  {/* <Route path="/game" element={<Navigate to="/game/index.html" replace />} /> */}
+      {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       <Route path="/about"  element={<AboutPage />} />
-      <Route path="/tournament"  element={<TournamentPage />} />
+      <Route path="/havefun"  element={<HaveFunPage />} />
       <Route path="/login"  element={<LoginPage />} />
 	  <Route path="/signup" element={<SignUpPage />} />
       <Route path="/friends" element={<FriendsPage />} />

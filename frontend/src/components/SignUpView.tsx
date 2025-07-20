@@ -47,6 +47,7 @@ export const SignUpView: React.FC<SignUpViewProps> = ({
 
       <InputField
         id="name"
+		name="name"
         type="text"
         placeholder="Name"
         value={form.name}

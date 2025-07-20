@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { logout } from '../services/authService'
+import { logout } from '../services/auth'
 
 interface MenuItem {
   label: string
@@ -34,7 +34,7 @@ export default function MyMenuPage() {
   const navigate = useNavigate()
 
   const handleLogout = (): void => {
-    logout()      // 1) removes authToken
+    logout()      // 1) removes jwtToken
     navigate('/') // 2) sends user to home/login
   }
 

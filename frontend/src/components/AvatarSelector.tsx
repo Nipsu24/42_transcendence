@@ -1,4 +1,5 @@
 import React from 'react'
+import defaultAvatar from '../assets/default.png'
 
 export interface AvatarSelectorProps {
   selected: string
@@ -16,6 +17,12 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
       <img
         src={selected}
         alt="current avatar"
+		onError={(e) => {
+		  const target = e.currentTarget
+		  if (target.src !== defaultAvatar) {
+			target.src = defaultAvatar
+		  }
+		}}
         className="w-32 h-32 rounded-3xl my-18 mb-10 bg-gray-100 object-cover"
       />
     </div>

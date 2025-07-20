@@ -26,6 +26,7 @@ test_frontend_ui: check_node_module_frontend
 # builds only the game
 test_game: check_node_module_game
 	@ cd $(GAME) && npm run build
+
 run_game: # just for quick testing purposes
 	@ cd $(GAME) && npm start 
 	
@@ -108,6 +109,9 @@ backend_container: check_node_module_backend
 prod: $(CERT_KEY)  $(CERT_CRT) check_node_module_frontend
 	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
 	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build	
+# NEW!! 
+# add for the prod testing with seed.js
+	@ docker exec -i fastify_backend npx prisma db seed
 
 # removes all built containers
 down:
