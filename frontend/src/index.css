@@ -1,19 +1,170 @@
-.successMsg {
-	color: green;
-	background: lightgrey;
-	font-size: 20px;
-	border-style: solid;
-	border-radius: 5px;
-	padding: 10px;
-	margin-bottom: 10px;
+@import url("https://use.typekit.net/upk1mgr.css");   /* All Round Gothic */
+@import url("https://use.typekit.net/fii4pwj.css");   /* Futura PT */
+
+@import "tailwindcss";
+
+@theme {
+	--font-body:    "futura-pt",       sans-serif;
+	--font-heading: "all-round-gothic", sans-serif;
   }
 
-  .error {
-	color: red;
-	background: lightgrey;
-	font-size: 20px;
-	border-style: solid;
-	border-radius: 5px;
-	padding: 10px;
-	margin-bottom: 10px;
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #faf5f5;
   }
+
+
+
+@layer components {
+	.site-header {
+	    @apply fixed top-[clamp(1.5rem,8vh,3.5rem)] w-full z-30;
+	}
+  
+	.site-header .inner {
+	  @apply max-w-7xl mx-auto flex items-center justify-between px-4 md:px-6;
+	}
+  
+	.site-header .menu {
+	  @apply flex items-center gap-x-8 sm:gap-x-12 font-medium;
+	}
+  
+	.login-btn {
+	  @apply text-sm px-4 py-1.5 border border-black rounded transition bg-black text-white;
+	}
+  
+	.login-btn:hover {
+	  background-image: linear-gradient(to right, #FEF018, #FE8915, #FF4F1A);
+	  color: #000;
+	  border-color: #fff;
+	}
+
+	.mymenu-btn {
+		@apply text-sm px-4 py-1.5 border border-black rounded transition bg-black text-white;
+	  }
+
+	.mymenu-btn:hover {
+		background-image: linear-gradient(to right, #55CFD4, #26B2C5, #0489C2);
+		color: #000;
+		border-color: #fff;
+	  }
+  }
+
+@layer utilities {
+	.fake-bold {
+	  -webkit-text-stroke: 11px currentColor;
+	  -webkit-text-fill-color: currentColor;
+	}
+  }
+
+@layer utilities {
+	.fake-semibold {
+	  -webkit-text-stroke: 3px currentColor;
+	  -webkit-text-fill-color: currentColor;
+	}
+  }
+
+@layer utilities {
+	@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+	.fade-in { animation: fade-in 0.5s ease-out forwards; }
+  }
+
+  /* ── PONG Loader 애니메이션 ── */
+  @layer utilities {
+	@keyframes ball {
+	  0%   { transform: translate(-60px, -20px); }
+	  10%  { transform: translate(-50px, -10px); }
+	  20%  { transform: translate(-30px, 0); }
+	  30%  { transform: translate(-10px, 10px); }
+	  40%  { transform: translate(10px, 20px); }
+	  50%  { transform: translate(30px, 10px); }
+	  60%  { transform: translate(50px, 0); }
+	  70%  { transform: translate(30px, -10px); }
+	  80%  { transform: translate(10px, -20px); }
+	  90%  { transform: translate(-10px, -10px); }
+	  100% { transform: translate(-30px, 0); }
+	}
+	@keyframes paddle {
+	  0%,100% { transform: scaleY(1); }
+	  50%     { transform: scaleY(1.3); }
+	}
+
+  @keyframes text-fade {
+    0%   { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes paddle-bounce {
+    0%   { opacity: 0; transform: translateY(-5px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .bounce {
+    animation: paddle-bounce 0.2s ease-out forwards;
+    transform-origin: bottom;
+  }
+
+  .animate-ball       { animation: ball 2.0s linear infinite; }
+  .animate-paddle     { animation: paddle 1.2s ease-in-out infinite; }
+  .animate-text-fade  { animation: text-fade 0.6s ease-out forwards; }
+  }
+
+  @keyframes zigzag-bounce {
+  0%   { transform: translate(0vw, var(--ball-bounce-max, 98vh)); }
+  10%  { transform: translate(20vw, 48vh); }
+  20%  { transform: translate(40vw, var(--ball-bounce-max, 98vh)); }
+  30%  { transform: translate(60vw, 52vh); }
+  40%  { transform: translate(80vw, var(--ball-bounce-max, 98vh)); }
+  50%  { transform: translate(100vw, 55vh); }
+  60%  { transform: translate(80vw, var(--ball-bounce-max, 98vh)); }
+  70%  { transform: translate(60vw, 46vh); }
+  80%  { transform: translate(40vw, var(--ball-bounce-max, 98vh)); }
+  90%  { transform: translate(20vw, 58vh); }
+  100% { transform: translate(0vw, var(--ball-bounce-max, 98vh)); }
+}
+
+
+  .animate-zigzag-bounce {
+    animation: zigzag-bounce 24s ease-in-out infinite alternate;
+  }
+
+  .domino-bar {
+    /* @apply w-[22px] h-30 origin-bottom transition-colors duration-500; */
+		@apply origin-bottom transition-colors duration-500;
+  }
+  .domino-bar {
+		width: clamp(16px, 1.8vw, 24px);
+		height: clamp(5rem, 10vw, 10rem);
+		transform: translateY(0);
+	}
+	  
+	  
+
+  .domino-yellow-light { @apply bg-[#FEF018]; }
+  .domino-yellow       { @apply bg-[#FE8915]; }
+  .domino-orange       { @apply bg-[#FF4F1A]; }
+
+  .domino-blue-light   { @apply bg-[#55CFD4]; }
+  .domino-sky-blue     { @apply bg-[#26B2C5]; }
+  .domino-blue         { @apply bg-[#0489C2]; }
+
+
+  @keyframes domino-bounce {
+	0%   { transform: translateY(0); }
+	50%  { transform: translateY(-8px); }
+	100% { transform: translateY(0); }
+  }
+  
+  .animate-domino-top {
+    animation: domino-bounce 8s ease-in-out infinite;
+	animation-fill-mode: both;
+  }
+
+  .animate-domino-bottom {
+    animation: domino-bounce 6s ease-in-out infinite;
+	animation-fill-mode: both;
+  }
+
+  
+
