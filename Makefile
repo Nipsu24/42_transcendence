@@ -26,14 +26,30 @@ test_frontend_ui: check_node_module_frontend
 # builds only the game
 test_game: check_node_module_game
 	@ cd $(GAME) && npm run build
+
 run_game: # just for quick testing purposes
 	@ cd $(GAME) && npm start
 
-# chekcs if requirements for compiling frontend fullfilled
+# chekcs if requirements for compiling frontend fullfilled (Added tailwindcss)
 check_node_module_frontend:
 	@if [ ! -d $(FRONTEND)/node_modules ]; then \
 		echo "install npm"; \
-		cd $(FRONTEND) && npm install; \
+		( \
+			cd $(FRONTEND) && \
+			npm install && \
+			npm install react-router-dom && \
+			npm install --save-dev \
+				typescript \
+				@types/react \
+				@types/react-dom \
+				vite \
+				@vitejs/plugin-react \
+				tailwindcss@latest \
+				postcss \
+ 				autoprefixer \
+ 				@tailwindcss/vite@latest \
+				jest ; \
+		); \
 	fi
 
 # chekcs if requirements for compiling game fulfilled
@@ -59,12 +75,15 @@ check_node_module_backend:
 		echo "install npm"; \
 		( \
 			cd $(BACKEND) && \
-			npm install && \
-			echo install fastify v ^3 && \
-			npm install fastify@^3 && \
-			npm i express bcrypt && \
+			npm install fastify@^5.0.0 && \
 			echo install fastify/static && \
-			npm i @fastify/static && \
+			npm install @fastify/static@8 && \
+			echo install fastify/jwt && \
+			npm install @fastify/jwt && \
+			npm i @fastify/multipart && \
+			npm install --save-dev jest && \
+			npm install supertest --save-dev && \
+			npm install sequelize sqlite3 && \
 			npm install @prisma/client && \
 			echo "Pushing Prisma schema to the database..." && \
 			npx prisma db push && \
@@ -90,6 +109,9 @@ backend_container: check_node_module_backend
 prod: $(CERT_KEY)  $(CERT_CRT) check_node_module_frontend
 	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
 	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build
+# NEW!!
+# add for the prod testing with seed.js
+	@ docker exec -i fastify_backend npx prisma db seed
 
 # removes all built containers
 down:

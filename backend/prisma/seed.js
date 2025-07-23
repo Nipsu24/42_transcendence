@@ -1,8 +1,27 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+async function clearDatabase() {
+    await prisma.$executeRaw`PRAGMA foreign_keys=OFF;`;
+    await prisma.$executeRaw`DELETE FROM Statistics;`;
+    await prisma.$executeRaw`DELETE FROM Player;`;
+    await prisma.$executeRaw`DELETE FROM Match;`;
+	await prisma.$executeRaw`DELETE FROM _PlayerFriends;`
+
+    // Reset auto-increment counters
+    await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'Player';`;
+    await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'Statistics';`;
+    await prisma.$executeRaw`DELETE FROM sqlite_sequence WHERE name = 'Match';`;
+
+	// Re-enable foreign keys
+    await prisma.$executeRaw`PRAGMA foreign_keys=ON;`;
+}
+
 async function main() {
-  // Create statistics records
+	// clears existing data
+	await clearDatabase();
+
+	// Create statistics records
 	const stats1 = await prisma.statistics.create({
 		data: { victories: 5, defeats: 2 }
 	});
@@ -19,7 +38,8 @@ async function main() {
 		name: 'Player One',
 		password: '23213',
 		e_mail: 'one@example.com',
-		online: true,
+		online: false,
+		avatar: './assets/img1.jpg',
 		statsId: stats1.id
 		}
 	});
@@ -29,6 +49,7 @@ async function main() {
 		password: 'password123',
 		e_mail: 'two@example.com',
 		online: false,
+		avatar: './assets/img2.jpg',
 		statsId: stats2.id
 		}
 	});
@@ -38,6 +59,7 @@ async function main() {
 		password: 'qwerty',
 		e_mail: 'three@example.com',
 		online: true,
+		avatar: './assets/img3.jpg',
 		statsId: stats3.id
 		}
 	});
@@ -51,11 +73,10 @@ async function main() {
 	// Seeds match data
 	const match1 = await prisma.match.create({
 		data: {
-		date: '2024-06-04',
-		playerOne: player1.id,
-		playerTwo: player2.id,
+		playerOneName: player1.name,
+		playerTwoName: player2.name,
 		resultPlayerOne: 9,
-		resultPlayerTwo: 11,
+		resultPlayerTwo: 10,
 		aiOpponent: false,
 		statistics: {
 			connect: [{ id: stats1.id }, { id: stats2.id }]
@@ -65,10 +86,9 @@ async function main() {
 
 	const match2 = await prisma.match.create({
 		data: {
-		date: '2024-06-05',
-		playerOne: player1.id,
-		playerTwo: player3.id,
-		resultPlayerOne: 11,
+		playerOneName: player1.name,
+		playerTwoName: player3.name,
+		resultPlayerOne: 10,
 		resultPlayerTwo: 7,
 		aiOpponent: false,
 		statistics: {
@@ -76,10 +96,146 @@ async function main() {
 		}
 		}
 	});
+
+	// NEW!!
+	// FROM HERE ADDITIONAL USERS AND MATCHES FOR TESTING
+
+	// New statistics for Player Four
+	const stats4 = await prisma.statistics.create({
+		data: { victories: 3, defeats: 2 }
+	});
+
+	// Create Player Four
+	const player4 = await prisma.player.create({
+		data: {
+			name: 'Gugu',
+			password: 'qwerty',
+			e_mail: 'gugu@hauhau.com',
+			online: true,
+			avatar: '/uploads/for_gugu.png',
+			statsId: stats4.id
+		}
+	});
+
+	// Additional users to serve as friends and opponents
+	const extraStats = await Promise.all(
+		Array.from({ length: 5 }, async (_, i) =>
+			prisma.statistics.create({
+				data: { victories: 2, defeats: 3 }
+			})
+		)
+	)
+
+	const avatarFilenames = [
+		'1-C_iYpYSA.png',
+		'2-BgCsig6a.png',
+		'3-tvYe1b1u.png',
+		'4-Dl6nFZco.png',
+		'5-BSC5akPy.png'
+	  ]
+	  
+	const extraPlayers = await Promise.all(
+		extraStats.map((stat, i) =>
+		  prisma.player.create({
+			data: {
+			  name: `Friend ${i + 1}`,
+			  password: `pass${i + 1}`,
+			  e_mail: `friend${i + 1}@example.com`,
+			  online: i % 2 === 0,
+			  avatar: `./assets/${avatarFilenames[i]}`,
+			  statsId: stat.id
+			}
+		  })
+		)
+	)
+	  
+
+	// Connect Player Four with the 5 new players as friends
+	await prisma.player.update({
+		where: { id: player4.id },
+		data: {
+			friends: {
+				connect: extraPlayers.map(p => ({ id: p.id }))
+			}
+		}
+	});
+
+	// Seed 5 matches for Player Four
+	await prisma.match.create({
+		data: {
+			playerOneName: player4.name,
+			playerTwoName: extraPlayers[0].name,
+			resultPlayerOne: 10,
+			resultPlayerTwo: 8,
+			aiOpponent: false,
+			statistics: {
+				connect: [{ id: stats4.id }, { id: extraPlayers[0].statsId }]
+			}
+		}
+	})
+
+	await prisma.match.create({
+		data: {
+			playerOneName: extraPlayers[1].name,
+			playerTwoName: player4.name,
+			resultPlayerOne: 9,
+			resultPlayerTwo: 11,
+			aiOpponent: false,
+			statistics: {
+				connect: [{ id: stats4.id }, { id: extraPlayers[1].statsId }]
+			}
+		}
+	})
+
+	await prisma.match.create({
+		data: {
+			playerOneName: player4.name,
+			playerTwoName: extraPlayers[2].name,
+			resultPlayerOne: 6,
+			resultPlayerTwo: 10,
+			aiOpponent: false,
+			statistics: {
+				connect: [{ id: stats4.id }, { id: extraPlayers[2].statsId }]
+			}
+		}
+	})
+
+	await prisma.match.create({
+		data: {
+			playerOneName: extraPlayers[3].name,
+			playerTwoName: player4.name,
+			resultPlayerOne: 10,
+			resultPlayerTwo: 5,
+			aiOpponent: false,
+			statistics: {
+				connect: [{ id: stats4.id }, { id: extraPlayers[3].statsId }]
+			}
+		}
+	})
+
+	await prisma.match.create({
+		data: {
+			playerOneName: player4.name,
+			playerTwoName: extraPlayers[4].name,
+			resultPlayerOne: 11,
+			resultPlayerTwo: 9,
+			aiOpponent: false,
+			statistics: {
+				connect: [{ id: stats4.id }, { id: extraPlayers[4].statsId }]
+			}
+		}
+	})
+
+
+// END OF NEW TEST DATA
+
+
 }
 
 main()
-  .catch(e => console.error(e))
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+.catch(e => console.error(e))
+.finally(async () => {
+	await prisma.$disconnect();
+});
+
+module.exports = { main, clearDatabase };

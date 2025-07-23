@@ -1,42 +1,53 @@
-const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
-const ctx = canvas.getContext('2d')!;
-
-const WIDTH = canvas.width;
-const HEIGHT = canvas.height;
+let isRunning = false;
 
 const paddleWidth = 10, paddleHeight = 80, ballSize = 12;
 let leftScore = 0, rightScore = 0;
 
-const paddle1 = { x: 10, y: HEIGHT / 2 - paddleHeight / 2, dy: 0 };
-const paddle2 = { x: WIDTH - 20, y: HEIGHT / 2 - paddleHeight / 2, dy: 0 };
-const ball = { x: WIDTH / 2, y: HEIGHT / 2, dx: 6, dy: 6 };
+const paddle1 = { x: 10, y: 0, dy: 0 };
+const paddle2 = { x: 0, y: 0, dy: 0 };
+const ball = { x: 0, y: 0, dx: 6, dy: 6 };
 
-function drawRect(x: number, y: number, w: number, h: number, color: string) {
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, w, h);
+let WIDTH: number, HEIGHT: number;
+let ctx: CanvasRenderingContext2D;
+
+let winnerCallback: ((winner: string) => void) | null = null;
+let player1Name: string, player2Name: string;
+
+// Key handling
+function setupInput() {
+  document.addEventListener('keydown', keyDownHandler);
+  document.addEventListener('keyup', keyUpHandler);
 }
 
-function drawBall() {
-  drawRect(ball.x, ball.y, ballSize, ballSize, 'white');
+function removeInput() {
+  document.removeEventListener('keydown', keyDownHandler);
+  document.removeEventListener('keyup', keyUpHandler);
 }
 
-function drawPaddles() {
-  drawRect(paddle1.x, paddle1.y, paddleWidth, paddleHeight, 'white');
-  drawRect(paddle2.x, paddle2.y, paddleWidth, paddleHeight, 'white');
+function keyDownHandler(e: KeyboardEvent) {
+  if (e.key === 'w') paddle1.dy = -6;
+  if (e.key === 's') paddle1.dy = 6;
+  if (e.key === 'ArrowUp') paddle2.dy = -6;
+  if (e.key === 'ArrowDown') paddle2.dy = 6;
 }
 
-function drawScores() {
-  ctx.fillStyle = 'white';
-  ctx.font = '32px Arial';
-  ctx.fillText(`${leftScore}`, WIDTH / 4, 50);
-  ctx.fillText(`${rightScore}`, WIDTH * 3 / 4, 50);
+function keyUpHandler(e: KeyboardEvent) {
+  if (e.key === 'w' || e.key === 's') paddle1.dy = 0;
+  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') paddle2.dy = 0;
 }
 
 function resetBall() {
   ball.x = WIDTH / 2;
   ball.y = HEIGHT / 2;
-  ball.dx = -ball.dx;
-  ball.dy = (Math.random() * 8 - 4);
+  const initialSpeed = 6;
+  ball.dx = Math.random() < 0.5 ? -initialSpeed : initialSpeed;
+
+  let angle = 0;
+  do {
+    angle = Math.random() * 8 - 4;
+  } while (Math.abs(angle) < 1);
+
+  ball.dy = angle;
 }
 
 function update() {
@@ -71,13 +82,37 @@ function update() {
 
   if (ball.x < 0) {
     rightScore++;
-    resetBall();
+    if (rightScore >= 2) endMatch(player2Name);
+    else resetBall();
   }
 
   if (ball.x > WIDTH) {
     leftScore++;
-    resetBall();
+    if (leftScore >= 2) endMatch(player1Name);
+    else resetBall();
   }
+}
+
+
+function drawRect(x: number, y: number, w: number, h: number, color: string) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, w, h);
+}
+
+function drawBall() {
+  drawRect(ball.x, ball.y, ballSize, ballSize, 'white');
+}
+
+function drawPaddles() {
+  drawRect(paddle1.x, paddle1.y, paddleWidth, paddleHeight, 'white');
+  drawRect(paddle2.x, paddle2.y, paddleWidth, paddleHeight, 'white');
+}
+
+function drawScores() {
+  ctx.fillStyle = 'white';
+  ctx.font = '32px Arial';
+  ctx.fillText(`${player1Name}: ${leftScore}`, WIDTH / 4, 50);
+  ctx.fillText(`${player2Name}: ${rightScore}`, WIDTH * 3 / 4, 50);
 }
 
 function draw() {
@@ -87,22 +122,61 @@ function draw() {
   drawScores();
 }
 
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
+function endMatch(winner: string) {
+  isRunning = false;
+  removeInput();
+
+  if (winnerCallback) {
+    winnerCallback(winner);
+    winnerCallback = null;
+  }
 }
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'w') paddle1.dy = -6;
-  if (e.key === 's') paddle1.dy = 6;
-  if (e.key === 'ArrowUp') paddle2.dy = -6;
-  if (e.key === 'ArrowDown') paddle2.dy = 6;
-});
+/**
+ * Starts a Pong match between two players.
+ * Ends automatically when one scores 10 points.
+ * 
+ * @param canvas - The canvas element.
+ * @param context - 2D canvas context.
+ * @param p1 - Name of player 1 (left side).
+ * @param p2 - Name of player 2 (right side).
+ * @param onMatchEnd - Callback called with winner's name.
+ */
+export function startPongMatch(
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+  p1: string,
+  p2: string,
+  onMatchEnd: (winner: string) => void
+) {
+  WIDTH = canvas.width;
+  HEIGHT = canvas.height;
+  ctx = context;
 
-document.addEventListener('keyup', (e) => {
-  if (e.key === 'w' || e.key === 's') paddle1.dy = 0;
-  if (e.key === 'ArrowUp' || e.key === 'ArrowDown') paddle2.dy = 0;
-});
+  player1Name = p1;
+  player2Name = p2;
+  winnerCallback = onMatchEnd;
 
-gameLoop();
+  paddle1.y = HEIGHT / 2 - paddleHeight / 2;
+  paddle2.x = WIDTH - 20;
+  paddle2.y = HEIGHT / 2 - paddleHeight / 2;
+
+  leftScore = 0;
+  rightScore = 0;
+  resetBall();
+
+  isRunning = true;
+  setupInput();
+
+  requestAnimationFrame(function gameLoop() {
+    if (!isRunning) return;
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+  });
+}
+
+export function stopPong() {
+  isRunning = false;
+  removeInput();
+}
