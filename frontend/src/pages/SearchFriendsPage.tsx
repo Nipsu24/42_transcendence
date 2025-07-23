@@ -70,8 +70,10 @@ export default function SearchFriendsPage() {
     try {
       // Call the API to add a friend
       await addFriend(name)
+	  // Fetch your updated profile (including the new friends list)
+	  const me = await getMe()
+	  setMyFriends(me.friends ?? [])
       // On success, remove the player from the search results
-      setResults(r => r.filter(f => f.name !== name))
 	  alert(`${name} is now your friend!`)
     } catch (err) {
       setServerError((err as Error).message)
@@ -174,9 +176,11 @@ export default function SearchFriendsPage() {
                         />
                       </td>
                       <td className="p-2">
-					  {!isAlreadyFriend && (
-                        <button
-                          onClick={() => handleAdd(r.name)}
+					  {isAlreadyFriend ? (
+						<span className="text-xs font-body text-gray-500">Already friend</span>
+					  ) : (
+						<button
+						onClick={() => handleAdd(r.name)}
                           className="px-2 py-1 text-xs font-body border border-gray-800 rounded hover:bg-gray-700 hover:text-white transition"
                         >
                           Add

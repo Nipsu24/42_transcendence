@@ -64,13 +64,13 @@ export const LoginView: React.FC<LoginViewProps> = ({
 		onChange={onChange}   
 		onSubmit={onSubmit}
       >
-    	<PrimaryButton
+    	  <PrimaryButton
 			type="submit"
 			loading={loading}
 			className="font-body tracking-wider bg-[#0489C2] hover:bg-[#26B2C5] w-full mt-4"
       >
         Log In
-      </PrimaryButton>
+        </PrimaryButton>
 	  </AuthForm>
       <div className="font-body tracking-wider text-center text-sm text-gray-600 mt-0.1">
         Don't have an account?{' '}

@@ -12,7 +12,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
   options,
   onSelect,
 }) => (
-  <div className="ml-10 mb-9 space-y-8">
+  <div className="mx-auto md:ml-10 mb-9 space-y-8">
     <div className="flex justify-center">
       <img
         src={selected}
