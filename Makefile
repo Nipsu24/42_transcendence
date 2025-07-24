@@ -40,8 +40,10 @@ check_node_module_frontend:
 			npm install react-router-dom && \
 			npm install --save-dev \
 				typescript \
+				history \
 				@types/react \
 				@types/react-dom \
+				@types/history \
 				vite \
 				@vitejs/plugin-react \
 				tailwindcss@latest \
@@ -109,9 +111,6 @@ backend_container: check_node_module_backend
 prod: $(CERT_KEY)  $(CERT_CRT) check_node_module_frontend
 	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
 	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build	
-# NEW!! 
-# add for the prod testing with seed.js
-	@ docker exec -i fastify_backend npx prisma db seed
 
 # removes all built containers
 down:

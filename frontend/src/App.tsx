@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import PongLoader    from './components/PongLoader'
 import LandingPage   from './pages/LandingPage'
 import MyHomePage    from './pages/MyHomePage'
@@ -17,15 +17,24 @@ import SearchFriendsPage   from './pages/SearchFriendsPage'
 
 export default function App() {
   const [loading, setLoading] = useState<boolean>(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 2200)
     return () => clearTimeout(t)
   }, [])
 
+useEffect(() => {
+		if (sessionStorage.getItem('unauthorized')) {
+			sessionStorage.removeItem('unauthorized')
+			navigate('/login')
+		  }
+	}, [navigate])
+  
   if (loading) return <PongLoader />
 
   return (
+
     <Routes>
       <Route path="/"       element={<LandingPage />} />
       <Route path="/gamemenu"   element={<GameMenuPage />} />

@@ -1,4 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react'
+import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { SignUpView } from '../components/SignUpView'
 import { register } from '../services/auth'
@@ -72,13 +73,15 @@ export default function SignUpPage() {
         password: form.password,
       })
 
-      // Load my info
-      await getMe()
-
-      // Navigate to home screen
+	  // Navigate to home screen
       navigate('/myhome')
-    } catch (err) {
-      setServerError((err as Error).message)
+    } catch (err : unknown) {
+	  if (err instanceof AxiosError) {
+    	// pull out your backend’s “already taken” message
+    	const message = err?.response?.data?.error ?? err.message
+    	setErrors({ name: message, email: message })
+	  }
+	  
     } finally {
       setLoading(false)
     }
