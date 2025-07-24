@@ -22,7 +22,7 @@ export default function BackgroundBall() {
       <div
         id="moving-ball"
         ref={ballRef}
-        className="absolute w-4 h-4 rounded-full bg-black shadow-md animate-zigzag-bounce"
+        className="absolute ball-size rounded-full bg-black shadow-md animate-zigzag-bounce"
       />
     </div>
   );

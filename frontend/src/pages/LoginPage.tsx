@@ -1,8 +1,8 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react'
+import axios, { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { LoginView } from '../components/LoginView'
 import { login } from '../services/auth'
-import { getMe } from '../services/players'
 
 interface LoginForm {
   email: string
@@ -16,7 +16,6 @@ type FormErrors = {
 
 export default function LoginPage() {
   const navigate = useNavigate()
-
   const [form, setForm] = useState<LoginForm>({ email: '', password: '' })
   const [errors, setErrors] = useState<FormErrors>({})
   const [serverError, setServerError] = useState<string | null>(null)
@@ -37,8 +36,9 @@ export default function LoginPage() {
     return errs
   }
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+	e.stopPropagation()
     setServerError(null)
 
     // Keep the input validation as-is
@@ -52,22 +52,30 @@ export default function LoginPage() {
     try {
       // Call login API: POST /api/login
       // Inside the service function, store JWT in localStorage and axios.defaults
-      await login({ e_mail: form.email, password: form.password })
-
-      // After successful login, get my info: GET /api/players/me
-      // Token is automatically included in the header, so no additional params needed
-      const me = await getMe()
-      console.log('현재 로그인 유저:', me)
-
-      // Navigate to home screen
-      navigate('/myhome')
-    } catch (err) {
-      // Handle network/auth errors
-      setServerError((err as Error).message)
-    } finally {
-      setLoading(false)
-    }
-  }
+		const { token } = await login({ e_mail: form.email, password: form.password })
+	  if (token) {
+      	navigate('/myhome')
+	  } else {
+		setServerError('Login succeeded but no token returned.')
+	  }
+	} catch (err : unknown) {
+	if (axios.isAxiosError(err) && err.response) {
+		const msg = (err.response.data as any).error ?? err.message
+		if (err.response.status === 401) {
+			// invalid credentials → inline field errors
+			setErrors({ email: msg, password: msg })
+			} else {
+			// other HTTP error → show banner
+			setServerError(msg)
+			}
+		} else {
+		// non-HTTP or unexpected error
+			setServerError((err as Error).message)
+		}
+	} finally {
+		setLoading(false)
+	}
+  	}
 
   const handleClose = (): void => {
     navigate('/')

@@ -23,7 +23,7 @@ interface PrimaryButtonProps {
 		font-body tracking-wider w-full py-3 mb-6
 		text-white font-medium rounded-lg transition
 		disabled:opacity-50
-		${className}          // ← merge in your overrides
+		${className}     
 	  `}
 	>
 	  {loading ? 'Loading…' : children}

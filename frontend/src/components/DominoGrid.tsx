@@ -1,14 +1,43 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-export default function DominoGrid(){
-// Explicitly specify row number and domino count types
+function useDominoCount(): number {
+  const [count, setCount] = useState(28)
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      let newCount = 28
+
+      if (width < 500) newCount = 16
+      else if (width < 640) newCount = 18
+      else if (width < 768) newCount = 24
+	  else if (width < 1560) newCount = 28
+	  else if (width < 1990) newCount = 28
+	  else if (width < 2560) newCount = 32
+      else newCount = 33
+
+      setCount(newCount)
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  return count
+}
+export default function DominoGrid() {
+  const count = useDominoCount()
   const rows: number[] = [0, 1]
-  const count: number = 28
 
 // Specify HTMLDivElement or null type for the 2D array ref
   const dominoRefs = useRef<(HTMLDivElement | null)[][]>(
     Array.from({ length: 2 }, () => Array(count).fill(null))
   )
+
+  useEffect(() => {
+	dominoRefs.current = Array.from({ length: 2 }, () => Array(count).fill(null))
+  }, [count])
 
 // Specify generic type for the ball position state
   const [ballPosition, setBallPosition] = useState<{ x: number; y: number }>({
@@ -69,16 +98,19 @@ export default function DominoGrid(){
 
   return (
     <div className="absolute bottom-[clamp(4vh,6vh,8vh)] w-full flex justify-center z-10">
-      <div className="w-[90.5vw] mx-auto px-[clamp(0.5rem,2vw,2rem)] flex flex-col items-center gap-4">
-        {rows.map((row) => (
+      {/* <div className="w-[90.5vw] mx-auto px-[clamp(0.5rem,2vw,2rem)] flex flex-col items-center gap-4"> */}
+	  <div className="w-[90.5vw] mx-auto px-[clamp(0.5rem,2vw,2rem)] flex flex-col items-center gap-4">
+		{rows.map((row) => (
           <div
             key={row}
-            className="flex justify-between w-full gap-[clamp(0.25rem,1.2vw,1.6rem)]"
-          >
+        //     className="flex justify-between w-full gap-[clamp(0.25rem,1.2vw,1.6rem)]"
+        //   >
+			className="flex justify-between w-full gap-[clamp(0.25rem,1.2vw,1.6rem)]"
+>
             {Array.from({ length: count }).map((_, i) => {
               const key = `${row}-${i}`
               const colorClass = active[key] || ''
-              const baseClass = `domino-bar bg-gray-100 ${colorClass}`
+              const baseClass = `domino-bar ${colorClass}`
               const tiltClass = active[key] ? 'tilt' : ''
               const animClass =
                 row === 1 ? 'animate-domino-top' : 'animate-domino-bottom'
@@ -89,7 +121,7 @@ export default function DominoGrid(){
                   ref={(el) => {
                     dominoRefs.current[row][i] = el
                   }}
-                  className={`${baseClass} ${tiltClass} ${animClass}`}
+                  className={`${baseClass} ${tiltClass} ${animClass} 4xl:w-[clamp(32px,2.2vw,48px)] 4xl:h-[clamp(8rem,12vw,14rem)]`}
                   style={{ animationDelay: `${i * 0.3 + row * 1.2}s` }}
                 />
               )

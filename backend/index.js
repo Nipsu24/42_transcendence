@@ -75,6 +75,7 @@ fastify.setErrorHandler((error, request, reply) => {
 // and serves index.html so React Router can handle the route.
 //
 // Actual unknown API or static file requests still return a proper 404.
+
 fastify.setNotFoundHandler((request, reply) => {
 	if (request.raw.method === 'GET' && !request.url.startsWith('/api') && !request.url.startsWith('/uploads') && !request.url.includes('.')) {
 	  return reply.type('text/html').sendFile('index.html');

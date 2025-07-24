@@ -94,26 +94,12 @@ export default function MyEditPage() {
   }
 
 
-  // save name & email
+  // save name & email & avatar
   const handleSave = async () => {
     setLoading(true); setError(null)
     try {
-    //   const updates: PlayerUpdateRequest[] = []
-    //   if (name) updates.push({ name })
-    //   if (email) updates.push({ e_mail: email })
-	//   if (avatar) updates.push({ avatar: avatar })
-
-    //   for (const upd of updates) {
-    //     await updateMe(upd)
-    //   }
-
-	// Update name
 	if (name) await updateMe({ name: name })
-
-	// Update email
 	if (email) await updateMe({ e_mail: email })
-
-	// Update avatar
 	if (avatar) await updateMe({ avatar: avatar })
 
 	  const me = await getMe()
@@ -121,12 +107,20 @@ export default function MyEditPage() {
 	  setName(me.name)
 	  setEmail(me.e_mail)
       navigate('/me')
-    } catch (error) {
-      setError((error as Error).message)
-    } finally {
-      setLoading(false)
+    } catch (error: any) {
+	  const message = error?.response?.data?.error ?? 'Unknown error'
+
+    if (message.includes('Name is not available')) {
+      alert('Name is not available anymore')
+	} else if (message.includes('E-mail is not available')) {
+	alert('E-mail is not available anymore')
+	} else {
+	alert('Oh, something went wrong!!')
     }
+  } finally {
+    setLoading(false)
   }
+ }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -146,8 +140,9 @@ export default function MyEditPage() {
           × CANCEL
         </button>
       {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
-      <div className="w-full max-w-4xl bg-white rounded-3xl shadow-md p-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative">
-
+      {/* <div className="w-full max-w-4xl bg-white rounded-3xl shadow-md p-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative"> */}
+	  <div className="w-full max-w-4xl mx-auto bg-white rounded-3xl shadow-md p-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative
++                 justify-items-center md:justify-items-stretch">
         {/* Left: static avatar options */}
         <AvatarSelector
           selected={avatar}
@@ -156,7 +151,7 @@ export default function MyEditPage() {
         />
 
         {/* Right: form & buttons */}
-        <div className="space-y-10 my-10 ml-10">
+        <div className="space-y-10 my-10 md:ml-10">
           <h1 className="text-4xl font-heading font-bold text-gray-800">
             Edit your profile!
           </h1>
