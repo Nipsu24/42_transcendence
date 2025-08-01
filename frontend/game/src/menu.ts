@@ -1,6 +1,7 @@
-import { launchGame } from './main.js';
+// import { launchGame } from './main.js';
 import { Button } from './Button.js';
 import { startTournamentMenu } from './tournamentMenu.js';
+import { startPongMatch } from './pong.js';
 
 /**
  * Starts the main menu, rendering buttons and handling interaction.
@@ -8,6 +9,8 @@ import { startTournamentMenu } from './tournamentMenu.js';
  * @param canvas - The canvas element where the menu is drawn.
  * @param ctx - The 2D drawing context for the canvas.
  */
+
+let inGame = false;
 
 export function startMenu(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
   let y = 200;
@@ -17,7 +20,11 @@ export function startMenu(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext
     new Button(300, y, 200, 50, '1 Player', () => alert('1 player')),
     new Button(300, y += space, 200, 50, '2 Players', () => {
       cleanup();
-      launchGame();
+      startPongMatch(canvas, ctx, 'Player 1', 'Player 2', (winner) => {
+          inGame = false;
+          alert(`${winner} wins!`);
+          startMenu(canvas, ctx);
+        });
     }),
     new Button(300, y += space, 200, 50, 'Tournament', () => {
       cleanup();
