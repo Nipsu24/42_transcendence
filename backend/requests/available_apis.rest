@@ -11,6 +11,10 @@ Content-Type: application/json
   "password": "23213"
 }
 
+### Send logout request for user
+PUT http://localhost:3001/api/players/me/logout
+Authorization: Bearer {{login.response.body.token}}
+
 ### Get info for the logged-in player (JWT protected)
 GET http://localhost:3001/api/players/me
 Authorization: Bearer {{login.response.body.token}}
