@@ -3,7 +3,7 @@ const { postDivReqResSchema } = require('./schemaHelpers');
 const { LoginReqSchema } = require('../schemas/login');
 const { LoginResSchema } = require('../schemas/login');
 
-// Handes login of registered users, returns player object and jwt token for further api calls
+// Handles login of registered users, returns player object and jwt token for further api calls
 async function userLogin(fastify, options) {
 
 fastify.post('/api/login', postDivReqResSchema(LoginReqSchema, LoginResSchema), async (request, reply) => {

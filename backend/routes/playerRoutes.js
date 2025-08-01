@@ -30,7 +30,7 @@ fastify.get('/api/players', arrayResponseSchema(playerBodySchema), async (reques
 		reply.send(players);
 	} 
 	catch (error) {
-		reply.status(500).send({ error: 'An error occurred while fetching players' });
+		reply.status(500).send({ error: 'An error occurred while fetching players.' });
 	}
 });
 
@@ -44,7 +44,7 @@ fastify.get('/api/players/me', objectResponseSchema(playerBodySchema), async (re
 		reply.send(player);
 	} 
 	catch (error) {
-		reply.status(500).send({ error: 'An error occurred while fetching the player' });
+		reply.status(500).send({ error: 'An error occurred while fetching the player.' });
 	}
 });
 
@@ -55,12 +55,12 @@ fastify.delete('/api/players/me', async (request, reply) => {
 		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
-			return reply.status(404).send({ error: 'Player not found'});
+			return reply.status(404).send({ error: 'Player not found.'});
 		await Player.deletePlayerById(id);
 		reply.status(204).send();
 	}
 	catch (error) {
-		reply.status(500).send({ error: 'An error occurred while deleting the player' });
+		reply.status(500).send({ error: 'An error occurred while deleting the player.' });
 	}
 });
 
@@ -70,7 +70,7 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
-			return reply.status(404).send({ error: 'Player not found' });
+			return reply.status(404).send({ error: 'Player not found.' });
 		const { name, e_mail, avatar } = request.body;
 		if (name) {
 			const foundPlayerByName = await Player.findPlayerByName(name);
@@ -82,7 +82,7 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 				reply.send(updatedPlayerInfo);
 			}
 			else
-				return reply.status(404).send({ error: 'Name is not available anymore' });
+				return reply.status(404).send({ error: 'Name is not available anymore.' });
 		}
 		if (e_mail) {
 			const foundPlayerByEMail = await Player.findPlayerByEMail(e_mail);
@@ -94,7 +94,7 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 				reply.send(updatedPlayerInfo);
 			}
 			else
-				return reply.status(404).send({ error: 'E-mail is not available anymore' });
+				return reply.status(404).send({ error: 'E-mail is not available anymore.' });
 		}
 		// NEW!! 
 		// new added code for updating avatar
@@ -107,7 +107,7 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 		}
 	}
 	catch (error) {
-		reply.status(500).send({ error: 'An error occured while updating the player information' });
+		reply.status(500).send({ error: 'An error occured while updating the player information.' });
 	}
 })
 
@@ -119,7 +119,7 @@ fastify.put('/api/players/me/stats', putDivReqResSchema(statsReqSchema, statsRes
 		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
-			return reply.status(404).send({ error: 'Player not found' });
+			return reply.status(404).send({ error: 'Player not found.' });
 		const { victories, defeats, opponentName, opponentVictories, opponentDefeats } = request.body;
 		const updateStats = await Stats.updateStats({
 			id: player.stats.id,
@@ -139,7 +139,7 @@ fastify.put('/api/players/me/stats', putDivReqResSchema(statsReqSchema, statsRes
 		reply.send(updateStats);
 	}
 	catch (error) {
-		reply.status(500).send({ error: 'An error occured while updating the statistics' });
+		reply.status(500).send({ error: 'An error occured while updating the statistics.' });
 	}
 });
 
@@ -152,12 +152,12 @@ fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySche
 		const playerOneId = request.user.id;
 		const playerOne = await Player.findPlayerById(playerOneId);
 		if (!playerOne) {
-			return reply.status(404).send({ error: 'PlayerOne not found' });
+			return reply.status(404).send({ error: 'PlayerOne not found.' });
 		}
 		if (request.body.playerTwoName) {
 			const playerTwo = await Player.findPlayerByName(request.body.playerTwoName);
 			if (!playerTwo) {
-				return reply.status(404).send({ error: 'PlayerTwo not found' });
+				return reply.status(404).send({ error: 'PlayerTwo not found.' });
 			}
 		}
 		const { playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
@@ -170,7 +170,7 @@ fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySche
 		reply.status(201).send(newMatch);
 	}
 	catch (error) {
-		reply.status(500).send({ error: 'An error occured while creating the match records' });
+		reply.status(500).send({ error: 'An error occured while creating the match records.' });
 	}
 })
 
@@ -184,12 +184,12 @@ fastify.post('/api/players/me/friends', postReqResSchema(friendsBodySchema), asy
 		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
-			return reply.status(404).send({ error: 'Player not found' });
+			return reply.status(404).send({ error: 'Player not found.' });
 		if (player.name === request.body.name)
-			return reply.status(404).send({ error: 'Cannot add yourself as friend' });
+			return reply.status(404).send({ error: 'Cannot add yourself as friend.' });
 		const friend = await Player.findPlayerByName(request.body.name);
 		if (!friend)
-			return reply.status(404).send({ error: 'Friend not found' });
+			return reply.status(404).send({ error: 'Friend not found.' });
 		if (player.friends.some(f => f.id === friend.id))
 			return reply.status(404).send({ error: `Friend ${friend.name} already added as a friend.` });
 		else {
@@ -198,7 +198,7 @@ fastify.post('/api/players/me/friends', postReqResSchema(friendsBodySchema), asy
 		}
 	}
 	catch (error) {
-		reply.status(500).send({ error: 'An error occured while adding a friend' });
+		reply.status(500).send({ error: 'An error occured while adding a friend.' });
 	}
 })
 
@@ -208,17 +208,17 @@ fastify.delete('/api/players/me/friends', async (request, reply) => {
 		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
-			return reply.status(404).send({ error: 'Player not found' });
+			return reply.status(404).send({ error: 'Player not found.' });
 		const friend = await Player.findPlayerByName(request.body.name);
 		if (!friend)
-			return reply.status(404).send({ error: 'Friend not found' });
+			return reply.status(404).send({ error: 'Friend not found.' });
 		else {
 			await Player.deleteFriend(id, friend.id);
 			reply.status(201).send({ message: `Friend ${friend.name} deleted successfully.` });
 		}
 	}
 	catch (error) {
-		reply.status(500).send({ error: 'An error occured while deleting a friend' });
+		reply.status(500).send({ error: 'An error occured while deleting a friend.' });
 	}
 })
 
@@ -234,7 +234,7 @@ fastify.post('/api/players/me/upload', async (request, reply) => {
 		const id = request.user.id;
 		const player = await Player.findPlayerById(id);
 		if (!player)
-			return reply.status(404).send({ error: 'Player not found' });
+			return reply.status(404).send({ error: 'Player not found.' });
 		
 		const data = await request.file();
 		console.log('request body:', (data));
@@ -245,7 +245,22 @@ fastify.post('/api/players/me/upload', async (request, reply) => {
 	}
 	catch (error) {
 		console.log('error:', (error));
-		reply.status(500).send({ error: 'An error occured while uploading the image' });
+		reply.status(500).send({ error: 'An error occured while uploading the image.' });
+	}
+})
+
+
+fastify.put('/api/players/me/logout', async (request, reply) => {
+	try {
+		const id = request.user.id;
+		const player = await Player.findPlayerById(id);
+		if (!player)
+			return reply.status(404).send({ error: 'Player not found.' });
+		await Player.setPlayerOffline(player);
+		return reply.status(200).send({ message: 'User logged out successfully.'});
+	}
+	catch (error) {
+		reply.status(500).send({ error: 'An error occured while logging out.' });
 	}
 })
 
