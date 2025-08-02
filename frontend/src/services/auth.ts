@@ -60,8 +60,17 @@ export const register = async (
   }
 }
 
-// Function to log out the user
-export const logout = (): void => {
-  localStorage.removeItem('jwtToken')
-  delete axios.defaults.headers.common['Authorization']
-}
+// Logout: send request to backend and clear stored tokens
+export const logout = async (): Promise<void> => {
+	try {
+	  // Call PUT /players/me/logout
+	  await axios.put(`${baseUrl}/players/me/logout`);
+	} catch (err) {
+	  console.error('Logout API failed:', err);
+	} finally {
+	  // Remove JWT from localStorage and axios default headers
+	  localStorage.removeItem('jwtToken');
+	  delete axios.defaults.headers.common['Authorization'];
+	}
+  };
+  
