@@ -18,7 +18,7 @@
     "react-router-dom": "^7.7.1"
   },
   "overrides": {
-    "glob": "^9.3.1"
+    "glob": "^10.3.10"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
@@ -39,7 +39,7 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.2",
-    "vite": "^6.3.5"
+    "vite": "^7.0.6"
   },
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
   "main": "eslint.config.js",
