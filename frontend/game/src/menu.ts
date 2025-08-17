@@ -1,4 +1,4 @@
-// import { launchGame } from './main.js';
+// import { launchGame } from './main.js'; 
 import { Button } from './Button.js';
 import { startTournamentMenu } from './tournamentMenu.js';
 import { startPongMatch } from './pong.js';
@@ -17,10 +17,17 @@ export function startMenu(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext
   const space = 80;
 
   const buttons: Button[] = [
-    new Button(300, y, 200, 50, '1 Player', () => alert('1 player')),
+    new Button(300, y, 200, 50, '1 Player', () => {
+      cleanup();
+      startPongMatch(canvas, ctx, true, 'Player 1', 'AI player', (winner) => {
+          inGame = false;
+          alert(`${winner} wins!`);
+          startMenu(canvas, ctx);
+        });
+    }),
     new Button(300, y += space, 200, 50, '2 Players', () => {
       cleanup();
-      startPongMatch(canvas, ctx, 'Player 1', 'Player 2', (winner) => {
+      startPongMatch(canvas, ctx, false, 'Player 1', 'Player 2', (winner) => {
           inGame = false;
           alert(`${winner} wins!`);
           startMenu(canvas, ctx);
