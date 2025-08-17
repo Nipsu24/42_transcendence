@@ -1,6 +1,10 @@
 let isRunning = false;
 let isAi = false;
 let cycle = 0;
+let fps = 60;
+let aiTargetY: number | null = null;
+let aiDecisionTime = 0;
+let aiDecisionInterval = 1000;
 
 const paddleWidth = 10, paddleHeight = 80, ballSize = 12;
 let leftScore = 0, rightScore = 0;
@@ -8,7 +12,7 @@ let leftScore = 0, rightScore = 0;
 const paddle1 = { x: 10, y: 0, dy: 0 };
 const paddle2 = { x: 0, y: 0, dy: 0 };
 const ball = { x: 0, y: 0, dx: 6, dy: 6 };
-const speedMod = 1.05;
+const speedMod = 1.02;
 
 let WIDTH: number, HEIGHT: number;
 let ctx: CanvasRenderingContext2D;
@@ -43,6 +47,7 @@ function resetBall() {
   ball.x = WIDTH / 2;
   ball.y = HEIGHT / 2;
   const initialSpeed = 6;
+  aiDecisionInterval = 1000;
   
   ball.dx = Math.random() < 0.5 ? -initialSpeed : initialSpeed;
 
@@ -54,53 +59,67 @@ function resetBall() {
   ball.dy = angle;
 }
 
-function getRandomInt (min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+// function getRandomInt (min: number, max: number) {
+//     return Math.floor(Math.random() * (max - min + 1)) + min;
+// }
+
+function predictBallY(): number {
+  let simX = ball.x;
+  let simY = ball.y;
+  let simDx = ball.dx;
+  let simDy = ball.dy;
+
+  while (simDx > 0 && simX < paddle2.x - ballSize)
+  {
+    simX += simDx;
+    simY += simDy;
+
+    if (simY < 0 || simY > HEIGHT - ballSize)
+      simDy *= -1;
+  }
+
+  return simY + ballSize / 2;
 }
 
 function aiBehavior() {
-  let nextMove = getRandomInt(1, 10);
-  const paddleBottom = paddle2.y + paddleHeight;
-  let reaction;
+  const now = performance.now();
 
-  if (nextMove == 1 || nextMove == 2)
-    reaction = WIDTH / 4;
-  else if (nextMove == 3 || nextMove == 4)
-    reaction = WIDTH - WIDTH / 3;
-  else
-    reaction = WIDTH / 2;
+  if (now - aiDecisionTime < aiDecisionInterval) return;
+  aiDecisionTime = now;
 
-  if (ball.x >= reaction)
-  {
-    if (ball.y > paddle2.y && ball.y < paddleBottom)
-      paddle2.dy = 0;
-    else if (nextMove >= 2)
-    {
-      if (ball.y < paddle2.y + paddleHeight / 2)
-        paddle2.dy = -6;
-      else if (ball.y > paddleBottom - paddleHeight / 2)
-        paddle2.dy = 6;
-    }
-    else
-      paddle2.dy = 0;
-  }
-  else
+  aiTargetY = predictBallY();
+  if (ball.dx < 0)
+    aiTargetY = HEIGHT / 2;
+}
+
+function controlAI() {
+  if (aiTargetY === null) return;
+
+  const paddleMiddle = paddle2.y + paddleHeight / 2;
+
+  if (Math.abs(aiTargetY - paddleMiddle) < 6)
     paddle2.dy = 0;
-  
+  else if (aiTargetY < paddleMiddle)
+    paddle2.dy = -6;
+  else
+    paddle2.dy = 6;
 }
 
-function updateCycle() {
-  if (cycle++ >= 3)
-    cycle = 0;
-  return cycle;
-}
+// function updateCycle() {
+//   if (cycle++ >= fps)
+//     cycle = 0;
+//   return cycle;
+// }
 
 function update() {
   paddle1.y += paddle1.dy;
   paddle2.y += paddle2.dy;
 
-  if (isAi) // && updateCycle() < 2)
+  if (isAi)
+  {
     aiBehavior();
+    controlAI();
+  }
 
   paddle1.y = Math.max(0, Math.min(HEIGHT - paddleHeight, paddle1.y));
   paddle2.y = Math.max(0, Math.min(HEIGHT - paddleHeight, paddle2.y));
@@ -116,6 +135,7 @@ function update() {
     ball.y < paddle1.y + paddleHeight
   ) {
     ball.dx *= -speedMod;
+    aiDecisionInterval -= 2;
     ball.x = paddle1.x + paddleWidth;
   }
 
@@ -125,6 +145,7 @@ function update() {
     ball.y < paddle2.y + paddleHeight
   ) {
     ball.dx *= -speedMod;
+    aiDecisionInterval -= 2;
     ball.x = paddle2.x - ballSize;
   }
 
