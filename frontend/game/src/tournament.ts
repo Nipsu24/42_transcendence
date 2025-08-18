@@ -155,7 +155,7 @@ function startNextMatch() {
   isMatchInProgress = true;
   stopBracketLoop();
 
-  startPongMatch(canvas, ctx, match.player1, match.player2, (winner) => {
+  startPongMatch(canvas, ctx, false, match.player1, match.player2, (winner) => {
     tm.recordWinner(winner);
 
     isMatchInProgress = false;

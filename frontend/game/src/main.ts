@@ -19,7 +19,7 @@
 // export function launchGame() {
 //   inGame = true;
 
-//   startPongMatch(canvas, ctx, 'Player 1', 'Player 2', (winner) => {
+//   startPongMatch(canvas, ctx, false, 'Player 1', 'Player 2', (winner) => {
 //     inGame = false;
 //     alert(`${winner} wins!`);
 //     startMenu(canvas, ctx);
