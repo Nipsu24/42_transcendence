@@ -28,8 +28,8 @@ test_game: check_node_module_game
 	@ cd $(GAME) && npm run build
 
 run_game: # just for quick testing purposes
-	@ cd $(GAME) && npm start 
-	
+	@ cd $(GAME) && npm start
+
 # chekcs if requirements for compiling frontend fullfilled (Added tailwindcss)
 check_node_module_frontend:
 	@if [ ! -d $(FRONTEND)/node_modules ]; then \
@@ -87,6 +87,8 @@ check_node_module_backend:
 			npm install supertest --save-dev && \
 			npm install sequelize sqlite3 && \
 			npm install @prisma/client && \
+			npm install gapi-script && \
+			npm install @react-oauth/google && \
 			echo "Pushing Prisma schema to the database..." && \
 			npx prisma db push && \
 			echo "Generating Prisma Client..." && \
@@ -110,7 +112,7 @@ backend_container: check_node_module_backend
 # full production environment, building both nginx (frontend) and backend container
 prod: $(CERT_KEY)  $(CERT_CRT) check_node_module_frontend
 	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
-	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build	
+	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build
 
 # removes all built containers
 down:

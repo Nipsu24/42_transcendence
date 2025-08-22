@@ -1,6 +1,6 @@
 require('dotenv').config()
 const fastify = require('fastify')({ logger: true });
-// MODIFIED!! 
+// MODIFIED!!
 // Changed the port from 3000 to 3001 to fix backend connection in prod compile
 const PORT = parseInt(process.env.PORT, 10) || 3001;
 //
@@ -28,8 +28,8 @@ fastify.register(fastifyStatic, {
 
 // registers JWT plugin
 fastify.register(require('@fastify/jwt'), {
-	secret: process.env.JWT_SECRET
-	// secret: 'hello'
+	// secret: process.env.JWT_SECRET
+	secret: 'hello'
 });
 
 //imports code from the player apis (e.g. ./routes/playerRoutes.js)
@@ -60,10 +60,10 @@ fastify.setErrorHandler((error, request, reply) => {
 			console.log('error:', (error));
 			return reply.status(400).send({ error: 'Invalid request data.' });
 		}
-	} 
+	}
 	else
 		console.log('error:', (error));
-		return reply.status(500).send({ error: 'An internal server error occurred.' });
+	return reply.status(500).send({ error: 'An internal server error occurred.' });
 });
 
 // NEW!!
@@ -78,18 +78,18 @@ fastify.setErrorHandler((error, request, reply) => {
 
 fastify.setNotFoundHandler((request, reply) => {
 	if (request.raw.method === 'GET' && !request.url.startsWith('/api') && !request.url.startsWith('/uploads') && !request.url.includes('.')) {
-	  return reply.type('text/html').sendFile('index.html');
+		return reply.type('text/html').sendFile('index.html');
 	} else {
-	  reply.status(404).send({
-		message: `Route ${request.raw.method}:${request.url} not found`,
-		error: 'Not Found',
-		statusCode: 404,
-	  });
+		reply.status(404).send({
+			message: `Route ${request.raw.method}:${request.url} not found`,
+			error: 'Not Found',
+			statusCode: 404,
+		});
 	}
-  });  
+});
 
 // defines port on which backend is listening (taken from .env file)
-fastify.listen( {port: PORT, host:'0.0.0.0'}, (err, address) => {
+fastify.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
 	if (err) {
 		fastify.log.error(err);
 		process.exit(1);

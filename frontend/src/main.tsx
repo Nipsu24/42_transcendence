@@ -1,11 +1,23 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { BrowserRouter, useNavigate  } from 'react-router-dom'
+import { BrowserRouter, useNavigate } from 'react-router-dom'
 import App from './App'
 import './index.css'
 import axios from 'axios'
 import { createBrowserHistory } from 'history'
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
+const clientId = '879044000690-g26h5hcndi0o40o6bimcrp22b7lf2n2k.apps.googleusercontent.com';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <GoogleOAuthProvider clientId={clientId}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </GoogleOAuthProvider>
+  </React.StrictMode>
+);
 // Initialize JWT token
 const token = localStorage.getItem('jwtToken')
 if (token) {
@@ -20,16 +32,8 @@ axios.interceptors.response.use(
     const isAlreadyOnLogin = window.location.pathname === '/login'
 
     if (err.response?.status === 401 && !isLoginRequest && !isAlreadyOnLogin) {
-	  sessionStorage.setItem('unauthorized', '1')
+      sessionStorage.setItem('unauthorized', '1')
     }
     return Promise.reject(err)
   }
-)
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
 )

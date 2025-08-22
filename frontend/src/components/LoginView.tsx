@@ -1,41 +1,54 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { AuthForm }      from './AuthForm'
-import { PrimaryButton }  from './PrimaryButton'
+import { AuthForm } from './AuthForm'
+import { PrimaryButton } from './PrimaryButton'
+import { GoogleLogin } from '@react-oauth/google'
+
+const clientID = 'GOOGLE_CLIENT_ID'
+
+
 
 interface LoginForm {
-	email: string
-	password: string
-  }
-  
-  type FormErrors = {
-	email?: string
-	password?: string
-  }
-  
-  interface LoginViewProps {
-	email: string
-	password: string
-	errors: FormErrors
-	serverError: string | null
-	loading: boolean
-	onChange: React.ChangeEventHandler<HTMLInputElement>
-	onSubmit: React.FormEventHandler<HTMLFormElement>
-	onClose: () => void
-	onOAuthClick?: () => void
-	oauthLoading?: boolean
+  email: string
+  password: string
+}
+
+type FormErrors = {
+  email?: string
+  password?: string
+}
+
+interface LoginViewProps {
+  email: string
+  password: string
+  errors: FormErrors
+  serverError: string | null
+  loading: boolean
+  onChange: React.ChangeEventHandler<HTMLInputElement>
+  onSubmit: React.FormEventHandler<HTMLFormElement>
+  onClose: () => void
+  onOAuthClick?: () => void
+  oauthLoading?: boolean
+}
+
+const onSuccess = (response: any) => {
+  console.log('Login Success:', response)
+}
+
+const onFailure = (response: any) => {
+  console.log('Login Failed:', response)
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({
-  email, 
-  password, 
-  errors, 
-  serverError, 
-  loading, 
-  onChange, 
-  onSubmit, 
-  onClose,  
-  onOAuthClick = () => {},
+  email,
+  password,
+  errors,
+  serverError,
+  loading,
+  onChange,
+  onSubmit,
+  onClose,
+  onOAuthClick = () => { },
   oauthLoading = false,
 }) => (
   <div className="relative bg-gray-700 min-h-screen flex items-center justify-center px-4">
@@ -61,17 +74,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
         errors={errors}
         serverError={serverError}
         loading={loading}
-		onChange={onChange}   
-		onSubmit={onSubmit}
+        onChange={onChange}
+        onSubmit={onSubmit}
       >
-    	  <PrimaryButton
-			type="submit"
-			loading={loading}
-			className="font-body tracking-wider bg-[#0489C2] hover:bg-[#26B2C5] w-full mt-4"
-      >
-        Log In
+        <PrimaryButton
+          type="submit"
+          loading={loading}
+          className="font-body tracking-wider bg-[#0489C2] hover:bg-[#26B2C5] w-full mt-4"
+        >
+          Log In
         </PrimaryButton>
-	  </AuthForm>
+      </AuthForm>
       <div className="font-body tracking-wider text-center text-sm text-gray-600 mt-0.1">
         Don't have an account?{' '}
         <Link to="/signup" className="font-semibold text-gray-700 hover:underline">
@@ -85,22 +98,23 @@ export const LoginView: React.FC<LoginViewProps> = ({
         <hr className="flex-grow border-[#334155]" />
       </div>
 
-	  <PrimaryButton
-		type="button"
-		loading={oauthLoading}
-		onClick={() => {
-			/* Google OAuth flow */
-		}}
-		className="w-full h-[52px] px-4 bg-[#26B2C5] hover:bg-[#55CFD4] text-white text-base font-body flex items-center justify-center gap-2 mt-4"
-		>
-		<span className="leading-none">Sign in with </span>
-		<img
-			src={new URL('../assets/google.svg', import.meta.url).href}
-			alt="Google logo"
-			className="h-18 w-18"
-		/>
-		</PrimaryButton>
+      <GoogleLogin
+        onSuccess={async (credentialResponse) => {
+          const idToken = credentialResponse.credential;
+          const res = await fetch('/api/google-signin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+          });
+          const data = await res.json();
+          if (data.token) {
+            localStorage.setItem('token', data.token);
+            console.log('Google login successful:', data);
+          }
+        }}
+        onError={() => alert('Google kirjautuminen epäonnistui')}
+      />
 
     </div>
-  </div>
+  </div >
 )
