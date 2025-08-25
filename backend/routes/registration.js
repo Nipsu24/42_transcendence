@@ -13,7 +13,12 @@ fastify.post('/api/registration', postDivReqResSchema(RegistrationReqSchema, Reg
 		const allPlayers = await Player.getAllPlayers();
 		if (allPlayers.some(p => p.name === request.body.name || p.e_mail === request.body.e_mail))
 			return reply.status(409).send({ error: 'Name or e-mail is not available anymore' });
-		const newPlayer = await Player.createPlayer(request.body);
+		
+		 const playerData = {
+            ...request.body,
+            auth: 'local', // for non-google sign-ins
+        };
+		const newPlayer = await Player.createPlayer(playerData);
 		const token = fastify.jwt.sign({ id: newPlayer.id, name: newPlayer.name },{ expiresIn: '1h' });
 		
 		reply.status(201).send({ ...newPlayer, token });

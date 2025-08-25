@@ -6,6 +6,7 @@ const playerBodySchema = {
 		id: { type: 'integer', minimum: 1 },
 		name: { type: 'string' },
 		password: { type: 'string' },
+		auth: { type: 'string'},
 		e_mail: { type: 'string' },
 		online: { type: 'boolean'},
 		avatar: { type: 'string' },
@@ -40,10 +41,7 @@ const playerBodySchema = {
 				properties: {
 					id: { type: 'integer' },
 					name: { type: 'string' },
-					// NEW!! 
-					// new code for enable the friends pages's avatars 
 					avatar: { type: 'string'},
-					//
 					online: { type: 'boolean' },
 				}
 			 }
@@ -61,8 +59,6 @@ const playerReqInfoSchema = {
 	properties: {
 		name: { type: 'string'},
 		e_mail: { type: 'string'},
-		// NEW!!
-		// new code for updating avatar field
 		avatar: { type: 'string'}
 	},
 	minProperties: 1,

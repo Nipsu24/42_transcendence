@@ -2,6 +2,8 @@ const Player = require('../dataAccess/player');
 const { postDivReqResSchema } = require('./schemaHelpers');
 const { LoginReqSchema } = require('../schemas/login');
 const { LoginResSchema } = require('../schemas/login');
+const { OAuth2Client } = require('google-auth-library'); // needed for google sign-in (updated after initial 'npm install google-auth-library' in package.json)
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // needed for google sign-in
 
 // Handles login of registered users, returns player object and jwt token for further api calls
 async function userLogin(fastify, options) {
@@ -15,6 +17,7 @@ async function userLogin(fastify, options) {
 		const token = fastify.jwt.sign({ id: user.id, name: user.name }, { expiresIn: '1h' });
 		await Player.setPlayerOnline(user);
 		reply.send({ ...user, token });
+	}); // changed so that google endpoint is not nested instide api/login endpoint
 
 		fastify.post('/api/google-signin', async (request, reply) => {
 			try {
@@ -42,7 +45,6 @@ async function userLogin(fastify, options) {
 				reply.status(401).send({ error: 'Google authentication failed' });
 			}
 		});
-	});
 
 }
 

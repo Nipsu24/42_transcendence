@@ -34,7 +34,6 @@ export default function App() {
   if (loading) return <PongLoader />
 
   return (
-
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/gamemenu" element={<GameMenuPage />} />

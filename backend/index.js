@@ -28,8 +28,8 @@ fastify.register(fastifyStatic, {
 
 // registers JWT plugin
 fastify.register(require('@fastify/jwt'), {
-	// secret: process.env.JWT_SECRET
-	secret: 'hello'
+	secret: process.env.JWT_SECRET
+	// secret: 'hello'
 });
 
 //imports code from the player apis (e.g. ./routes/playerRoutes.js)
@@ -56,14 +56,11 @@ fastify.setErrorHandler((error, request, reply) => {
 			return reply.status(400).send({ error: 'Invalid friend data: "name" required.' });
 		else if (request.method === 'PUT' && request.url.startsWith('/api/players/me'))
 			return reply.status(400).send({ error: 'Invalid player info data: name and/or e_mail required.' });
-		else {
-			console.log('error:', (error));
+		else 
 			return reply.status(400).send({ error: 'Invalid request data.' });
-		}
 	}
 	else
-		console.log('error:', (error));
-	return reply.status(500).send({ error: 'An internal server error occurred.' });
+		return reply.status(500).send({ error: 'An internal server error occurred.' });
 });
 
 // NEW!!

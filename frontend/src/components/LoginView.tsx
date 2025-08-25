@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom'
 import { AuthForm } from './AuthForm'
 import { PrimaryButton } from './PrimaryButton'
 import { GoogleLogin } from '@react-oauth/google'
-
-const clientID = 'GOOGLE_CLIENT_ID'
-
-
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
 
 interface LoginForm {
   email: string
@@ -31,14 +29,6 @@ interface LoginViewProps {
   oauthLoading?: boolean
 }
 
-const onSuccess = (response: any) => {
-  console.log('Login Success:', response)
-}
-
-const onFailure = (response: any) => {
-  console.log('Login Failed:', response)
-}
-
 export const LoginView: React.FC<LoginViewProps> = ({
   email,
   password,
@@ -48,9 +38,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
   onChange,
   onSubmit,
   onClose,
-  onOAuthClick = () => { },
-  oauthLoading = false,
-}) => (
+  
+}) => { const navigate = useNavigate();
+  return (
   <div className="relative bg-gray-700 min-h-screen flex items-center justify-center px-4">
     {/* Close */}
     <button
@@ -97,7 +87,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
         <span className="px-3 text-sm">or</span>
         <hr className="flex-grow border-[#334155]" />
       </div>
-
+<div className="flex justify-center items-center mt-6">
       <GoogleLogin
         onSuccess={async (credentialResponse) => {
           const idToken = credentialResponse.credential;
@@ -108,13 +98,15 @@ export const LoginView: React.FC<LoginViewProps> = ({
           });
           const data = await res.json();
           if (data.token) {
-            localStorage.setItem('token', data.token);
-            console.log('Google login successful:', data);
+            localStorage.setItem('jwtToken', data.token);//changed from token to jwtToken for consistency in other functions
+            axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`; //needed for further api calls when logged in with google
+            navigate('/myhome'); // needed to be forwarded to correct page after login with google
           }
         }}
-        onError={() => alert('Google kirjautuminen epäonnistui')}
+        onError={() => alert('Google sign-in failed')} // changed to English:)
       />
-
+</div>
     </div>
   </div >
 )
+}

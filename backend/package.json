@@ -33,6 +33,7 @@
     "dotenv": "^17.2.1",
     "fastify": "^5.5.0",
     "gapi-script": "^1.2.0",
+    "google-auth-library": "^10.2.1",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7"
   },

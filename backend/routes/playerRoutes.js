@@ -237,14 +237,12 @@ fastify.post('/api/players/me/upload', async (request, reply) => {
 			return reply.status(404).send({ error: 'Player not found.' });
 		
 		const data = await request.file();
-		console.log('request body:', (data));
 		const filePath = `./uploads/${data.filename}`;
         await pump(data.file, fs.createWriteStream(filePath));
 		await Player.updateAvatar(id, filePath);
 		return reply.status(200).send({url: `/uploads/${data.filename}`})
 	}
 	catch (error) {
-		console.log('error:', (error));
 		reply.status(500).send({ error: 'An error occured while uploading the image.' });
 	}
 })

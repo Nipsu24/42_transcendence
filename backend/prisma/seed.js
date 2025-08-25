@@ -32,11 +32,16 @@ async function main() {
 		data: { victories: 7, defeats: 1 }
 	});
 
+	// 	const stats50 = await prisma.statistics.create({
+	// 	data: { victories: 7, defeats: 1 }
+	// });
+
   // Creates players with statsId referencing the statistics records
 	const player1 = await prisma.player.create({
 		data: {
 		name: 'Player One',
 		password: '23213',
+		auth: 'local',
 		e_mail: 'one@example.com',
 		online: false,
 		avatar: './assets/img1.jpg',
@@ -47,6 +52,7 @@ async function main() {
 		data: {
 		name: 'Player Two',
 		password: 'password123',
+			auth: 'local',
 		e_mail: 'two@example.com',
 		online: false,
 		avatar: './assets/img2.jpg',
@@ -57,6 +63,7 @@ async function main() {
 		data: {
 		name: 'Player Three',
 		password: 'qwerty',
+			auth: 'local',
 		e_mail: 'three@example.com',
 		online: true,
 		avatar: './assets/img3.jpg',
@@ -110,12 +117,24 @@ async function main() {
 		data: {
 			name: 'Gugu',
 			password: 'qwerty',
+			auth: 'local',
 			e_mail: 'gugu@hauhau.com',
 			online: true,
 			avatar: '/uploads/for_gugu.png',
 			statsId: stats4.id
 		}
 	});
+
+	// 	const player5 = await prisma.player.create({
+	// 	data: {
+	// 		name: 'Marius',
+	// 		password: '123456',
+	// 		e_mail: 'marius.meier24@gmail.com',
+	// 		online: false,
+	// 		avatar: '/uploads/for_gugu.png',
+	// 		statsId: stats50.id
+	// 	}
+	// });
 
 	// Additional users to serve as friends and opponents
 	const extraStats = await Promise.all(
@@ -140,6 +159,7 @@ async function main() {
 			data: {
 			  name: `Friend ${i + 1}`,
 			  password: `pass${i + 1}`,
+				auth: 'local',
 			  e_mail: `friend${i + 1}@example.com`,
 			  online: i % 2 === 0,
 			  avatar: `./assets/${avatarFilenames[i]}`,
