@@ -17,7 +17,8 @@ datasource db {
 model Player {
   id       Int    @id @default(autoincrement())
   name     String @unique
-  password String
+  password String?
+  auth     String
   e_mail   String? @unique
   online   Boolean?
   avatar   String?
