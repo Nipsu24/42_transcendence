@@ -20,6 +20,9 @@ let ctx: CanvasRenderingContext2D;
 let winnerCallback: ((winner: string) => void) | null = null;
 let player1Name: string, player2Name: string;
 
+let playArea: { x: number; y: number; width: number; height: number };
+
+
 // Key handling
 function setupInput() {
   document.addEventListener('keydown', keyDownHandler);
@@ -41,11 +44,14 @@ function keyDownHandler(e: KeyboardEvent) {
 function keyUpHandler(e: KeyboardEvent) {
   if (e.key === 'w' || e.key === 's') paddle1.dy = 0;
   if (e.key === 'ArrowUp' || e.key === 'ArrowDown') paddle2.dy = 0;
+  if (e.key === 'Escape') endMatch("");
 }
+
+
 
 function resetBall() {
   ball.x = WIDTH / 2;
-  ball.y = HEIGHT / 2;
+  ball.y = playArea.height / 2;
   const initialSpeed = 6;
   aiDecisionInterval = 1000;
   
@@ -74,7 +80,7 @@ function predictBallY(): number {
     simX += simDx;
     simY += simDy;
 
-    if (simY < 0 || simY > HEIGHT - ballSize)
+    if (simY < playArea.y || simY > playArea.y + playArea.height - ballSize)
       simDy *= -1;
   }
 
@@ -89,7 +95,7 @@ function aiBehavior() {
 
   aiTargetY = predictBallY();
   if (ball.dx < 0)
-    aiTargetY = HEIGHT / 2;
+    aiTargetY = playArea.height / 2;
 }
 
 function controlAI() {
@@ -121,13 +127,13 @@ function update() {
     controlAI();
   }
 
-  paddle1.y = Math.max(0, Math.min(HEIGHT - paddleHeight, paddle1.y));
-  paddle2.y = Math.max(0, Math.min(HEIGHT - paddleHeight, paddle2.y));
+  paddle1.y = Math.max(playArea.y, Math.min(playArea.y + playArea.height - paddleHeight, paddle1.y));
+  paddle2.y = Math.max(playArea.y, Math.min(playArea.y + playArea.height - paddleHeight, paddle2.y));
 
   ball.x += ball.dx;
   ball.y += ball.dy;
 
-  if (ball.y < 0 || ball.y > HEIGHT - ballSize) ball.dy *= -1;
+  if (ball.y < playArea.y || ball.y > playArea.y + playArea.height - ballSize) ball.dy *= -1;
 
   if (
     ball.x < paddle1.x + paddleWidth &&
@@ -179,9 +185,19 @@ function drawPaddles() {
 
 function drawScores() {
   ctx.fillStyle = 'white';
-  ctx.font = '32px Arial';
-  ctx.fillText(`${player1Name}: ${leftScore}`, WIDTH / 4, 50);
-  ctx.fillText(`${player2Name}: ${rightScore}`, WIDTH * 3 / 4, 50);
+  ctx.font = '24px Arial';
+  ctx.textAlign = 'center';
+
+  const scoreY = 28;
+  ctx.fillText(`${player1Name}: ${leftScore}`, WIDTH / 4, scoreY);
+  ctx.fillText(`${player2Name}: ${rightScore}`, (WIDTH * 3) / 4, scoreY);
+}
+
+function drawBorder() {
+  const scoreBarHeight = 40;
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(0, scoreBarHeight, playArea.width, playArea.height);
 }
 
 function draw() {
@@ -189,6 +205,7 @@ function draw() {
   drawPaddles();
   drawBall();
   drawScores();
+  drawBorder();
 }
 
 function endMatch(winner: string) {
@@ -222,12 +239,20 @@ export function startPongMatch(
 ) {
   WIDTH = canvas.width;
   HEIGHT = canvas.height;
+  playArea = {
+    x: 0,
+    y: 40,
+    width: WIDTH,
+    height: HEIGHT - 40
+  };
+
   ctx = context;
 
   if (ai)
     isAi = true;
   else
     isAi = false;
+
 
   player1Name = p1;
   player2Name = (isAi) ? "AI player" : p2;
