@@ -28,8 +28,8 @@ fastify.register(fastifyStatic, {
 
 // registers JWT plugin
 fastify.register(require('@fastify/jwt'), {
-	secret: process.env.JWT_SECRET
-	// secret: 'hello'
+	// secret: process.env.JWT_SECRET
+	secret: 'hello'
 });
 
 //imports code from the player apis (e.g. ./routes/playerRoutes.js)

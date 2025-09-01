@@ -12,7 +12,11 @@ import { startPongMatch } from './pong.js';
 
 let inGame = false;
 
-export function startMenu(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+export function startMenu(
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  onQuit?: () => void
+) {
   let y = 200;
   const space = 80;
 
@@ -20,24 +24,29 @@ export function startMenu(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext
     new Button(300, y, 200, 50, '1 Player', () => {
       cleanup();
       startPongMatch(canvas, ctx, true, 'Player 1', 'AI player', (winner) => {
-          inGame = false;
+        inGame = false;
+        if (winner != "")
           alert(`${winner} wins!`);
-          startMenu(canvas, ctx);
-        });
+        startMenu(canvas, ctx, onQuit);
+      });
     }),
-    new Button(300, y += space, 200, 50, '2 Players', () => {
+    new Button(300, (y += space), 200, 50, '2 Players', () => {
       cleanup();
       startPongMatch(canvas, ctx, false, 'Player 1', 'Player 2', (winner) => {
-          inGame = false;
+        inGame = false;
+        if (winner != "")
           alert(`${winner} wins!`);
-          startMenu(canvas, ctx);
-        });
+        startMenu(canvas, ctx, onQuit);
+      });
     }),
-    new Button(300, y += space, 200, 50, 'Tournament', () => {
+    new Button(300, (y += space), 200, 50, 'Tournament', () => {
       cleanup();
       startTournamentMenu(canvas, ctx);
     }),
-    new Button(300, y += space, 200, 50, 'Quit', () => alert('Quit')),
+    new Button(300, (y += space), 200, 50, 'Quit', () => {
+      cleanup();
+      if (onQuit) onQuit();
+    }),
   ];
 
   const handleClick = (e: MouseEvent) => {

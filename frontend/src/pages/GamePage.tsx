@@ -1,34 +1,32 @@
 import React, { useEffect, useRef } from 'react';
 import { startMenu } from '../../game/src/menu';
+import { useNavigate } from 'react-router-dom';
 
 export default function GamePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Defer until canvas is definitely mounted
     if (!canvasRef.current) return;
-
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-
-    if (!ctx) {
-      console.error('Could not get 2D context');
-      return;
-    }
+    if (!ctx) return;
 
     canvas.width = 800;
-    canvas.height = 600;
+    canvas.height = 640;
 
-    startMenu(canvas, ctx);
+    startMenu(canvas, ctx, () => {
+      navigate('/myhome');
+    });
 
     return () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
-  }, []); // runs after initial render
+  }, [navigate]);
 
   return (
-    <div className="w-full h-screen flex items-center justify-center" >
-      <canvas ref={canvasRef} /* className={{ border: '1px solid black', justifyContent: 'center' }} */  />
+    <div className="w-full h-screen flex items-center justify-center">
+      <canvas ref={canvasRef} />
     </div>
   );
 }
