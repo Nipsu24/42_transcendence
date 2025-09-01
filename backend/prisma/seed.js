@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const bcrypt = require('bcryptjs');
 
 async function clearDatabase() {
     await prisma.$executeRaw`PRAGMA foreign_keys=OFF;`;
@@ -32,15 +33,18 @@ async function main() {
 		data: { victories: 7, defeats: 1 }
 	});
 
-	// 	const stats50 = await prisma.statistics.create({
-	// 	data: { victories: 7, defeats: 1 }
-	// });
+	const hashedPassword1 = await bcrypt.hash('23213', 10);
+	const hashedPassword2 = await bcrypt.hash('password123', 10);
+	const hashedPassword3 = await bcrypt.hash('qwerty', 10);
+	const hashedPassword4 = await bcrypt.hash('qwerty', 10);
+
+
 
   // Creates players with statsId referencing the statistics records
 	const player1 = await prisma.player.create({
 		data: {
 		name: 'Player One',
-		password: '23213',
+		password: hashedPassword1,
 		auth: 'local',
 		e_mail: 'one@example.com',
 		online: false,
@@ -51,7 +55,7 @@ async function main() {
 	const player2 = await prisma.player.create({
 		data: {
 		name: 'Player Two',
-		password: 'password123',
+		password: hashedPassword2,
 			auth: 'local',
 		e_mail: 'two@example.com',
 		online: false,
@@ -62,7 +66,7 @@ async function main() {
 	const player3 = await prisma.player.create({
 		data: {
 		name: 'Player Three',
-		password: 'qwerty',
+		password: hashedPassword3,
 			auth: 'local',
 		e_mail: 'three@example.com',
 		online: true,
@@ -116,7 +120,7 @@ async function main() {
 	const player4 = await prisma.player.create({
 		data: {
 			name: 'Gugu',
-			password: 'qwerty',
+			password: hashedPassword4,
 			auth: 'local',
 			e_mail: 'gugu@hauhau.com',
 			online: true,
@@ -124,17 +128,6 @@ async function main() {
 			statsId: stats4.id
 		}
 	});
-
-	// 	const player5 = await prisma.player.create({
-	// 	data: {
-	// 		name: 'Marius',
-	// 		password: '123456',
-	// 		e_mail: 'marius.meier24@gmail.com',
-	// 		online: false,
-	// 		avatar: '/uploads/for_gugu.png',
-	// 		statsId: stats50.id
-	// 	}
-	// });
 
 	// Additional users to serve as friends and opponents
 	const extraStats = await Promise.all(
