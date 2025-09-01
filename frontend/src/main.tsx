@@ -7,7 +7,7 @@ import axios from 'axios'
 import { createBrowserHistory } from 'history'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
-const clientId = '879044000690-g26h5hcndi0o40o6bimcrp22b7lf2n2k.apps.googleusercontent.com';
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
