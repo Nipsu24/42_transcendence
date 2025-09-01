@@ -83,7 +83,8 @@ check_node_module_backend:
 			echo install fastify/jwt && \
 			npm install @fastify/jwt && \
 			npm i @fastify/multipart && \
-			npm install google-auth-library \
+			npm install google-auth-library &&\
+			npm install bcrypt && \
 			npm install --save-dev jest && \
 			npm install supertest --save-dev && \
 			npm install sequelize sqlite3 && \
