@@ -16,7 +16,7 @@ export default function GamePage() {
     canvas.height = 640;
 
     startMenu(canvas, ctx, () => {
-      navigate('/');
+      navigate('/myhome');
     });
 
     return () => {
