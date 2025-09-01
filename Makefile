@@ -13,15 +13,15 @@ CERT_CRT = $(CERT_DIR)/transcendence.crt
 
 # builds frontend test environemnt with 'mock' json-server
 test_frontend: check_node_module_frontend
-	@ cd $(FRONTEND) && cp .env.frontend .env && npm run fulltest
+	@ cd $(FRONTEND) && npm run fulltest
 
 # builds mock json-server (probably not really needed individually)
 test_frontend_server: check_node_module_frontend
-	@ cd $(FRONTEND) && cp .env.frontend .env && npm run server
+	@ cd $(FRONTEND) && npm run server
 
 # builds only frontend server without mock json-server
 test_frontend_ui: check_node_module_frontend
-	@ cd $(FRONTEND) && cp .env.frontend .env && npm run dev
+	@ cd $(FRONTEND) && npm run dev
 
 # builds only the game
 test_game: check_node_module_game
@@ -69,7 +69,7 @@ test_backend_server: check_node_module_backend
 
 # full test with both backend and frontend
 test_backend_w_ui: check_node_module_backend check_node_module_frontend
-	@ cd $(BACKEND) && cp ../frontend/.env.backend ../frontend/.env && npm run build:ui && npm run dev
+	@ cd $(BACKEND) && npm run build:ui && npm run dev
 
 # checks requirements for compiling backend
 check_node_module_backend:
@@ -83,8 +83,7 @@ check_node_module_backend:
 			echo install fastify/jwt && \
 			npm install @fastify/jwt && \
 			npm i @fastify/multipart && \
-			npm install google-auth-library &&\
-			npm install bcrypt && \
+			npm install google-auth-library \
 			npm install --save-dev jest && \
 			npm install supertest --save-dev && \
 			npm install sequelize sqlite3 && \
@@ -104,7 +103,7 @@ check_node_module_backend:
 
 #nginx container, also containing the frontend dist folder (for serving static frontend files)
 nginx_frontend: $(CERT_KEY)  $(CERT_CRT) check_node_module_frontend
-	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
+	@ cd $(FRONTEND) && npm run build && cp -r dist ../nginx
 	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --no-deps --build nginx
 
 # builds backend container
@@ -113,7 +112,7 @@ backend_container: check_node_module_backend
 
 # full production environment, building both nginx (frontend) and backend container
 prod: $(CERT_KEY)  $(CERT_CRT) check_node_module_frontend
-	@ cd $(FRONTEND) && cp .env.backend .env && npm run build && cp -r dist ../nginx
+	@ cd $(FRONTEND) && npm run build && cp -r dist ../nginx
 	@ COMPOSE_BAKE=true docker-compose -f docker-compose.yml up -d --build
 
 # removes all built containers
