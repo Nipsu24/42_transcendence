@@ -21,10 +21,6 @@ jobs:
           echo "PORT=${{ vars.PORT }}" >> ./backend/.env
           echo "GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}" >> ./backend/.env
           echo "JWT_SECRET=${{ vars.JWT_SECRET }}" >> ./backend/.env
-          echo "VITE_GOOGLE_CLIENT_ID=${{ vars.VITE_GOOGLE_CLIENT_ID }}" >> ./frontend/.env.frontend
-          echo "VITE_APP_BASE_URL=${{ vars.VITE_APP_BASE_URL }}" >> ./frontend/.env.frontend
-          echo "VITE_GOOGLE_CLIENT_ID=${{ vars.VITE_GOOGLE_CLIENT_ID }}" >> ./frontend/.env.backend
-          echo "VITE_APP_BASE_URL=${{ vars.VITE_APP_BASE_URL }}" >> ./frontend/.env.backend
           echo "VITE_GOOGLE_CLIENT_ID=${{ vars.VITE_GOOGLE_CLIENT_ID }}" >> ./frontend/.env
           echo "VITE_APP_BASE_URL=${{ vars.VITE_APP_BASE_URL }}" >> ./frontend/.env
       - name: Build frontend
