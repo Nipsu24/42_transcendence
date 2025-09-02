@@ -13,8 +13,6 @@ dist-ssr
 *.local
 db.json
 .env
-.env.backend
-.env.frontend
 
 # Editor directories and files
 .vscode/*

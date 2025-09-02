@@ -2,7 +2,7 @@ node_modules
 .env
 dist
 prisma/dev.db
-prisa/node_modules
+prisma/node_modules
 generated/
 requests/available_apis.rest
 **/.DS_Store
