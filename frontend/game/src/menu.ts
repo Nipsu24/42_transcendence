@@ -1,49 +1,38 @@
-// import { launchGame } from './main.js'; 
 import { Button } from './Button.js';
 import { startTournamentMenu } from './tournamentMenu.js';
 import { startPongMatch } from './pong.js';
-
-/**
- * Starts the main menu, rendering buttons and handling interaction.
- * 
- * @param canvas - The canvas element where the menu is drawn.
- * @param ctx - The 2D drawing context for the canvas.
- */
-
-let inGame = false;
 
 export function startMenu(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   onQuit?: () => void
 ) {
-  let y = 200;
-  const space = 80;
+  const buttonWidth = canvas.width * 0.25;
+  const buttonHeight = canvas.height * 0.10;
+  const buttonX = canvas.width / 2 - buttonWidth / 2;
+  let y = canvas.height * 0.25;
+  const space = canvas.height * 0.15;
 
   const buttons: Button[] = [
-    new Button(300, y, 200, 50, '1 Player', () => {
+    new Button(buttonX, y, buttonWidth, buttonHeight, '1 Player', () => {
       cleanup();
       startPongMatch(canvas, ctx, true, 'Player 1', 'AI player', (winner) => {
-        inGame = false;
-        if (winner != "")
-          alert(`${winner} wins!`);
+        if (winner !== "") alert(`${winner} wins!`);
         startMenu(canvas, ctx, onQuit);
       });
     }),
-    new Button(300, (y += space), 200, 50, '2 Players', () => {
+    new Button(buttonX, (y += space), buttonWidth, buttonHeight, '2 Players', () => {
       cleanup();
       startPongMatch(canvas, ctx, false, 'Player 1', 'Player 2', (winner) => {
-        inGame = false;
-        if (winner != "")
-          alert(`${winner} wins!`);
+        if (winner !== "") alert(`${winner} wins!`);
         startMenu(canvas, ctx, onQuit);
       });
     }),
-    new Button(300, (y += space), 200, 50, 'Tournament', () => {
+    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Tournament', () => {
       cleanup();
-      startTournamentMenu(canvas, ctx);
+      startTournamentMenu(canvas, ctx, onQuit);
     }),
-    new Button(300, (y += space), 200, 50, 'Quit', () => {
+    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Quit', () => {
       cleanup();
       if (onQuit) onQuit();
     }),
@@ -78,12 +67,21 @@ export function startMenu(
     canvas.removeEventListener('mousemove', handleMouseMove);
   }
 
+  function drawBorder() {
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+  }
+
   function drawMenu() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawBorder();
+
     ctx.fillStyle = 'white';
-    ctx.font = '48px Arial';
+    ctx.font = `${Math.floor(canvas.height * 0.08)}px Arial`;
     ctx.textAlign = 'center';
-    ctx.fillText('Pong', canvas.width / 2, 150);
+    ctx.fillText('Pong', canvas.width / 2, canvas.height * 0.2);
 
     buttons.forEach(button => button.draw(ctx));
   }

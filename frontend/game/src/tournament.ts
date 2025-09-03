@@ -1,4 +1,4 @@
-import { TournamentManager, Match } from './TournamentManager.js';
+import { TournamentManager } from './TournamentManager.js';
 import { startPongMatch } from './pong.js';
 
 let canvas: HTMLCanvasElement;
@@ -6,14 +6,14 @@ let ctx: CanvasRenderingContext2D;
 let tm: TournamentManager;
 let onTournamentEnd: (() => void) | null = null;
 
-const nextMatchButton = { x: 300, y: 500, width: 200, height: 50 };
-const endTournamentButton = { x: 300, y: 500, width: 200, height: 50 };
-
 let clickHandler: ((e: MouseEvent) => void) | null = null;
 
 let isMatchInProgress = false;
 let tournamentEnded = false;
 let bracketLoopId: number | null = null;
+
+let nextMatchButton: { x: number; y: number; width: number; height: number };
+let endTournamentButton: { x: number; y: number; width: number; height: number };
 
 export function startTournament(
   canvasEl: HTMLCanvasElement,
@@ -31,6 +31,24 @@ export function startTournament(
 
   onTournamentEnd = onEndCallback || null;
 
+  const buttonWidth = canvas.width * 0.25;
+  const buttonHeight = canvas.height * 0.1;
+  const buttonX = canvas.width / 2 - buttonWidth / 2;
+
+  nextMatchButton = {
+    x: buttonX,
+    y: canvas.height * 0.8,
+    width: buttonWidth,
+    height: buttonHeight,
+  };
+
+  endTournamentButton = {
+    x: buttonX,
+    y: canvas.height * 0.8,
+    width: buttonWidth,
+    height: buttonHeight,
+  };
+
   cleanupListeners();
 
   clickHandler = (e) => handleClick(e, onReturnToMenu);
@@ -42,21 +60,24 @@ export function startTournament(
 function drawBracket() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  drawBorder();
+
   ctx.fillStyle = 'white';
-  ctx.font = '32px Arial';
+  ctx.font = `${Math.floor(canvas.height * 0.05)}px Arial`;
   ctx.textAlign = 'center';
-  ctx.fillText('Tournament Bracket', canvas.width / 2, 50);
+  ctx.fillText('Tournament Bracket', canvas.width / 2, canvas.height * 0.1);
 
   const matches = tm.currentRound;
-  const startY = 100;
-  const spacing = 60;
+  const startY = canvas.height * 0.15;
+  const spacing = canvas.height * 0.07;
 
   matches.forEach((match, i) => {
     const y = startY + i * spacing;
-    const x1 = canvas.width / 2 - 150;
-    const x2 = canvas.width / 2 + 50;
+    const x1 = canvas.width / 2 - canvas.width * 0.25;
+    const x2 = canvas.width / 2 + canvas.width * 0.05;
 
     ctx.textAlign = 'left';
+    ctx.font = `${Math.floor(canvas.height * 0.035)}px Arial`;
 
     ctx.fillStyle = match.winner === match.player1 ? 'lightgreen' : 'white';
     ctx.fillText(match.player1, x1, y);
@@ -66,14 +87,7 @@ function drawBracket() {
   });
 
   if (!tm.isFinished() && tm.hasNextMatch()) {
-
-    ctx.fillStyle = 'white';
-    ctx.fillRect(nextMatchButton.x, nextMatchButton.y, nextMatchButton.width, nextMatchButton.height);
-
-    ctx.fillStyle = 'black';
-    ctx.font = '24px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Start Match', nextMatchButton.x + nextMatchButton.width / 2, nextMatchButton.y + 33);
+    drawButton(nextMatchButton, 'Start Match');
   }
 
   if (tm.isFinished()) {
@@ -83,17 +97,29 @@ function drawBracket() {
     const centerY = canvas.height / 2;
 
     ctx.fillStyle = 'gold';
-    ctx.font = '48px Arial';
+    ctx.font = `${Math.floor(canvas.height * 0.07)}px Arial`;
     ctx.textAlign = 'center';
-    ctx.fillText(`🏆 Champion: ${tm.getChampion()}`, centerX, centerY - 40);
+    ctx.fillText(`🏆 Champion: ${tm.getChampion()}`, centerX, centerY - canvas.height * 0.1);
 
-    ctx.fillStyle = 'white';
-    ctx.fillRect(endTournamentButton.x, endTournamentButton.y, endTournamentButton.width, endTournamentButton.height);
-
-    ctx.fillStyle = 'black';
-    ctx.font = '24px Arial';
-    ctx.fillText('End Tournament', endTournamentButton.x + endTournamentButton.width / 2, endTournamentButton.y + endTournamentButton.height / 2);
+    drawButton(endTournamentButton, 'End Tournament');
   }
+}
+
+function drawButton(btn: { x: number; y: number; width: number; height: number }, text: string) {
+  ctx.fillStyle = 'white';
+  ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+
+  ctx.fillStyle = 'black';
+  ctx.font = `${Math.floor(canvas.height * 0.04)}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, btn.x + btn.width / 2, btn.y + btn.height / 2);
+}
+
+function drawBorder() {
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(0, 0, canvas.width, canvas.height);
 }
 
 function startBracketLoop() {
@@ -139,7 +165,6 @@ function handleClick(e: MouseEvent, onReturnToMenu?: () => void) {
       y <= endTournamentButton.y + endTournamentButton.height
     ) {
       endTournament();
-
       if (onReturnToMenu) onReturnToMenu();
       return;
     }
@@ -177,4 +202,9 @@ function cleanupListeners() {
     canvas.removeEventListener('click', clickHandler);
     clickHandler = null;
   }
+}
+
+export function cleanupTournament() {
+  cleanupListeners();
+  stopBracketLoop();
 }

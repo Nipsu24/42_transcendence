@@ -19,7 +19,8 @@ export class Button {
     ctx.fillRect(this.x, this.y, this.width, this.height);
 
     ctx.fillStyle = 'white';
-    ctx.font = '20px Arial';
+    const fontSize = Math.floor(this.height * 0.5);
+    ctx.font = `${fontSize}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(this.text, this.x + this.width / 2, this.y + this.height / 2);

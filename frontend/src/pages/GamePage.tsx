@@ -12,8 +12,25 @@ export default function GamePage() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = 800;
-    canvas.height = 640;
+    const ASPECT_RATIO = 4 / 3;
+    const MIN_WIDTH = 320;
+    const MIN_HEIGHT = 240;
+
+    let width = window.innerWidth * 0.75;
+    let height = window.innerHeight * 0.75;
+
+    if (width / height > ASPECT_RATIO) {
+      width = height * ASPECT_RATIO;
+    }
+    else {
+      height = width / ASPECT_RATIO;
+    }
+
+    width = Math.max(width, MIN_WIDTH);
+    height = Math.max(height, MIN_HEIGHT);
+
+    canvas.width = Math.floor(width);
+    canvas.height = Math.floor(height);
 
     startMenu(canvas, ctx, () => {
       navigate('/myhome');
