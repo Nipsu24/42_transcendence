@@ -30,10 +30,10 @@ test_game: check_node_module_game
 run_game: # just for quick testing purposes
 	@ cd $(GAME) && npm start
 
-# chekcs if requirements for compiling frontend fullfilled (Added tailwindcss)
+# checks if requirements for compiling frontend fulfilled (Added Babylon.js)
 check_node_module_frontend:
 	@if [ ! -d $(FRONTEND)/node_modules ]; then \
-		echo "install npm"; \
+		echo "Installing frontend dependencies..."; \
 		( \
 			cd $(FRONTEND) && \
 			npm install && \
@@ -50,7 +50,10 @@ check_node_module_frontend:
 				postcss \
  				autoprefixer \
  				@tailwindcss/vite@latest \
-				jest ; \
+				jest && \
+			npm install \
+				babylonjs \
+				babylonjs-loaders; \
 		); \
 	fi
 

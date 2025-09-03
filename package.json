@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "@babylonjs/core": "^8.25.0",
     "@react-oauth/google": "^0.12.2",
+    "babylonjs": "^8.25.0",
+    "babylonjs-loaders": "^8.25.0",
     "gapi-script": "^1.2.0",
     "react-google-login": "^5.2.2"
   }
