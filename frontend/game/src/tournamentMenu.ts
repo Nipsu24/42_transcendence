@@ -1,5 +1,5 @@
 import { Button } from './Button.js';
-import { startTournament } from './tournament.js';
+import { startTournament, cleanupTournament } from './tournament.js';
 import { startMenu } from './menu.js';
 
 let canvas: HTMLCanvasElement;
@@ -14,12 +14,16 @@ let moveHandler: (e: MouseEvent) => void;
 const MIN_PLAYERS = 3;
 const MAX_PLAYERS = 16;
 
-export function startTournamentMenu(canvasEl: HTMLCanvasElement, ctxEl: CanvasRenderingContext2D) {
+export function startTournamentMenu(
+  canvasEl: HTMLCanvasElement,
+  ctxEl: CanvasRenderingContext2D,
+  onQuit?: () => void
+) {
   canvas = canvasEl;
   ctx = ctxEl;
   players = [];
 
-  setupButtons();
+  setupButtons(onQuit);
   cleanupListeners();
 
   clickHandler = (e) => {
@@ -45,12 +49,15 @@ export function startTournamentMenu(canvasEl: HTMLCanvasElement, ctxEl: CanvasRe
   drawMenu();
 }
 
-function setupButtons() {
-  let y = 200;
-  const space = 70;
+function setupButtons(onQuit?: () => void) {
+  const buttonWidth = canvas.width * 0.25;
+  const buttonHeight = canvas.height * 0.10;
+  const buttonX = canvas.width / 2 - buttonWidth / 2;
+  let y = canvas.height * 0.30;
+  const space = canvas.height * 0.15;
 
   buttons = [
-    new Button(300, y, 200, 50, 'Add Player', () => {
+    new Button(buttonX, y, buttonWidth, buttonHeight, 'Add Player', () => {
       if (players.length >= MAX_PLAYERS) {
         alert(`Maximum of ${MAX_PLAYERS} players reached.`);
         return;
@@ -58,44 +65,52 @@ function setupButtons() {
       players.push(`Player ${players.length + 1}`);
       drawMenu();
     }),
-    new Button(300, y += space, 200, 50, 'Remove Player', () => {
+    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Remove Player', () => {
       if (players.length === 0) return;
       players.pop();
       drawMenu();
     }),
-    new Button(300, y += space, 200, 50, 'Start Tournament', () => {
+    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Start Tournament', () => {
       if (players.length < MIN_PLAYERS) {
         alert(`At least ${MIN_PLAYERS} players required!`);
         return;
       }
       cleanupListeners();
       startTournament(canvas, ctx, players, () => {
-
-        startMenu(canvas, ctx);
+        startMenu(canvas, ctx, onQuit);
       });
     }),
-    new Button(300, y += space, 200, 50, 'Back', () => {
-      cleanupListeners();
-      startMenu(canvas, ctx);
+    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Back', () => {
+      cleanupTournament();
+      startMenu(canvas, ctx, onQuit);
     }),
   ];
 }
 
+
 function drawMenu() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = 'white';
-  ctx.font = '40px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('Tournament Setup', canvas.width / 2, 80);
+  drawBorder();
 
-  ctx.font = '24px Arial';
+  ctx.fillStyle = 'white';
+  ctx.font = `${Math.floor(canvas.height * 0.07)}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.fillText('Tournament Setup', canvas.width / 2, canvas.height * 0.15);
+
+  ctx.font = `${Math.floor(canvas.height * 0.04)}px Arial`;
   ctx.textAlign = 'left';
   players.forEach((name, i) => {
-    ctx.fillText(name, 50, 140 + i * 30);
+    ctx.fillText(name, canvas.width * 0.1, canvas.height * 0.20 + i * (canvas.height * 0.05));
   });
 
   buttons.forEach(btn => btn.draw(ctx));
+}
+
+function drawBorder() {
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(0, 0, canvas.width, canvas.height);
 }
 
 function cleanupListeners() {
