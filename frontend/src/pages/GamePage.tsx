@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { startMenu } from '../../game/src/menu';
 import { useNavigate } from 'react-router-dom';
+import { attachTouchAdapter } from '../components/attachTouchAdapter'; 
 
 export default function GamePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,9 +42,17 @@ export default function GamePage() {
     };
   }, [navigate]);
 
+   // Add touch input adapter (one useEffect)
+   useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    return attachTouchAdapter(canvas);  // auto cleanup
+  }, []);
+
   return (
     <div className="w-full h-screen flex items-center justify-center">
-      <canvas ref={canvasRef} />
+       <canvas ref={canvasRef} className="touch-none select-none" /> {/* Helps prevent scroll/selection */}
     </div>
   );
 }
+
