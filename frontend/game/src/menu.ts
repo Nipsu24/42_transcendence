@@ -14,11 +14,10 @@ export async function startMenu(
   let y = canvas.height * 0.25;
   const space = canvas.height * 0.15;
 
-  // 👇 try fetching the user
   let player1Name = "Player 1";
   try {
     const me = await getMe();
-    player1Name = me.name;   // backend should return a "name"
+    player1Name = me.name;
   } catch (err) {
     console.error("Could not fetch user:", err);
   }
@@ -93,7 +92,6 @@ export async function startMenu(
     ctx.textAlign = 'center';
     ctx.fillText('Pong', canvas.width / 2, canvas.height * 0.2);
 
-    // 👇 show username below title
     ctx.font = `${Math.floor(canvas.height * 0.05)}px Arial`;
     ctx.fillText(`Welcome, ${player1Name}`, canvas.width / 2, canvas.height * 0.1);
 
