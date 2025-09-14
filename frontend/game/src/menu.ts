@@ -1,8 +1,9 @@
 import { Button } from './Button.js';
 import { startTournamentMenu } from './tournamentMenu.js';
 import { startPongMatch } from './pong.js';
+import { getMe } from './login.js';
 
-export function startMenu(
+export async function startMenu(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   onQuit?: () => void
@@ -13,17 +14,26 @@ export function startMenu(
   let y = canvas.height * 0.25;
   const space = canvas.height * 0.15;
 
+  // 👇 try fetching the user
+  let player1Name = "Player 1";
+  try {
+    const me = await getMe();
+    player1Name = me.name;   // backend should return a "name"
+  } catch (err) {
+    console.error("Could not fetch user:", err);
+  }
+
   const buttons: Button[] = [
     new Button(buttonX, y, buttonWidth, buttonHeight, '1 Player', () => {
       cleanup();
-      startPongMatch(canvas, ctx, true, 'Player 1', 'AI player', (winner) => {
+      startPongMatch(canvas, ctx, true, player1Name, 'AI player', (winner) => {
         if (winner !== "") alert(`${winner} wins!`);
         startMenu(canvas, ctx, onQuit);
       });
     }),
     new Button(buttonX, (y += space), buttonWidth, buttonHeight, '2 Players', () => {
       cleanup();
-      startPongMatch(canvas, ctx, false, 'Player 1', 'Player 2', (winner) => {
+      startPongMatch(canvas, ctx, false, player1Name, 'Player 2', (winner) => {
         if (winner !== "") alert(`${winner} wins!`);
         startMenu(canvas, ctx, onQuit);
       });
@@ -82,6 +92,10 @@ export function startMenu(
     ctx.font = `${Math.floor(canvas.height * 0.08)}px Arial`;
     ctx.textAlign = 'center';
     ctx.fillText('Pong', canvas.width / 2, canvas.height * 0.2);
+
+    // 👇 show username below title
+    ctx.font = `${Math.floor(canvas.height * 0.05)}px Arial`;
+    ctx.fillText(`Welcome, ${player1Name}`, canvas.width / 2, canvas.height * 0.1);
 
     buttons.forEach(button => button.draw(ctx));
   }
