@@ -1,7 +1,8 @@
 import { Button } from './Button.js';
 import { startTournamentMenu } from './tournamentMenu.js';
 import { startPongMatch } from './pong.js';
-import { getMe } from './login.js';
+import { getMe } from './apiCalls.js';
+import { updateMyStats } from "./apiCalls.js";
 
 export async function startMenu(
   canvas: HTMLCanvasElement,
@@ -25,11 +26,18 @@ export async function startMenu(
   const buttons: Button[] = [
     new Button(buttonX, y, buttonWidth, buttonHeight, '1 Player', () => {
       cleanup();
-      startPongMatch(canvas, ctx, true, player1Name, 'AI player', (winner) => {
+      startPongMatch(canvas, ctx, true, player1Name, 'AI player', async (winner) => {
+        const me = await getMe();
         if (winner !== "") alert(`${winner} wins!`);
+        if (winner === player1Name) {
+          await updateMyStats({ victories: me.stats.victories + 1, defeats: me.stats.defeats });
+        } else {
+          await updateMyStats({ victories: me.stats.victories, defeats: me.stats.defeats + 1 });
+        }
         startMenu(canvas, ctx, onQuit);
       });
     }),
+
     new Button(buttonX, (y += space), buttonWidth, buttonHeight, '2 Players', () => {
       cleanup();
       startPongMatch(canvas, ctx, false, player1Name, 'Player 2', (winner) => {
@@ -37,10 +45,12 @@ export async function startMenu(
         startMenu(canvas, ctx, onQuit);
       });
     }),
+
     new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Tournament', () => {
       cleanup();
       startTournamentMenu(canvas, ctx, onQuit);
     }),
+
     new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Quit', () => {
       cleanup();
       if (onQuit) onQuit();

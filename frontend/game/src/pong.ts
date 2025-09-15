@@ -1,3 +1,6 @@
+import { getMe } from './apiCalls.js';
+import { createRecord } from './apiCalls.js';
+
 let isRunning = false;
 let isAi = false;
 // let cycle = 0;
@@ -7,6 +10,7 @@ let aiDecisionTime = 0;
 let aiDecisionInterval = 1000;
 
 let leftScore = 0, rightScore = 0;
+const maxScore = 10;
 
 const paddle1 = { x: 10, y: 0, dy: 0 };
 const paddle2 = { x: 0, y: 0, dy: 0 };
@@ -115,9 +119,10 @@ function controlAI() {
 //   return cycle;
 // }
 
-function update() {
+async function update() {
   paddle1.y += paddle1.dy;
   paddle2.y += paddle2.dy;
+  const me = await getMe();
 
   if (isAi)
   {
@@ -155,13 +160,19 @@ function update() {
 
   if (ball.x < 0) {
     rightScore++;
-    if (rightScore >= 10) endMatch(player2Name);
+    if (rightScore >= maxScore) {
+      await createRecord({ resultPlayerOne: leftScore, resultPlayerTwo: rightScore, aiOpponent: isAi });
+      endMatch(player2Name);
+    }
     else resetBall();
   }
 
   if (ball.x > WIDTH) {
     leftScore++;
-    if (leftScore >= 10) endMatch(player1Name);
+    if (leftScore >= maxScore) {
+      await createRecord({ resultPlayerOne: leftScore, resultPlayerTwo: rightScore, aiOpponent: isAi });
+      endMatch(player1Name);
+    }
     else resetBall();
   }
 }
