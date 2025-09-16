@@ -1,8 +1,9 @@
 import { Button } from './Button.js';
 import { startTournamentMenu } from './tournamentMenu.js';
 import { startPongMatch } from './pong.js';
-import { getMe } from './apiCalls.js';
+import { getMe } from '../../src/services/players.js';
 import { updateMyStats } from "./apiCalls.js";
+import { createRecord } from './apiCalls.js';
 
 export async function startMenu(
   canvas: HTMLCanvasElement,
@@ -26,9 +27,16 @@ export async function startMenu(
   const buttons: Button[] = [
     new Button(buttonX, y, buttonWidth, buttonHeight, '1 Player', () => {
       cleanup();
-      startPongMatch(canvas, ctx, true, player1Name, 'AI player', async (winner) => {
+      startPongMatch(canvas, ctx, true, player1Name, 'AI player', async (winner, leftScore, rightScore) => {
         const me = await getMe();
-        if (winner !== "") alert(`${winner} wins!`);
+        if (winner !== "") {
+          alert(`${winner} wins!`);
+          await createRecord({
+          resultPlayerOne: leftScore,
+          resultPlayerTwo: rightScore,
+          aiOpponent: true
+        });
+        }
         if (winner === player1Name) {
           await updateMyStats({ victories: me.stats.victories + 1, defeats: me.stats.defeats });
         } else {
