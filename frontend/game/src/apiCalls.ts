@@ -1,5 +1,5 @@
 
-export async function createRecord(record: Partial<{ resultPlayerOne: number; resultPlayerTwo: number; aiOpponent: boolean }>) {
+export async function createRecord(record: Partial<{ playerTwoName: string; resultPlayerOne: number; resultPlayerTwo: number; aiOpponent: boolean }>) {
   return apiRequest("/players/me/matches", "POST", record);
 }
 

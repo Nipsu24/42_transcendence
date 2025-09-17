@@ -46,13 +46,47 @@ export async function startMenu(
       });
     }),
 
-    new Button(buttonX, (y += space), buttonWidth, buttonHeight, '2 Players', () => {
+    new Button(buttonX, (y += space), buttonWidth, buttonHeight, '2 Players', async () => {
       cleanup();
-      startPongMatch(canvas, ctx, false, player1Name, 'Player 2', (winner) => {
-        if (winner !== "") alert(`${winner} wins!`);
+
+      const me = await getMe();
+      if (!me.friends || me.friends.length === 0) {
+        alert("You have no friends to play against. Add some first!");
+        startMenu(canvas, ctx, onQuit);
+        return;
+      }
+
+      const friendNames = me.friends.map(f => f.name).join(", ");
+      const chosen = prompt(`Choose an opponent: ${friendNames}`);
+
+      const opponent = me.friends.find(f => f.name === chosen);
+      if (!opponent) {
+        alert("Invalid selection.");
+        startMenu(canvas, ctx, onQuit);
+        return;
+      }
+
+      startPongMatch(canvas, ctx, false, me.name, opponent.name, async (winner, leftScore, rightScore) => {
+        if (winner !== "") {
+          alert(`${winner} wins!`);
+          await createRecord({
+            playerTwoName: opponent.name,
+            resultPlayerOne: leftScore,
+            resultPlayerTwo: rightScore,
+            aiOpponent: false
+          });
+        }
+
+        if (winner === me.name) {
+          await updateMyStats({ victories: me.stats.victories + 1, defeats: me.stats.defeats });
+        } else {
+          await updateMyStats({ victories: me.stats.victories, defeats: me.stats.defeats + 1 });
+        }
+
         startMenu(canvas, ctx, onQuit);
       });
     }),
+
 
     new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Tournament', () => {
       cleanup();
