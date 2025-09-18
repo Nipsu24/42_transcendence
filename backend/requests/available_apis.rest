@@ -7,8 +7,8 @@ POST http://localhost:3001/api/login
 Content-Type: application/json
 
 {
-  "e_mail": "one@example.com",
-  "password": "23213"
+  "e_mail": "gugu@hauhau.com",
+  "password": "qwerty"
 }
 
 ### Send logout request for user

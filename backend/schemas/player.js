@@ -43,8 +43,16 @@ const playerBodySchema = {
 					name: { type: 'string' },
 					avatar: { type: 'string'},
 					online: { type: 'boolean' },
+					stats: {
+						type: 'object',
+						properties: {
+							victories: { type: 'integer', minimum: 0, maximum: 1000 },
+							defeats: { type: 'integer', minimum: 0, maximum: 1000 }
+						},
+						additionalProperties: false
+					}
 				}
-			 }
+			}
 		},
 	},
 	additionalProperties: false
