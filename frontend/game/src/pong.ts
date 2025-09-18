@@ -1,3 +1,5 @@
+import { createRecord } from './apiCalls.js';
+
 let isRunning = false;
 let isAi = false;
 // let cycle = 0;
@@ -7,6 +9,7 @@ let aiDecisionTime = 0;
 let aiDecisionInterval = 1000;
 
 let leftScore = 0, rightScore = 0;
+const maxScore = 10;
 
 const paddle1 = { x: 10, y: 0, dy: 0 };
 const paddle2 = { x: 0, y: 0, dy: 0 };
@@ -16,7 +19,7 @@ const speedMod = 1.02;
 let WIDTH: number, HEIGHT: number;
 let ctx: CanvasRenderingContext2D;
 
-let winnerCallback: ((winner: string) => void) | null = null;
+let winnerCallback: ((winner: string, leftScore: number, rightScore: number) => void) | null = null;
 let player1Name: string, player2Name: string;
 
 let playArea: { x: number; y: number; width: number; height: number };
@@ -115,7 +118,7 @@ function controlAI() {
 //   return cycle;
 // }
 
-function update() {
+async function update() {
   paddle1.y += paddle1.dy;
   paddle2.y += paddle2.dy;
 
@@ -154,14 +157,20 @@ function update() {
   }
 
   if (ball.x < 0) {
-    rightScore++;
-    if (rightScore >= 10) endMatch(player2Name);
+    rightScore = Math.min(maxScore, rightScore + 1);
+    if (rightScore >= maxScore) {
+      // await createRecord({ resultPlayerOne: leftScore, resultPlayerTwo: rightScore, aiOpponent: isAi });
+      endMatch(player2Name);
+    }
     else resetBall();
   }
 
   if (ball.x > WIDTH) {
-    leftScore++;
-    if (leftScore >= 10) endMatch(player1Name);
+    leftScore = Math.min(maxScore, leftScore + 1);
+    if (leftScore >= maxScore) {
+      // await createRecord({ resultPlayerOne: leftScore, resultPlayerTwo: rightScore, aiOpponent: isAi });
+      endMatch(player1Name);
+    }
     else resetBall();
   }
 }
@@ -211,7 +220,7 @@ function endMatch(winner: string) {
   removeInput();
 
   if (winnerCallback) {
-    winnerCallback(winner);
+    winnerCallback(winner, leftScore, rightScore);
     winnerCallback = null;
   }
 }
@@ -233,7 +242,7 @@ export function startPongMatch(
   ai: boolean,
   p1: string,
   p2: string,
-  onMatchEnd: (winner: string) => void
+  onMatchEnd: (winner: string, leftScore: number, rightScore: number) => void
 ) {
   WIDTH = canvas.width;
   HEIGHT = canvas.height;

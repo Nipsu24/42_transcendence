@@ -33,9 +33,11 @@ export default function GamePage() {
     canvas.width = Math.floor(width);
     canvas.height = Math.floor(height);
 
-    startMenu(canvas, ctx, () => {
-      navigate('/myhome');
-    });
+     (async () => {
+      await startMenu(canvas, ctx, () => {
+        navigate('/myhome');
+      });
+    })();
 
     return () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
