@@ -1,6 +1,7 @@
 import { Button } from './Button.js';
 import { startTournament, cleanupTournament } from './tournament.js';
 import { startMenu } from './menu.js';
+import { getMe } from '../../src/services/players.js';
 
 let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
@@ -14,7 +15,9 @@ let moveHandler: (e: MouseEvent) => void;
 const MIN_PLAYERS = 3;
 const MAX_PLAYERS = 16;
 
-export function startTournamentMenu(
+let me: any; // store logged-in user
+
+export async function startTournamentMenu(
   canvasEl: HTMLCanvasElement,
   ctxEl: CanvasRenderingContext2D,
   onQuit?: () => void
@@ -22,6 +25,10 @@ export function startTournamentMenu(
   canvas = canvasEl;
   ctx = ctxEl;
   players = [];
+
+  // fetch current user and add automatically
+  me = await getMe();
+  players.push(me.name);
 
   setupButtons(onQuit);
   cleanupListeners();
@@ -57,16 +64,37 @@ function setupButtons(onQuit?: () => void) {
   const space = canvas.height * 0.15;
 
   buttons = [
-    new Button(buttonX, y, buttonWidth, buttonHeight, 'Add Player', () => {
+    new Button(buttonX, y, buttonWidth, buttonHeight, 'Add Friend', () => {
       if (players.length >= MAX_PLAYERS) {
         alert(`Maximum of ${MAX_PLAYERS} players reached.`);
         return;
       }
-      players.push(`Player ${players.length + 1}`);
+      if (!me.friends || me.friends.length === 0) {
+        alert("You have no friends to add. Add some first!");
+        return;
+      }
+
+      const friendNames = me.friends.map(f => f.name).join(", ");
+      const chosen = prompt(`Choose a friend to add: ${friendNames}`);
+
+      const friend = me.friends.find(f => f.name === chosen);
+      if (!friend) {
+        alert("Invalid selection.");
+        return;
+      }
+      if (players.includes(friend.name)) {
+        alert(`${friend.name} is already in the tournament.`);
+        return;
+      }
+
+      players.push(friend.name);
       drawMenu();
     }),
-    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Remove Player', () => {
-      if (players.length === 0) return;
+    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Remove Last', () => {
+      if (players.length <= 1) {
+        alert("You cannot remove yourself from the tournament.");
+        return;
+      }
       players.pop();
       drawMenu();
     }),
@@ -87,7 +115,6 @@ function setupButtons(onQuit?: () => void) {
   ];
 }
 
-
 function drawMenu() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -101,7 +128,7 @@ function drawMenu() {
   ctx.font = `${Math.floor(canvas.height * 0.04)}px Arial`;
   ctx.textAlign = 'left';
   players.forEach((name, i) => {
-    ctx.fillText(name, canvas.width * 0.1, canvas.height * 0.20 + i * (canvas.height * 0.05));
+    ctx.fillText(name, canvas.width * 0.20, canvas.height * 0.25 + i * (canvas.height * 0.05));
   });
 
   buttons.forEach(btn => btn.draw(ctx));

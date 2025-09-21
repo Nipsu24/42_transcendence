@@ -65,7 +65,6 @@ export async function startMenu(
         startMenu(canvas, ctx, onQuit);
         return;
       }
-
       startPongMatch(canvas, ctx, false, me.name, opponent.name, async (winner, leftScore, rightScore) => {
         if (winner !== "") {
           alert(`${winner} wins!`);
@@ -86,7 +85,6 @@ export async function startMenu(
         startMenu(canvas, ctx, onQuit);
       });
     }),
-
 
     new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Tournament', () => {
       cleanup();

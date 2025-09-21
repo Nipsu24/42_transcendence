@@ -7,6 +7,13 @@ export async function updateMyStats(stats: Partial<{ victories: number; defeats:
   return apiRequest("/players/me/stats", "PUT", stats);
 }
 
+// export async function updatePlayerStats(
+//   playerId: number,
+//   stats: Partial<{ victories: number; defeats: number }>
+// ) {
+//   return apiRequest(`/players/${playerId}/stats`, "PUT", stats);
+// }
+
 async function apiRequest(
   endpoint: string,
   method: string = "GET",
