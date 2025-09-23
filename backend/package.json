@@ -32,7 +32,7 @@
     "ajv": "^8.17.1",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.1",
-    "fastify": "^5.6.0",
+    "fastify": "^5.6.1",
     "gapi-script": "^1.2.0",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7"

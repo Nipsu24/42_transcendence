@@ -1,40 +1,66 @@
+import axios from 'axios'
 
-export async function createRecord(record: Partial<{ playerTwoName: string; resultPlayerOne: number; resultPlayerTwo: number; aiOpponent: boolean }>) {
-  return apiRequest("/players/me/matches", "POST", record);
+import { baseUrl } from "../../src/services/players"
+
+// Define types
+export interface MatchRecord {
+  playerTwoName?: string
+  resultPlayerOne?: number
+  resultPlayerTwo?: number
+  aiOpponent?: boolean
 }
 
-export async function updateMyStats(stats: Partial<{ victories: number; defeats: number }>) {
-  return apiRequest("/players/me/stats", "PUT", stats);
+export interface StatsUpdate {
+  victories?: number
+  defeats?: number
 }
 
-// export async function updatePlayerStats(
+// Create a new match record
+export const createRecord = async (
+  record: MatchRecord
+): Promise<void> => {
+  try {
+    await axios.post(`${baseUrl}/me/matches`, record, {
+      headers: authHeaders(),
+    })
+  } catch (error) {
+    console.error('createRecord failed:', error)
+    throw error
+  }
+}
+
+// Update current user’s stats
+export const updateMyStats = async (
+  stats: StatsUpdate
+): Promise<void> => {
+  try {
+    await axios.put(`${baseUrl}/me/stats`, stats, {
+      headers: authHeaders(),
+    })
+  } catch (error) {
+    console.error('updateMyStats failed:', error)
+    throw error
+  }
+}
+
+// export const updatePlayerStats = async (
 //   playerId: number,
-//   stats: Partial<{ victories: number; defeats: number }>
-// ) {
-//   return apiRequest(`/players/${playerId}/stats`, "PUT", stats);
+//   stats: StatsUpdate
+// ): Promise<void> => {
+//   try {
+//     await axios.put(`${baseUrl}/${playerId}/stats`, stats, {
+//       headers: authHeaders(),
+//     })
+//   } catch (error) {
+//     console.error('updatePlayerStats failed:', error)
+//     throw error
+//   }
 // }
 
-async function apiRequest(
-  endpoint: string,
-  method: string = "GET",
-  body?: any
-) {
-  const token = localStorage.getItem("jwtToken");
-  if (!token) throw new Error("No token found");
-
-  const res = await fetch(`http://localhost:3001/api${endpoint}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API ${method} ${endpoint} failed: ${res.status} ${text}`);
+function authHeaders() {
+  const token = localStorage.getItem('jwtToken')
+  if (!token) throw new Error('No token found')
+  return {
+    Authorization: `Bearer ${token}`,
   }
-
-  return res.json();
 }
