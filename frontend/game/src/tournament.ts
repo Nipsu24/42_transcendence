@@ -180,12 +180,13 @@ function startNextMatch() {
   isMatchInProgress = true;
   stopBracketLoop();
 
-  startPongMatch(canvas, ctx, false, match.player1, match.player2, (winner) => {
-    tm.recordWinner(winner);
+  startPongMatch(canvas, ctx, false, match.player1, match.player2, (winner, leftScore, rightScore) => {
+    tm.recordWinner(winner, leftScore, rightScore);
 
     isMatchInProgress = false;
     startBracketLoop();
   });
+
 }
 
 function endTournament() {
