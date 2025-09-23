@@ -149,8 +149,9 @@ fastify.put('/api/players/me/stats', putDivReqResSchema(statsReqSchema, statsRes
 // playerOne name is retrieved via player id, whereby playerTwoName is to be provided in the request body
 fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySchema, matchResponseSchema), async (request, reply) => {
 	try {
-		const playerOneId = request.user.id;
-		const playerOne = await Player.findPlayerById(playerOneId);
+		// const playerOneId = request.user.id;
+		// const playerOne = await Player.findPlayerById(playerOneId);
+		const playerOne = await Player.findPlayerByName(request.body.playerOneName); 
 		if (!playerOne) {
 			return reply.status(404).send({ error: 'PlayerOne not found.' });
 		}
@@ -160,8 +161,9 @@ fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySche
 				return reply.status(404).send({ error: 'PlayerTwo not found.' });
 			}
 		}
-		const { playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
-		const newMatch = await Match.createMatch(playerOne.name, {
+		const { playerOneName, playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
+		const newMatch = await Match.createMatch({
+			playerOneName,
 			playerTwoName, 
 			resultPlayerOne, 
 			resultPlayerTwo, 

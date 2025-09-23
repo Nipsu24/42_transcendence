@@ -1,8 +1,9 @@
 // defines structure of the match object (fetched within player's stats object)
 const matchRequestBodySchema = {
 	type: 'object',
-	required: ['resultPlayerOne', 'resultPlayerTwo', 'aiOpponent'],
+	required: ['playerOneName', 'resultPlayerOne', 'resultPlayerTwo', 'aiOpponent'],
 	properties: {
+		playerOneName: { type: ['string']},
 		playerTwoName: { type: ['string', 'null'] }, // can be left away in case of Ai matches
 		resultPlayerOne: { type: 'integer', minimum: 0, maximum: 10},
 		resultPlayerTwo: { type: 'integer', minimum: 0, maximum: 10},
