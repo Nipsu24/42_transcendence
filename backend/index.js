@@ -58,8 +58,10 @@ fastify.setErrorHandler((error, request, reply) => {
 		else 
 			return reply.status(400).send({ error: 'Invalid request data.' });
 	}
-	else
+	else {
+		console.log('error:', {error})
 		return reply.status(500).send({ error: 'An internal server error occurred.' });
+	}
 });
 
 // NEW!!

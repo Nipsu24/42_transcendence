@@ -3,12 +3,12 @@ const { findPlayerById } = require('./player');
 const { findPlayerByName } = require('./player');
 const prisma = new PrismaClient();
 
-const createMatch = async (playerOneName, data) => {
+const createMatch = async (data) => {
 // creates new match record
 	const match = await prisma.match.create({
 		data: {
 			date: new Date().toISOString(),
-			playerOneName: playerOneName, //passed as an extra argument, as not part of request body (data)
+			playerOneName: data.playerOneName,
 			playerTwoName: data.playerTwoName,
 			resultPlayerOne: data.resultPlayerOne,
 			resultPlayerTwo: data.resultPlayerTwo,
@@ -17,7 +17,7 @@ const createMatch = async (playerOneName, data) => {
 	});
 
 	// attaches game to PlayerOne stats
-	const playerOne = await findPlayerByName(playerOneName);
+	const playerOne = await findPlayerByName(data.playerOneName);
 	if (playerOne && playerOne.stats) {
 		await prisma.statistics.update({
 			where: { id: playerOne.stats.id },
