@@ -112,7 +112,7 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 })
 
 /*######################################## Stats ######################################## */
-
+// ************************************DEPRICATED, NO LONGER NEEDED******************************************
 // updates stats of a single player and the player's opponent
 fastify.put('/api/players/me/stats', putDivReqResSchema(statsReqSchema, statsResSchema), async (request, reply) => {
 	try {
@@ -142,11 +142,13 @@ fastify.put('/api/players/me/stats', putDivReqResSchema(statsReqSchema, statsRes
 		reply.status(500).send({ error: 'An error occured while updating the statistics.' });
 	}
 });
+//***************************************************************************************************************** */
 
 /*######################################## Match ######################################## */
 
 // creates new match record and 'attaches' this to the participating players' statistics
-// playerOne name is retrieved via player id, whereby playerTwoName is to be provided in the request body
+// also updates victory/defeat statistics of participating players
+// playerOneName is always to be provided, whereby playerTwoName only in case it is not an AI game
 fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySchema, matchResponseSchema), async (request, reply) => {
 	try {
 		const playerOne = await Player.findPlayerByName(request.body.playerOneName); 
@@ -164,7 +166,6 @@ fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySche
             }
         }
 
-		// const { playerOneName, playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
 		const newMatch = await Match.createMatch({
 			playerOneName: playerOne.name,
 			playerTwoName, 
@@ -173,7 +174,7 @@ fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySche
 			aiOpponent
 		});
 
-		// Update stats based on match result
+		// Updates stats based on match result
         const playerOneWon = resultPlayerOne > resultPlayerTwo;
         
         // Update playerOne stats
