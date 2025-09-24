@@ -149,30 +149,55 @@ fastify.put('/api/players/me/stats', putDivReqResSchema(statsReqSchema, statsRes
 // playerOne name is retrieved via player id, whereby playerTwoName is to be provided in the request body
 fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySchema, matchResponseSchema), async (request, reply) => {
 	try {
-		// const playerOneId = request.user.id;
-		// const playerOne = await Player.findPlayerById(playerOneId);
 		const playerOne = await Player.findPlayerByName(request.body.playerOneName); 
 		if (!playerOne) {
 			return reply.status(404).send({ error: 'PlayerOne not found.' });
 		}
-		if (request.body.playerTwoName) {
-			const playerTwo = await Player.findPlayerByName(request.body.playerTwoName);
-			if (!playerTwo) {
-				return reply.status(404).send({ error: 'PlayerTwo not found.' });
-			}
-		}
-		const { playerOneName, playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
+
+		const { playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
+
+		let playerTwo = null;
+        if (playerTwoName && !aiOpponent) {
+            playerTwo = await Player.findPlayerByName(playerTwoName);
+            if (!playerTwo) {
+                return reply.status(404).send({ error: 'PlayerTwo not found.' });
+            }
+        }
+
+		// const { playerOneName, playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
 		const newMatch = await Match.createMatch({
-			playerOneName,
+			playerOneName: playerOne.name,
 			playerTwoName, 
 			resultPlayerOne, 
 			resultPlayerTwo, 
 			aiOpponent
-		})
-		reply.status(201).send(newMatch);
-	}
+		});
+
+		// Update stats based on match result
+        const playerOneWon = resultPlayerOne > resultPlayerTwo;
+        
+        // Update playerOne stats
+        await Stats.updateStats({
+            id: playerOne.stats.id,
+            victories: playerOne.stats.victories + (playerOneWon ? 1 : 0),
+            defeats: playerOne.stats.defeats + (playerOneWon ? 0 : 1)
+        });
+
+        // Update playerTwo stats (if not AI)
+        if (playerTwo) {
+            await Stats.updateStats({
+                id: playerTwo.stats.id,
+                victories: playerTwo.stats.victories + (playerOneWon ? 0 : 1),
+                defeats: playerTwo.stats.defeats + (playerOneWon ? 1 : 0)
+            });
+        }
+
+        reply.status(201).send(newMatch);
+    }
+
 	catch (error) {
 		reply.status(500).send({ error: 'An error occured while creating the match records.' });
+		console.log('error:', { error });
 	}
 })
 
