@@ -4,15 +4,11 @@ import { baseUrl } from "../../src/services/players"
 
 // Define types
 export interface MatchRecord {
+  playerOneName?: string
   playerTwoName?: string
   resultPlayerOne?: number
   resultPlayerTwo?: number
   aiOpponent?: boolean
-}
-
-export interface StatsUpdate {
-  victories?: number
-  defeats?: number
 }
 
 // Create a new match record
@@ -28,34 +24,6 @@ export const createRecord = async (
     throw error
   }
 }
-
-// Update current user’s stats
-export const updateMyStats = async (
-  stats: StatsUpdate
-): Promise<void> => {
-  try {
-    await axios.put(`${baseUrl}/me/stats`, stats, {
-      headers: authHeaders(),
-    })
-  } catch (error) {
-    console.error('updateMyStats failed:', error)
-    throw error
-  }
-}
-
-// export const updatePlayerStats = async (
-//   playerId: number,
-//   stats: StatsUpdate
-// ): Promise<void> => {
-//   try {
-//     await axios.put(`${baseUrl}/${playerId}/stats`, stats, {
-//       headers: authHeaders(),
-//     })
-//   } catch (error) {
-//     console.error('updatePlayerStats failed:', error)
-//     throw error
-//   }
-// }
 
 function authHeaders() {
   const token = localStorage.getItem('jwtToken')

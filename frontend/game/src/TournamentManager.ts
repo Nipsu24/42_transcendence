@@ -1,5 +1,4 @@
 import { getMe } from '../../src/services/players.js';
-import { updateMyStats } from "./apiCalls.js";
 import { createRecord } from './apiCalls.js';
 
 export interface Match {
@@ -70,24 +69,11 @@ export class TournamentManager {
     // save match record
     if (match.player2) {
       await createRecord({
+        playerOneName: match.player1,
         playerTwoName: match.player2,
         resultPlayerOne: winner === match.player1 ? leftScore : rightScore,
         resultPlayerTwo: winner === match.player1 ? rightScore : leftScore,
         aiOpponent: false,
-      });
-    }
-
-    // update stats
-    const me = await getMe();
-    if (winner === me.name) {
-      await updateMyStats({
-        victories: me.stats.victories + 1,
-        defeats: me.stats.defeats,
-      });
-    } else {
-      await updateMyStats({
-        victories: me.stats.victories,
-        defeats: me.stats.defeats + 1,
       });
     }
 
