@@ -50,7 +50,7 @@ fastify.setErrorHandler((error, request, reply) => {
 		else if (request.method === 'PUT' && request.url.startsWith('/api/players/me/stats'))
 			return reply.status(400).send({ error: 'Invalid player data: victory and defeats are required, min. 0, max 1000' });
 		else if (request.method === 'POST' && request.url.startsWith('/api/players/me/matches'))
-			return reply.status(400).send({ error: 'Invalid match data: resultPlayerOne, resultPlayerTwo and aiOpponent are required. Results need to be <= 10' });
+			return reply.status(400).send({ error: 'Invalid match data: playerOneName, resultPlayerOne, resultPlayerTwo and aiOpponent are required. Results need to be <= 10' });
 		else if (request.method === 'POST' && request.url.startsWith('/api/players/me/friends'))
 			return reply.status(400).send({ error: 'Invalid friend data: "name" required.' });
 		else if (request.method === 'PUT' && request.url.startsWith('/api/players/me'))
@@ -58,8 +58,10 @@ fastify.setErrorHandler((error, request, reply) => {
 		else 
 			return reply.status(400).send({ error: 'Invalid request data.' });
 	}
-	else
+	else {
+		console.log('error:', {error})
 		return reply.status(500).send({ error: 'An internal server error occurred.' });
+	}
 });
 
 // NEW!!

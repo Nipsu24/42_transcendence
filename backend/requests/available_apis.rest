@@ -80,6 +80,7 @@ Authorization: Bearer {{login.response.body.token}}
 Content-Type: application/json
 
 {
+	"playerOneName": "Gugu",
 	"playerTwoName": "Player Two",
 	"resultPlayerOne": 10,
 	"resultPlayerTwo": 5,
