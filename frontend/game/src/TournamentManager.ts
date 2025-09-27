@@ -60,33 +60,38 @@ export class TournamentManager {
   }
 
 
-  public async recordWinner(winner: string, leftScore: number, rightScore: number) {
-    const match = this.currentRound[this.currentMatchIndex];
-    if (!match || match.winner) return;
+ public async recordWinner(winner: string, leftScore: number, rightScore: number) {
+  const match = this.currentRound[this.currentMatchIndex];
+  if (!match || match.winner) return;
 
-    match.winner = winner;
+  match.winner = winner;
 
-    // save match record
-    if (match.player2) {
+  if (match.player2) {
+    try {
       await createRecord({
         playerOneName: match.player1,
         playerTwoName: match.player2,
-        resultPlayerOne: winner === match.player1 ? leftScore : rightScore,
-        resultPlayerTwo: winner === match.player1 ? rightScore : leftScore,
+        resultPlayerOne: leftScore,
+        resultPlayerTwo: rightScore,
         aiOpponent: false,
       });
-    }
-
-    const allDecided = this.currentRound.every(m => m.winner !== null);
-    if (allDecided) {
-      const winners = this.currentRound.map(m => m.winner!).filter(Boolean);
-      if (winners.length === 1) {
-        this.champion = winners[0];
-      } else {
-        this.createRound(winners);
-      }
+    } catch (err) {
+      console.error("Failed to save match record:", err);
     }
   }
+
+  // advance round if all matches decided
+  const allDecided = this.currentRound.every(m => m.winner !== null);
+  if (allDecided) {
+    const winners = this.currentRound.map(m => m.winner!).filter(Boolean);
+    if (winners.length === 1) {
+      this.champion = winners[0];
+    } else {
+      this.createRound(winners);
+    }
+  }
+}
+
 
   public isFinished(): boolean {
     return this.champion !== null;
