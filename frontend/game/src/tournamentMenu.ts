@@ -104,7 +104,6 @@ export async function startTournamentMenu(
       cleanupTournament();
     };
 
-    // Button handlers
     const handleAddFriend = () => {
       if (players.length >= MAX_PLAYERS) {
         alert(`Maximum of ${MAX_PLAYERS} players reached.`);
@@ -157,22 +156,20 @@ export async function startTournamentMenu(
       startMenu(canvas, scene, onQuit);
     };
 
-    // Config array with actions (same structure as babylonMenu)
     const buttonConfigs = [
-      { text: "Add Friend", top: `${y * 100}%`, onClick: handleAddFriend },
-      { text: "Remove Last", top: `${(y + space) * 100}%`, onClick: handleRemoveLast },
-      { text: "Start Tournament", top: `${(y + space * 2) * 100}%`, onClick: handleStartTournament },
-      { text: "Back", top: `${(y + space * 3) * 100}%`, onClick: handleBack },
+      { text: "Add Friend", top: `${y * 100}%`, onClick: handleAddFriend, hoverColor: "#FE8915" },
+      { text: "Remove Last", top: `${(y + space) * 100}%`, onClick: handleRemoveLast, hoverColor: "#FF4F1A" },
+      { text: "Start Tournament", top: `${(y + space * 2) * 100}%`, onClick: handleStartTournament, hoverColor: "#55CFD4" },
+      { text: "Back", top: `${(y + space * 3) * 100}%`, onClick: handleBack, hoverColor: "#0489C2" },
     ];
 
-    // Create Babylon.js GUI buttons (same structure as babylonMenu)
     buttonConfigs.forEach(cfg => {
       const button = GUI.Button.CreateSimpleButton(`btn_${cfg.text}`, cfg.text);
       button.width = buttonWidth;
       button.height = buttonHeight;
       button.color = "white";
       button.background = "rgba(51, 51, 51, 0.9)";
-      button.cornerRadius = 8;
+      button.cornerRadius = 0;
       button.thickness = 3;
       button.fontSize = Math.floor(canvas.height * 0.035);
       button.fontWeight = "bold";
@@ -180,9 +177,8 @@ export async function startTournamentMenu(
       button.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
       button.top = cfg.top;
 
-      // Hover effects (same as babylonMenu)
       button.onPointerEnterObservable.add(() => {
-        button.background = "rgba(31, 156, 96, 0.95)";
+        button.background = cfg.hoverColor;
         button.color = "black";
         button.scaleX = 1.05;
         button.scaleY = 1.05;
@@ -194,7 +190,6 @@ export async function startTournamentMenu(
         button.scaleY = 1.0;
       });
 
-      // Click action
       button.onPointerClickObservable.add(() => cfg.onClick());
 
       ui.addControl(button);
@@ -204,7 +199,6 @@ export async function startTournamentMenu(
     console.log(`Total buttons created: ${buttons.length}`);
     console.log("UI controls count:", ui.getChildren().length);
 
-    // Return cleanup function so it can be called from outside
     return cleanup;
 
   } catch (error) {
@@ -214,7 +208,6 @@ export async function startTournamentMenu(
     console.error("Scene:", scene);
     alert("Error loading tournament menu: " + (error instanceof Error ? error.message : 'Unknown error'));
     
-    // Try to fallback to main menu even if there's an error
     try {
       startMenu(canvas, scene, onQuit);
     } catch (fallbackError) {

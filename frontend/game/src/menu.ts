@@ -22,8 +22,6 @@ export async function startMenu(
   
   const ui = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GameMenuUI");
 
-  console.log("Babylon Menu initialized - Canvas size:", canvas.width, "x", canvas.height);
-
   const background = new GUI.Rectangle();
   background.width = "100%";
   background.height = "100%";
@@ -88,7 +86,7 @@ export async function startMenu(
             aiOpponent: true
           });
         }
-        startMenu(canvas, scene, onQuit); // restart menu after game
+        startMenu(canvas, scene, onQuit);
       });
     }
 
@@ -137,12 +135,10 @@ export async function startMenu(
     if (onQuit) {
       onQuit();
     } else {
-      // Fallback if no onQuit callback is provided
-      window.location.href = '/';
+      window.location.href = '/gamemenu';
     }
   }
 
-  // Config array with actions
   const buttonConfigs = [
     { text: "1 Player", top: `${y * 100}%`, onClick: handleSinglePlayer, hoverColor: "#FE8915" },
     { text: "2 Players", top: `${(y + space) * 100}%`, onClick: handleTwoPlayers, hoverColor: "#FF4F1A" },
@@ -150,14 +146,13 @@ export async function startMenu(
     { text: "Quit", top: `${(y + space * 3) * 100}%`, onClick: handleQuit, hoverColor: "#0489C2" },
   ];
 
-  // Create Babylon.js GUI buttons
   buttonConfigs.forEach(cfg => {
     const button = GUI.Button.CreateSimpleButton(`btn_${cfg.text}`, cfg.text);
     button.width = buttonWidth;
     button.height = buttonHeight;
     button.color = "white";
     button.background = "rgba(51, 51, 51, 0.9)";
-    button.cornerRadius = 0; // Make buttons square (no rounded corners)
+    button.cornerRadius = 0;
     button.thickness = 3;
     button.fontSize = Math.floor(canvas.height * 0.035);
     button.fontWeight = "bold";
@@ -165,7 +160,6 @@ export async function startMenu(
     button.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
     button.top = cfg.top;
 
-    // Hover effects with specific colors for each button
     button.onPointerEnterObservable.add(() => {
       button.background = cfg.hoverColor;
       button.color = "black";
@@ -185,16 +179,9 @@ export async function startMenu(
     buttons.push(button);
   });
 
-  console.log(`Total buttons created: ${buttons.length}`);
-  console.log("UI controls count:", ui.getChildren().length);
-
   function cleanup() {
-    //window.removeEventListener("resize", resizeHandler);
-    // Dispose of Babylon.js resources
     buttons.forEach(btn => btn.dispose());
     ui.dispose();
-    //scene.dispose();
-    //engine.dispose();
   }
   return cleanup;
 }

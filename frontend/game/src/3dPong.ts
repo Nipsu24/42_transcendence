@@ -27,6 +27,7 @@ const trailColors = [
 ];
 
 const lights: RectAreaLight[] = [];
+let lightsAnimObserver: any = null;
 let paddle1 = { mesh: null as any, x: 0, y: 0, dy: 0 };
 let paddle2 = { mesh: null as any, x: 0, y: 0, dy: 0 };
 let ball = { mesh: null as any, x: 0, y: 0, dx: 0, dy: 0 };
@@ -39,6 +40,7 @@ let player1Name: string, player2Name: string;
 
 let canvasEl: HTMLCanvasElement;
 let scene: Scene;
+let handleResize: (() => void) | null = null;
 
 function getPaddleWidth() { return Math.max(playArea.width * 0.0125, 10); }
 function getPaddleHeight() { return Math.max(playArea.height * 0.1333, 60); }
@@ -70,10 +72,10 @@ function removeInput() {
 }
 
 function keyDownHandler(e: KeyboardEvent) {
-  if (e.key === 'w') paddle1.dy = -getPaddleSpeed();
-  if (e.key === 's') paddle1.dy = getPaddleSpeed();
-  if (e.key === 'ArrowUp' && !isAi) paddle2.dy = -getPaddleSpeed();
-  if (e.key === 'ArrowDown' && !isAi) paddle2.dy = getPaddleSpeed();
+  if (e.key === 'w') paddle1.dy = getPaddleSpeed();
+  if (e.key === 's') paddle1.dy = -getPaddleSpeed();
+  if (e.key === 'ArrowUp' && !isAi) paddle2.dy = getPaddleSpeed();
+  if (e.key === 'ArrowDown' && !isAi) paddle2.dy = -getPaddleSpeed();
 }
 
 function keyUpHandler(e: KeyboardEvent) {
@@ -158,11 +160,11 @@ async function update() {
 		ball.x + getBallSize() > paddle1.x - getPaddleWidth() / 2 &&
 		ball.y < paddle1.y + getPaddleHeight() &&
 		ball.y + getBallSize() > paddle1.y &&
-		ball.dx < 0 // Ball moving left toward paddle1
+		ball.dx < 0
 	) {
 		ball.dx *= -speedMod;
 		aiDecisionInterval -= 2;
-		ball.x = paddle1.x + getPaddleWidth() / 2 + 1; // Move ball away from paddle
+		ball.x = paddle1.x + getPaddleWidth() / 2 + 1;
 	}
 
 	if (
@@ -174,13 +176,12 @@ async function update() {
 	) {
 		ball.dx *= -speedMod;
 		aiDecisionInterval -= 2;
-		ball.x = paddle2.x - getPaddleWidth() / 2 - getBallSize() - 1; // Move ball away from paddle
+		ball.x = paddle2.x - getPaddleWidth() / 2 - getBallSize() - 1;
 	}
 
 	if (ball.x < 0) {
 		rightScore = Math.min(maxScore, rightScore + 1);
 		if (rightScore >= maxScore) {
-		// await createRecord({ resultPlayerOne: leftScore, resultPlayerTwo: rightScore, aiOpponent: isAi });
 		endMatch(player2Name);
 		}
 		else resetBall();
@@ -189,7 +190,6 @@ async function update() {
 	if (ball.x > playArea.width) {
 		leftScore = Math.min(maxScore, leftScore + 1);
 		if (leftScore >= maxScore) {
-		// await createRecord({ resultPlayerOne: leftScore, resultPlayerTwo: rightScore, aiOpponent: isAi });
 		endMatch(player1Name);
 		}
 		else resetBall();
@@ -248,22 +248,21 @@ function createTrailParticle() {
 function endMatch(winner: string) {
   isRunning = false;
   removeInput();
-  
-  if (scene.activeCamera) {
-    scene.activeCamera.detachControl();
+  window.removeEventListener('resize', handleResize);
+  if (scene.activeCamera) { scene.activeCamera.detachControl(); }
+  if (winnerCallback) { winnerCallback(winner, leftScore, rightScore); winnerCallback = null; }
+
+  for (let i = 0; i < lights.length; i++) {
+    const parent = lights[i].parent;
+    lights[i].dispose();
+    if (parent && (parent as any).dispose) (parent as any).dispose();
   }
-  
-  if (winnerCallback) { 
-	winnerCallback(winner, leftScore, rightScore); 
-	winnerCallback = null; 
-  }
+  lights.length = 0;
+  if (lightsAnimObserver) { scene.onBeforeRenderObservable.remove(lightsAnimObserver); lightsAnimObserver = null; }
 
   paddle1.mesh.dispose();
   paddle2.mesh.dispose();
   ball.mesh.dispose();
-  lights.forEach(l => l.dispose());
-  lights.length = 0;
-
   if (scoreUI) { scoreUI.dispose(); scoreUI = null as any; }
   player1ScoreText = null as any;
   player2ScoreText = null as any;
@@ -315,19 +314,17 @@ function setupPongScene(scene: Scene) {
 	scene.meshes.forEach(m => m.dispose());
 	scene.lights.forEach(l => l.dispose());
 	scene.cameras.forEach(c => c.dispose());
-	if (scoreUI) { scoreUI.dispose(); scoreUI = null as any; }
 
-	// Camera
 	const camera = new ArcRotateCamera(
 		"camera",
-		-Math.PI / 2,               // alpha: center horizontally
-		Math.PI / 2 + 0.05,          // beta: slightly below center
-		playArea.width,              // radius
-		new Vector3(playArea.width/2, playArea.height/2 - 10, 0),
+		-Math.PI / 2,
+		Math.PI / 2 + 0.05,
+		Math.max(playArea.width, playArea.height) * 0.8,
+		new Vector3(playArea.width/2, playArea.y + playArea.height/2 - 10, 0),
 		scene
 	);
 
-	camera.setTarget(new Vector3(playArea.width/2, playArea.height/2 - 10, 0));
+	camera.setTarget(new Vector3(playArea.width/2, playArea.y + playArea.height/2 - 10, 0));
 	camera.detachControl();
 	scene.activeCamera = camera;
 	
@@ -362,11 +359,12 @@ function setupPongScene(scene: Scene) {
 		lights.push(createLight(new Vector3(x, yPos, zBack), color, "light" + i, scene));
 	}
 
-	scene.onBeforeRenderObservable.add(() => {
+	if (lightsAnimObserver) { scene.onBeforeRenderObservable.remove(lightsAnimObserver); lightsAnimObserver = null; }
+	lightsAnimObserver = scene.onBeforeRenderObservable.add(() => {
 		const time = performance.now() * 0.002; // scale speed
-		lights.forEach((light, i) => {
-			light.intensity = 0.5 + 0.5 * Math.sin(time + i);
-		});
+		for (let i = 0; i < lights.length; i++) {
+			lights[i].intensity = 0.5 + 0.5 * Math.sin(time + i);
+		}
 	});
 
 	const mat1 = new StandardMaterial("mat1", scene);
@@ -384,7 +382,7 @@ function setupPongScene(scene: Scene) {
 		scene
 	);
 	ground.material = groundMat;
-	ground.position.y = playArea.y - 1;
+	ground.position.y = playArea.y - Math.max(playArea.width * 0.015, 20) * 0.2;
 	ground.position.x = playArea.width / 2;
 	ground.position.z = 0;
 
@@ -408,10 +406,10 @@ function setupPongScene(scene: Scene) {
 
 
 	const paddle1Mat = new StandardMaterial("paddle1Mat", scene);
-	paddle1Mat.diffuseColor = Color3.FromHexString("#FEF018"); // yellow
+	paddle1Mat.diffuseColor = Color3.FromHexString("#FEF018");
 
 	const paddle2Mat = new StandardMaterial("paddle2Mat", scene);
-	paddle2Mat.diffuseColor = Color3.FromHexString("#0489C2"); // blue
+	paddle2Mat.diffuseColor = Color3.FromHexString("#0489C2");
 	
 	var redMat = new StandardMaterial("redMat", scene);
 	redMat.ambientColor = new Color3(1, 0, 0);
@@ -427,7 +425,7 @@ function setupPongScene(scene: Scene) {
 	light1.specular = new Color3(0, 1, 0);
 	light1.groundColor = new Color3(0, 1, 0);
 	
-	const ballSize = Math.max(playArea.width * 0.015, 20); // Minimum size 20
+	const ballSize = Math.max(playArea.width * 0.015, 20);
 	ball.mesh = MeshBuilder.CreateSphere("ball", { diameter: ballSize }, scene);
 	ball.mesh.material = greenMat;
 	
@@ -442,7 +440,7 @@ function setupPongScene(scene: Scene) {
 
 	paddle1.mesh.material = redMat;
 	paddle1.mesh.position.x = paddleWidth / 2;
-	paddle1.mesh.position.y = playArea.y + (playArea.height / 2); // Will be updated when paddles are positioned
+	paddle1.mesh.position.y = playArea.y + (playArea.height / 2);
 	
 	paddle2.mesh = MeshBuilder.CreateBox("paddle2", { 
 		width: paddleWidth, 
@@ -452,7 +450,7 @@ function setupPongScene(scene: Scene) {
 
 	paddle2.mesh.material = greenMat;
 	paddle2.mesh.position.x = playArea.width - (paddleWidth / 2);
-	paddle2.mesh.position.y = playArea.y + (playArea.height / 2); // Will be updated when paddles are positioned
+	paddle2.mesh.position.y = playArea.y + (playArea.height / 2);
 
 	mat1.maxSimultaneousLights = 8;
 	blackMat.maxSimultaneousLights = 8;
@@ -468,27 +466,26 @@ function setupScoreUI(scene: Scene) {
   player1ScoreText = new GUI.TextBlock();
   player1ScoreText.text = `${player1Name}: ${leftScore}`;
   player1ScoreText.color = "white";
-  player1ScoreText.fontSize = 48;
+  player1ScoreText.fontSize = Math.floor(playArea.height * 0.07);
   player1ScoreText.fontWeight = "bold";
   player1ScoreText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
   player1ScoreText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   player1ScoreText.top = "20px";
   player1ScoreText.left = "20px";
-  player1ScoreText.zIndex = 10;
   scoreUI.addControl(player1ScoreText);
 
   player2ScoreText = new GUI.TextBlock();
   player2ScoreText.text = `${player2Name}: ${rightScore}`;
   player2ScoreText.color = "white";
-  player2ScoreText.fontSize = 48;
+  player2ScoreText.fontSize = Math.floor(playArea.height * 0.07);
   player2ScoreText.fontWeight = "bold";
   player2ScoreText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
   player2ScoreText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   player2ScoreText.top = "20px";
   player2ScoreText.left = "-20px";
-  player2ScoreText.zIndex = 10;
   scoreUI.addControl(player2ScoreText);
 }
+
 
 function drawScores() {
   if (!player1ScoreText || !player2ScoreText) return;
@@ -507,8 +504,15 @@ export async function startPongMatch(
 	canvasEl = canvas;
 	scene = sceneEl;
 
-	const canvasWidth = canvasEl.width;
-	const canvasHeight = canvasEl.height;
+	// Use getBoundingClientRect to get actual display size, not just canvas.width/height
+	const rect = canvasEl.getBoundingClientRect();
+	
+	// Constrain dimensions to viewport to prevent overflow
+	const viewportWidth = window.innerWidth;
+	const viewportHeight = window.innerHeight;
+	const canvasWidth = Math.min(rect.width, viewportWidth);
+	const canvasHeight = Math.min(rect.height, viewportHeight);
+	
 	const topMargin = canvasHeight * 0.08;
 	const bottomMargin = canvasHeight * 0.08;
 
@@ -526,8 +530,8 @@ export async function startPongMatch(
 	leftScore = 0; 
 	rightScore = 0;
 
-	setupScoreUI(scene);
 	setupPongScene(scene);
+	setupScoreUI(scene);
 
 	paddle1.x = getPaddleWidth() / 2;
 	paddle1.y = playArea.y + (playArea.height / 2) - (getPaddleHeight() / 2);
@@ -554,40 +558,24 @@ export async function startPongMatch(
 	isRunning = true;
 	setupInput();
 
-	/* const topY = playArea.y;
-	const bottomY = playArea.y + playArea.height;
-	const leftX = 0 + getPaddleWidth() / 2;
-	const rightX = playArea.width - getPaddleWidth() / 2;
-
-	// Horizontal top line (top of play area)
-	createDebugLine(
-		scene,
-		[new Vector3(leftX, topY, 0), 
-		new Vector3(rightX, topY, 0)],
-		Color3.Yellow()
-	);
-
-	// Horizontal bottom line
-	createDebugLine(
-		scene,
-		[new Vector3(leftX, bottomY, 0), 
-		new Vector3(rightX, bottomY, 0)],
-		Color3.Teal()
-	);
-
-	// Vertical left line
-	createDebugLine(
-		scene,
-		[new Vector3(leftX, topY, 0), new Vector3(leftX, bottomY, 0)],
-		Color3.Purple()
-	);
-
-	// Vertical right line
-	createDebugLine(
-		scene,
-		[new Vector3(rightX, topY, 0), new Vector3(rightX, bottomY, 0)],
-		Color3.Green()
-	); */
+	handleResize = () => {
+		if (!isRunning) return;
+		const rect = canvasEl.getBoundingClientRect();
+		const newWidth = rect.width;
+		const newHeight = rect.height;
+		const newTopMargin = newHeight * 0.08;
+		const newBottomMargin = newHeight * 0.08;
+		
+		playArea = {
+			y: newTopMargin,
+			width: newWidth,
+			height: newHeight - newTopMargin - newBottomMargin
+		};
+		player1ScoreText.fontSize = Math.floor(playArea.height * 0.07);
+		player2ScoreText.fontSize = Math.floor(playArea.height * 0.07);
+	};
+	
+	window.addEventListener('resize', handleResize);
 
 	scene.onBeforeRenderObservable.add(() => {
 		if (!isRunning) return;
