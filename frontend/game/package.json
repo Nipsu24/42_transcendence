@@ -10,6 +10,11 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "dependencies": {
+    "@babylonjs/core": "^7.0.0",
+    "@babylonjs/loaders": "^7.0.0",
+    "@babylonjs/gui": "^7.0.0"
+  },
   "devDependencies": {
     "lite-server": "^2.6.1",
     "typescript": "^5.8.3"

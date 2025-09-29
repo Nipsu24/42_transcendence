@@ -1,19 +1,15 @@
-import { Button } from './Button.js';
+import { Scene } from "@babylonjs/core";
+import * as GUI from "@babylonjs/gui";
 import { startTournamentMenu } from './tournamentMenu.js';
-import { startPongMatch } from './pong.js';
+import { startPongMatch } from './3dPong';
 import { getMe } from '../../src/services/players.js';
 import { createRecord } from './apiCalls.js';
 
 export async function startMenu(
   canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+  scene: Scene,
   onQuit?: () => void
 ) {
-  const buttonWidth = canvas.width * 0.25;
-  const buttonHeight = canvas.height * 0.10;
-  const buttonX = canvas.width / 2 - buttonWidth / 2;
-  let y = canvas.height * 0.25;
-  const space = canvas.height * 0.15;
 
   let player1Name = "Player 1";
   try {
@@ -22,120 +18,183 @@ export async function startMenu(
   } catch (err) {
     console.error("Could not fetch user:", err);
   }
+  console.log("Player name:", player1Name);
+  
+  const ui = GUI.AdvancedDynamicTexture.CreateFullscreenUI("GameMenuUI");
 
-  const buttons: Button[] = [
-    new Button(buttonX, y, buttonWidth, buttonHeight, '1 Player', () => {
-      cleanup();
-      startPongMatch(canvas, ctx, true, player1Name, 'AI player', async (winner, leftScore, rightScore) => {
-        const me = await getMe();
-        if (winner !== "") {
-          alert(`${winner} wins!`);
-          await createRecord({
-            playerOneName: player1Name,
+  console.log("Babylon Menu initialized - Canvas size:", canvas.width, "x", canvas.height);
+
+  const background = new GUI.Rectangle();
+  background.width = "100%";
+  background.height = "100%";
+  background.color = "transparent";
+  background.thickness = 0;
+  background.background = "rgba(0, 0, 0, 0.85)";
+  background.alpha = 1.0;
+  ui.addControl(background);
+
+  const border = new GUI.Rectangle();
+  border.width = "95%";
+  border.height = "90%";
+  border.color = "white";
+  border.thickness = 3;
+  border.background = "transparent";
+  border.alpha = 1.0;
+  border.cornerRadius = 10;
+  ui.addControl(border);
+
+  const title = new GUI.TextBlock();
+  title.text = "PONG";
+  title.fontFamily = "futura-pt, sans-serif";
+  title.color = "white";
+  title.fontSize = Math.floor(canvas.height * 0.08);
+  title.fontWeight = "bold";
+  title.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+  title.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  title.top = "15%";
+  title.alpha = 1.0;
+  ui.addControl(title);
+
+  const welcome = new GUI.TextBlock();
+  welcome.text = `Welcome, ${player1Name}`;
+  welcome.color = "#cccccc";
+  welcome.fontSize = Math.floor(canvas.height * 0.04);
+  welcome.fontFamily = "futura-pt, sans-serif";
+  welcome.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+  welcome.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  welcome.top = "25%";
+  welcome.alpha = 1.0;
+  ui.addControl(welcome);
+
+  let y = 0.35;
+  const space = 0.15;
+
+  const buttonWidth = "30%";
+  const buttonHeight = "8%";
+
+  const buttons: GUI.Button[] = [];
+
+  async function handleSinglePlayer() {
+    cleanup();
+
+    startPongMatch(canvas, scene, true, player1Name, "AI player", async (winner, leftScore, rightScore) => {
+      const me = await getMe();
+      if (winner !== "") {
+        alert(`${winner} wins!`);
+        await createRecord({
+          playerOneName: player1Name,
             resultPlayerOne: leftScore,
             resultPlayerTwo: rightScore,
             aiOpponent: true
           });
         }
-        startMenu(canvas, ctx, onQuit);
+        startMenu(canvas, scene, onQuit); // restart menu after game
       });
-    }),
+    }
 
-    new Button(buttonX, (y += space), buttonWidth, buttonHeight, '2 Players', async () => {
-      cleanup();
+  async function handleTwoPlayers() {
+    cleanup();
+    const me = await getMe();
 
-      const me = await getMe();
-      if (!me.friends || me.friends.length === 0) {
-        alert("You have no friends to play against. Add some first!");
-        startMenu(canvas, ctx, onQuit);
-        return;
+    if (!me.friends || me.friends.length === 0) {
+      alert("You have no friends to play against. Add some first!");
+      startMenu(canvas, scene, onQuit);
+      return;
+    }
+
+    const friendNames = me.friends.map(f => f.name).join(", ");
+    const chosen = prompt(`Choose an opponent: ${friendNames}`);
+    const opponent = me.friends.find(f => f.name === chosen);
+
+    if (!opponent) {
+      alert("Invalid selection.");
+      startMenu(canvas,  scene, onQuit);
+      return;
+    }
+
+    startPongMatch(canvas, scene, false, me.name, opponent.name, async (winner, leftScore, rightScore) => {
+      if (winner !== "") {
+        alert(`${winner} wins!`);
+        await createRecord({
+          playerOneName: player1Name,
+          playerTwoName: opponent.name,
+          resultPlayerOne: leftScore,
+          resultPlayerTwo: rightScore,
+          aiOpponent: false,
+        });
       }
+      startMenu(canvas, scene, onQuit);
+    });
+  }
 
-      const friendNames = me.friends.map(f => f.name).join(", ");
-      const chosen = prompt(`Choose an opponent: ${friendNames}`);
+  function handleTournament() {
+    cleanup();
+    startTournamentMenu(canvas, scene, onQuit);
+  }
 
-      const opponent = me.friends.find(f => f.name === chosen);
-      if (!opponent) {
-        alert("Invalid selection.");
-        startMenu(canvas, ctx, onQuit);
-        return;
-      }
-      startPongMatch(canvas, ctx, false, me.name, opponent.name, async (winner, leftScore, rightScore) => {
-        if (winner !== "") {
-          alert(`${winner} wins!`);
-          await createRecord({
-            playerOneName: player1Name,
-            playerTwoName: opponent.name,
-            resultPlayerOne: leftScore,
-            resultPlayerTwo: rightScore,
-            aiOpponent: false
-          });
-        }
-        startMenu(canvas, ctx, onQuit);
-      });
-    }),
+  function handleQuit() {
+    cleanup();
+    if (onQuit) {
+      onQuit();
+    } else {
+      // Fallback if no onQuit callback is provided
+      window.location.href = '/';
+    }
+  }
 
-    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Tournament', () => {
-      cleanup();
-      startTournamentMenu(canvas, ctx, onQuit);
-    }),
-
-    new Button(buttonX, (y += space), buttonWidth, buttonHeight, 'Quit', () => {
-      cleanup();
-      if (onQuit) onQuit();
-    }),
+  // Config array with actions
+  const buttonConfigs = [
+    { text: "1 Player", top: `${y * 100}%`, onClick: handleSinglePlayer, hoverColor: "#FE8915" },
+    { text: "2 Players", top: `${(y + space) * 100}%`, onClick: handleTwoPlayers, hoverColor: "#FF4F1A" },
+    { text: "Tournament", top: `${(y + space * 2) * 100}%`, onClick: handleTournament, hoverColor: "#55CFD4" },
+    { text: "Quit", top: `${(y + space * 3) * 100}%`, onClick: handleQuit, hoverColor: "#0489C2" },
   ];
 
-  const handleClick = (e: MouseEvent) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    buttons.forEach(button => {
-      if (button.isClicked(x, y)) button.onClick();
+  // Create Babylon.js GUI buttons
+  buttonConfigs.forEach(cfg => {
+    const button = GUI.Button.CreateSimpleButton(`btn_${cfg.text}`, cfg.text);
+    button.width = buttonWidth;
+    button.height = buttonHeight;
+    button.color = "white";
+    button.background = "rgba(51, 51, 51, 0.9)";
+    button.cornerRadius = 0; // Make buttons square (no rounded corners)
+    button.thickness = 3;
+    button.fontSize = Math.floor(canvas.height * 0.035);
+    button.fontWeight = "bold";
+    button.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    button.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+    button.top = cfg.top;
+
+    // Hover effects with specific colors for each button
+    button.onPointerEnterObservable.add(() => {
+      button.background = cfg.hoverColor;
+      button.color = "black";
+      button.scaleX = 1.05;
+      button.scaleY = 1.05;
     });
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-
-    buttons.forEach(button => {
-      button.hovered = button.isHovered(mx, my);
+    button.onPointerOutObservable.add(() => {
+      button.background = "rgba(51, 51, 51, 0.9)";
+      button.color = "white";
+      button.scaleX = 1.0;
+      button.scaleY = 1.0;
     });
 
-    drawMenu();
-  };
+    button.onPointerClickObservable.add(() => cfg.onClick());
 
-  canvas.addEventListener('click', handleClick);
-  canvas.addEventListener('mousemove', handleMouseMove);
+    ui.addControl(button);
+    buttons.push(button);
+  });
+
+  console.log(`Total buttons created: ${buttons.length}`);
+  console.log("UI controls count:", ui.getChildren().length);
 
   function cleanup() {
-    canvas.removeEventListener('click', handleClick);
-    canvas.removeEventListener('mousemove', handleMouseMove);
+    //window.removeEventListener("resize", resizeHandler);
+    // Dispose of Babylon.js resources
+    buttons.forEach(btn => btn.dispose());
+    ui.dispose();
+    //scene.dispose();
+    //engine.dispose();
   }
-
-  function drawBorder() {
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
-  }
-
-  function drawMenu() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    drawBorder();
-
-    ctx.fillStyle = 'white';
-    ctx.font = `${Math.floor(canvas.height * 0.08)}px Arial`;
-    ctx.textAlign = 'center';
-    ctx.fillText('Pong', canvas.width / 2, canvas.height * 0.2);
-
-    ctx.font = `${Math.floor(canvas.height * 0.05)}px Arial`;
-    ctx.fillText(`Welcome, ${player1Name}`, canvas.width / 2, canvas.height * 0.1);
-
-    buttons.forEach(button => button.draw(ctx));
-  }
-
-  drawMenu();
+  return cleanup;
 }
