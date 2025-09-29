@@ -2,7 +2,6 @@ import { Button } from './Button.js';
 import { startTournamentMenu } from './tournamentMenu.js';
 import { startPongMatch } from './pong.js';
 import { getMe } from '../../src/services/players.js';
-import { updateMyStats } from "./apiCalls.js";
 import { createRecord } from './apiCalls.js';
 
 export async function startMenu(
@@ -32,15 +31,11 @@ export async function startMenu(
         if (winner !== "") {
           alert(`${winner} wins!`);
           await createRecord({
-          resultPlayerOne: leftScore,
-          resultPlayerTwo: rightScore,
-          aiOpponent: true
-        });
-        }
-        if (winner === player1Name) {
-          await updateMyStats({ victories: me.stats.victories + 1, defeats: me.stats.defeats });
-        } else {
-          await updateMyStats({ victories: me.stats.victories, defeats: me.stats.defeats + 1 });
+            playerOneName: player1Name,
+            resultPlayerOne: leftScore,
+            resultPlayerTwo: rightScore,
+            aiOpponent: true
+          });
         }
         startMenu(canvas, ctx, onQuit);
       });
@@ -69,19 +64,13 @@ export async function startMenu(
         if (winner !== "") {
           alert(`${winner} wins!`);
           await createRecord({
+            playerOneName: player1Name,
             playerTwoName: opponent.name,
             resultPlayerOne: leftScore,
             resultPlayerTwo: rightScore,
             aiOpponent: false
           });
         }
-
-        if (winner === me.name) {
-          await updateMyStats({ victories: me.stats.victories + 1, defeats: me.stats.defeats });
-        } else {
-          await updateMyStats({ victories: me.stats.victories, defeats: me.stats.defeats + 1 });
-        }
-
         startMenu(canvas, ctx, onQuit);
       });
     }),
