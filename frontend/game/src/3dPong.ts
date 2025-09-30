@@ -28,10 +28,12 @@ const trailColors = [
 
 const lights: RectAreaLight[] = [];
 let lightsAnimObserver: any = null;
+let updateObserver: any = null; // tracks per-frame update observer to avoid stacking
 let paddle1 = { mesh: null as any, x: 0, y: 0, dy: 0 };
 let paddle2 = { mesh: null as any, x: 0, y: 0, dy: 0 };
 let ball = { mesh: null as any, x: 0, y: 0, dx: 0, dy: 0 };
 const speedMod = 1.02;
+let baseSpeed = 0; // Store the initial base speed to prevent drift
 
 let playArea = { y: 0, width: 0, height: 0 };
 
@@ -48,18 +50,6 @@ function getBallSize() { return Math.max(playArea.width * 0.015, 12); }
 
 function getBallSpeed() { return playArea.width * 0.0075; }
 function getPaddleSpeed() { return playArea.height * 0.01; }
-
-function createDebugLine(scene: Scene, points: Vector3[], color: Color3) {
-  const line = MeshBuilder.CreateLines(
-    "debugLine",
-    { points, updatable: false },
-    scene
-  );
-  const mat = new StandardMaterial("lineMat", scene);
-  mat.emissiveColor = color;
-  line.material = mat;
-  return line;
-}
 
 function setupInput() {
   document.addEventListener('keydown', keyDownHandler);
@@ -89,13 +79,14 @@ function resetBall() {
   ball.y = playArea.y + (playArea.height / 2);
   aiDecisionInterval = 1000;
 
-  const initialSpeed = getBallSpeed();
+  // Use stored baseSpeed instead of recalculating to prevent drift
+  const initialSpeed = baseSpeed || getBallSpeed();
   ball.dx = Math.random() < 0.5 ? -initialSpeed : initialSpeed;
 
   let angle = 0;
   do {
-	angle = Math.random() * getBallSpeed() - getBallSpeed() / 2;
-  } while (Math.abs(angle) < getBallSpeed() / 6);
+	angle = Math.random() * initialSpeed - initialSpeed / 2;
+  } while (Math.abs(angle) < initialSpeed / 6);
   ball.dy = angle;
 }
 
@@ -172,7 +163,7 @@ async function update() {
 		ball.x + getBallSize() > paddle2.x - getPaddleWidth() / 2 &&
 		ball.y < paddle2.y + getPaddleHeight() &&
 		ball.y + getBallSize() > paddle2.y &&
-		ball.dx > 0 // Ball moving right toward paddle2
+		ball.dx > 0
 	) {
 		ball.dx *= -speedMod;
 		aiDecisionInterval -= 2;
@@ -248,9 +239,12 @@ function createTrailParticle() {
 function endMatch(winner: string) {
   isRunning = false;
   removeInput();
+  paddle1.dy = 0; // ensure no residual motion
+  paddle2.dy = 0;
   window.removeEventListener('resize', handleResize);
   if (scene.activeCamera) { scene.activeCamera.detachControl(); }
   if (winnerCallback) { winnerCallback(winner, leftScore, rightScore); winnerCallback = null; }
+  if (updateObserver) { scene.onBeforeRenderObservable.remove(updateObserver); updateObserver = null; }
 
   for (let i = 0; i < lights.length; i++) {
     const parent = lights[i].parent;
@@ -311,9 +305,9 @@ function createLight(
 }
 
 function setupPongScene(scene: Scene) {
-	scene.meshes.forEach(m => m.dispose());
-	scene.lights.forEach(l => l.dispose());
-	scene.cameras.forEach(c => c.dispose());
+  scene.meshes.forEach(m => m.dispose());
+  scene.lights.forEach(l => l.dispose());
+  scene.cameras.forEach(c => c.dispose());
 
 	const camera = new ArcRotateCamera(
 		"camera",
@@ -373,7 +367,7 @@ function setupPongScene(scene: Scene) {
 	const groundMat = new PBRMaterial("groundMat", scene);
 	groundMat.albedoColor = new Color3(1, 1, 1);
 	groundMat.roughness = 0.15;
-	groundMat.maxSimultaneousLights = 6;
+	groundMat.maxSimultaneousLights = 8;
 
 	const ground = MeshBuilder.CreateGround
 	(
@@ -382,7 +376,7 @@ function setupPongScene(scene: Scene) {
 		scene
 	);
 	ground.material = groundMat;
-	ground.position.y = playArea.y - Math.max(playArea.width * 0.015, 20) * 0.2;
+	ground.position.y = playArea.y - getBallSize() * 0.5;
 	ground.position.x = playArea.width / 2;
 	ground.position.z = 0;
 
@@ -407,16 +401,11 @@ function setupPongScene(scene: Scene) {
 
 	const paddle1Mat = new StandardMaterial("paddle1Mat", scene);
 	paddle1Mat.diffuseColor = Color3.FromHexString("#FEF018");
+	paddle1Mat.emissiveColor = paddle1Mat.diffuseColor.scale(0.3);
 
 	const paddle2Mat = new StandardMaterial("paddle2Mat", scene);
 	paddle2Mat.diffuseColor = Color3.FromHexString("#0489C2");
-	
-	var redMat = new StandardMaterial("redMat", scene);
-	redMat.ambientColor = new Color3(1, 0, 0);
-	
-	var greenMat = new StandardMaterial("redMat", scene);
-	greenMat.ambientColor = new Color3(1, 1, 1);
-	
+	paddle2Mat.emissiveColor = paddle2Mat.diffuseColor.scale(0.3);
 	
 	scene.ambientColor = new Color3(1, 1, 1);
 	
@@ -425,9 +414,12 @@ function setupPongScene(scene: Scene) {
 	light1.specular = new Color3(0, 1, 0);
 	light1.groundColor = new Color3(0, 1, 0);
 	
+	var ballMat = new StandardMaterial("redMat", scene);
+	ballMat.ambientColor = new Color3(1, 1, 1);
+
 	const ballSize = Math.max(playArea.width * 0.015, 20);
 	ball.mesh = MeshBuilder.CreateSphere("ball", { diameter: ballSize }, scene);
-	ball.mesh.material = greenMat;
+	ball.mesh.material = ballMat;
 	
 	const paddleWidth = Math.max(getPaddleWidth(), 15);
 	const paddleHeight = Math.max(getPaddleHeight(), 80);
@@ -437,8 +429,7 @@ function setupPongScene(scene: Scene) {
 		height: paddleHeight, 
 		depth: 8 
 	}, scene);
-
-	paddle1.mesh.material = redMat;
+  	paddle1.mesh.material = paddle1Mat;
 	paddle1.mesh.position.x = paddleWidth / 2;
 	paddle1.mesh.position.y = playArea.y + (playArea.height / 2);
 	
@@ -447,15 +438,12 @@ function setupPongScene(scene: Scene) {
 		height: paddleHeight, 
 		depth: 8 
 	}, scene);
-
-	paddle2.mesh.material = greenMat;
+  	paddle2.mesh.material = paddle2Mat;
 	paddle2.mesh.position.x = playArea.width - (paddleWidth / 2);
 	paddle2.mesh.position.y = playArea.y + (playArea.height / 2);
 
 	mat1.maxSimultaneousLights = 8;
 	blackMat.maxSimultaneousLights = 8;
-	redMat.maxSimultaneousLights = 8;
-	greenMat.maxSimultaneousLights = 8;
 	paddle1Mat.maxSimultaneousLights = 8;
 	paddle2Mat.maxSimultaneousLights = 8;
 }
@@ -530,6 +518,11 @@ export async function startPongMatch(
 	leftScore = 0; 
 	rightScore = 0;
 
+	// Store the base speed for this game to prevent drift across matches
+	baseSpeed = playArea.width * 0.0075;
+	ball.dx = 0;
+	ball.dy = 0;
+
 	setupPongScene(scene);
 	setupScoreUI(scene);
 
@@ -577,7 +570,9 @@ export async function startPongMatch(
 	
 	window.addEventListener('resize', handleResize);
 
-	scene.onBeforeRenderObservable.add(() => {
+	// Ensure no duplicate observers from previous matches
+	if (updateObserver) { scene.onBeforeRenderObservable.remove(updateObserver); updateObserver = null; }
+	updateObserver = scene.onBeforeRenderObservable.add(() => {
 		if (!isRunning) return;
 		update();
 	});

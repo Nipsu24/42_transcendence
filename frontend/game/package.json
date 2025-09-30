@@ -11,9 +11,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@babylonjs/core": "^7.0.0",
-    "@babylonjs/loaders": "^7.0.0",
-    "@babylonjs/gui": "^7.0.0"
+    "@babylonjs/core": "^7.54.3",
+    "@babylonjs/loaders": "^7.54.3",
+    "@babylonjs/gui": "^7.54.3"
   },
   "devDependencies": {
     "lite-server": "^2.6.1",
