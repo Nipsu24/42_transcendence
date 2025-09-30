@@ -15,7 +15,7 @@ let nextMatchButton: GUI.Button;
 let endTournamentButton: GUI.Button;
 let playerTextBlocks: TextBlock[] = [];
 let buttonsRef: GUI.Button[] = [];
-let bracketLoopId: number | null = null; // NEW
+let bracketLoopId: number | null = null;
 
 function hideTournamentUI() {
   if (ui) {
@@ -39,7 +39,7 @@ function startBracketLoop() {
   if (bracketLoopId !== null) return;
   const loop = () => {
     if (!isMatchInProgress) {
-      drawBracketUI(); // mirror 2D logic: re-render each frame
+      drawBracketUI();
     }
     bracketLoopId = requestAnimationFrame(loop);
   };
@@ -83,7 +83,7 @@ export async function startTournament(
   border.color = "white";
   border.background = "transparent";
   border.cornerRadius = 10;
-  border.isPointerBlocker = false; // allow clicks to reach buttons
+  border.isPointerBlocker = false;
   ui.addControl(border);
 
   const title = new TextBlock();
@@ -97,7 +97,6 @@ export async function startTournament(
   title.isPointerBlocker = false;
   ui.addControl(title);
 
-  // Initial draw
   drawBracketUI();
 
   const buttons: GUI.Button[] = [];
@@ -153,7 +152,6 @@ export async function startTournament(
     if (cfg.id === 'endTournament') endTournamentButton = btn;
   });
 
-  // Initial visibility
   for (let i = 0; i < buttons.length; i++) {
     const b = buttons[i];
     for (let j = 0; j < buttonConfigs.length; j++) {
@@ -163,26 +161,21 @@ export async function startTournament(
       }
     }
   }
-
-  // Start bracket UI loop (replaces canvas animation loop)
   startBracketLoop();
 }
 
 function drawBracketUI() {
-  // Clear previous dynamic text controls
   for (let i = 0; i < playerTextBlocks.length; i++) playerTextBlocks[i].dispose();
   playerTextBlocks = [];
 
   const matches = tm.currentRound;
   const count = matches.length;
 
-  // Dynamic vertical layout so items don't drift too low
-  const topStart = count <= 4 ? 18 : 14;          // starting percentage from top
-  const bottomLimit = 58;                         // keep bracket within upper 60%
+  const topStart = count <= 4 ? 18 : 14;
+  const bottomLimit = 58;
   const available = Math.max(4, bottomLimit - topStart);
   const spacing = count > 1 ? available / (count - 1) : 0;
 
-  // Helper for clamped font sizing
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
   const baseH = canvasElement.height;
   const nameFont = clamp(Math.floor(baseH * 0.032), 18, 42);
@@ -228,7 +221,7 @@ function drawBracketUI() {
     championText.fontSize = champFont;
     championText.fontWeight = 'bold';
     championText.fontFamily = 'futura-pt, sans-serif';
-    championText.top = '33%';
+    championText.top = '0px';
     championText.isPointerBlocker = false;
     championText.zIndex = 12;
     championText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
