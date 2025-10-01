@@ -1,60 +1,70 @@
 import React, { useEffect, useRef } from 'react';
-import { startMenu } from '../../game/src/menu';
 import { useNavigate } from 'react-router-dom';
-import { attachTouchAdapter } from '../components/attachTouchAdapter'; 
+import { attachTouchAdapter } from '../components/attachTouchAdapter';
+import { startMenu } from '../../game/src/menu';
+import { Engine, Scene, ArcRotateCamera, HemisphericLight, Color4, Vector3 } from '@babylonjs/core';
 
 export default function GamePage() {
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    const ASPECT_RATIO = 4 / 3;
-    const MIN_WIDTH = 320;
-    const MIN_HEIGHT = 240;
+    const engine = new Engine(canvas, true);
+    const scene = new Scene(engine);
 
-    let width = window.innerWidth * 0.75;
-    let height = window.innerHeight * 0.75;
+      scene.clearColor = new Color4(0, 0, 0, 0);
+      
+      const camera = new ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 10, Vector3.Zero(), scene);
+      camera.attachControl(canvas, false);
+    
+      const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
+      light.intensity = 0.7;
 
-    if (width / height > ASPECT_RATIO) {
-      width = height * ASPECT_RATIO;
-    }
-    else {
-      height = width / ASPECT_RATIO;
-    }
+      engine.runRenderLoop(() => {
+        scene.render();
+      });
 
-    width = Math.max(width, MIN_WIDTH);
-    height = Math.max(height, MIN_HEIGHT);
+      const resizeHandler = () => {
+        engine.resize();
+      };
+      window.addEventListener("resize", resizeHandler);
 
-    canvas.width = Math.floor(width);
-    canvas.height = Math.floor(height);
+    let cleanup: (() => void) | undefined;
 
-     (async () => {
-      await startMenu(canvas, ctx, () => {
-        navigate('/myhome');
+    (async () => {
+      cleanup = await startMenu(canvas, scene, () => {
+      if (cleanup) cleanup();
+        navigate("/myhome");
       });
     })();
 
     return () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      window.removeEventListener("resize", resizeHandler);
+      scene.dispose();
+      engine.dispose();
+      if (cleanup) cleanup();
     };
   }, [navigate]);
 
-   // Add touch input adapter (one useEffect)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    return attachTouchAdapter(canvas);
+  }, []);
+
    useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    return attachTouchAdapter(canvas);  // auto cleanup
+    return attachTouchAdapter(canvas);
   }, []);
 
   return (
-    <div className="w-full h-screen flex items-center justify-center">
-       <canvas ref={canvasRef} className="touch-none select-none" /> {/* Helps prevent scroll/selection */}
+    <div style={{ width: "100%", height: "100vh", background: "#111" }}>
+      <canvas ref={canvasRef} style={{ width: "100%", height: "100%" }} />
     </div>
   );
 }
-

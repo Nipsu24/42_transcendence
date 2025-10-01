@@ -38,6 +38,10 @@ check_node_module_frontend:
 			cd $(FRONTEND) && \
 			npm install && \
 			npm install react-router-dom && \
+			npm install \
+				@babylonjs/core \
+				@babylonjs/gui \
+				@babylonjs/loaders && \
 			npm install --save-dev \
 				typescript \
 				history \
