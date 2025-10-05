@@ -1,10 +1,10 @@
-import { Scene, ArcRotateCamera, HemisphericLight, MeshBuilder, Vector3, Color3, StandardMaterial, PBRMaterial, RectAreaLight
+import { Scene, RectAreaLight
 } from '@babylonjs/core';
-import * as GUI from '@babylonjs/gui';
+import { PongGraphics } from './graphics/PongGraphics';
+import { PongScoreUI } from './ui/PongScoreUI';
 
-let scoreUI: GUI.AdvancedDynamicTexture;
-let player1ScoreText: GUI.TextBlock;
-let player2ScoreText: GUI.TextBlock;
+let pongScoreUI: PongScoreUI;
+let pongGraphics: PongGraphics;
 
 let isRunning = false;
 let isAi = false;
@@ -17,14 +17,7 @@ const maxScore = 10;
 
 let frameCount = 0;
 let trailIndex = 0;
-const trailColors = [
-	Color3.FromHexString("#FEF018"),
-	Color3.FromHexString("#FE8915"),
-	Color3.FromHexString("#FF4F1A"),
-	Color3.FromHexString("#55CFD4"),
-	Color3.FromHexString("#26B2C5"),
-	Color3.FromHexString("#0489C2"),
-];
+// Trail colors are now handled by PongGraphics class
 
 const lights: RectAreaLight[] = [];
 let lightsAnimObserver: any = null;
@@ -201,39 +194,11 @@ async function update() {
 }
 
 function createTrailParticle() {
+	if (!pongGraphics) return;
+	
 	const trailSize = getBallSize();
-	const trail = MeshBuilder.CreateSphere("trail" + trailIndex, { diameter: trailSize }, scene);
-	
-	const trailPos = new Vector3(ball.x, ball.y, 10);
-	trail.position = trailPos;
-
-	const trailMat = new StandardMaterial("trailMat" + trailIndex, scene);
-	trailMat.emissiveColor = trailColors[trailIndex % trailColors.length];
-	trailMat.alpha = 0.8;
-	trailMat.disableLighting = true;
-	trail.material = trailMat;
-
+	pongGraphics.createTrailParticle(ball.x, ball.y, trailSize, trailIndex);
 	trailIndex++;
-
-	let life = 1.0;
-	const fadeSpeed = 0.04;
-	
-	const fadeAnimation = () => {
-		if (!trail.isDisposed()) {
-			life -= fadeSpeed;
-			trailMat.alpha = life * 0.8;
-			
-			const scale = life * 0.9 + 0.1;
-			trail.scaling = new Vector3(scale, scale, scale);
-			
-			if (life <= 0) {
-				trail.dispose();
-				return;
-			}
-			requestAnimationFrame(fadeAnimation);
-		}
-	};
-	requestAnimationFrame(fadeAnimation);
 }
 
 function endMatch(winner: string) {
@@ -257,228 +222,67 @@ function endMatch(winner: string) {
   paddle1.mesh.dispose();
   paddle2.mesh.dispose();
   ball.mesh.dispose();
-  if (scoreUI) { scoreUI.dispose(); scoreUI = null as any; }
-  player1ScoreText = null as any;
-  player2ScoreText = null as any;
+  if (pongScoreUI) { 
+    pongScoreUI.dispose(); 
+    pongScoreUI = null as any; 
+  }
+  if (pongGraphics) {
+    pongGraphics.dispose();
+    pongGraphics = null as any;
+  }
 }
 
-function createLight(
-  position: Vector3,
-  color: Color3,
-  name: string,
-  scene: Scene
-): RectAreaLight {
-	const lightWidth = playArea.width * 0.08;
-	const lightHeight = lightWidth * 5;
-	
-	const box = MeshBuilder.CreateBox(
-		"box" + name,
-		{ width: lightWidth, height: lightHeight, depth: 2 },
-		scene
-	);
-
-	const lightMaterial = new StandardMaterial("mat" + name, scene);
-	lightMaterial.disableLighting = true;
-	lightMaterial.emissiveColor = color;
-
-	box.material = lightMaterial;
-	box.position = position;
-	
-	box.rotation.x = 0;
-	box.rotation.y = 0;
-	box.rotation.z = 0;
-
-	const light = new RectAreaLight(
-		"light" + name,
-		new Vector3(0, 0, 1),
-		lightWidth,
-		lightHeight,
-		scene
-	);
-
-	light.parent = box;
-	light.specular = color;
-	light.diffuse = color;
-	light.intensity = 1.2;
-
-	return light;
-}
+// Light creation is now handled by PongGraphics class
 
 function setupPongScene(scene: Scene) {
-  scene.meshes.forEach(m => m.dispose());
-  scene.lights.forEach(l => l.dispose());
-  scene.cameras.forEach(c => c.dispose());
-
-	const camera = new ArcRotateCamera(
-		"camera",
-		-Math.PI / 2,
-		Math.PI / 2 + 0.05,
-		Math.max(playArea.width, playArea.height) * 0.8,
-		new Vector3(playArea.width/2, playArea.y + playArea.height/2 - 10, 0),
-		scene
-	);
-
-	camera.setTarget(new Vector3(playArea.width/2, playArea.y + playArea.height/2 - 10, 0));
-	camera.detachControl();
-	scene.activeCamera = camera;
-	
-	if (canvasEl) {
-		canvasEl.onpointerdown = null;
-		canvasEl.onpointermove = null;
-		canvasEl.onpointerup = null;
-		canvasEl.onwheel = null;
+	// Initialize PongGraphics
+	if (!pongGraphics) {
+		pongGraphics = new PongGraphics(scene);
 	}
 
-	const colors = [
-		Color3.FromHexString("#FEF018"),
-		Color3.FromHexString("#FE8915"),
-		Color3.FromHexString("#FF4F1A"),
-		Color3.FromHexString("#55CFD4"),
-		Color3.FromHexString("#26B2C5"),
-		Color3.FromHexString("#0489C2"),
-	];
+	// Setup scene and camera using PongGraphics
+	pongGraphics.setupSceneAndCamera(playArea, canvasEl);
 
-	const numOfLights = 6;
-	const lightWidth = playArea.width * 0.08;
-	const lightGap = lightWidth * 0.5;
-	const totalLightSpace = (numOfLights * lightWidth) + ((numOfLights - 1) * lightGap);
-	const startX = (playArea.width - totalLightSpace) / 2;
+	// Create all game objects using PongGraphics
+	const gameObjects = pongGraphics.setupPongGameObjects(playArea, getBallSize, getPaddleWidth, getPaddleHeight);
 	
-	const zBack = 60;
-	const yPos = playArea.height * 0.5;
+	// Assign to game state variables
+	paddle1.mesh = gameObjects.paddle1;
+	paddle2.mesh = gameObjects.paddle2;
+	ball.mesh = gameObjects.ball;
 
-	for (let i = 0; i < numOfLights; i++) {
-		const color = colors[i % colors.length];
-		const x = startX + (i * (lightWidth + lightGap)) + (lightWidth / 2);
-		lights.push(createLight(new Vector3(x, yPos, zBack), color, "light" + i, scene));
+	// Setup lights
+	lights.length = 0; // Clear existing lights
+	lights.push(...gameObjects.lights);
+
+	// Setup lighting animation
+	if (lightsAnimObserver) { 
+		scene.onBeforeRenderObservable.remove(lightsAnimObserver); 
+		lightsAnimObserver = null; 
 	}
-
-	if (lightsAnimObserver) { scene.onBeforeRenderObservable.remove(lightsAnimObserver); lightsAnimObserver = null; }
 	lightsAnimObserver = scene.onBeforeRenderObservable.add(() => {
-		const time = performance.now() * 0.002; // scale speed
-		for (let i = 0; i < lights.length; i++) {
-			lights[i].intensity = 0.5 + 0.5 * Math.sin(time + i);
+		if (pongGraphics) {
+			pongGraphics.animateLights(lights, frameCount);
 		}
 	});
-
-	const mat1 = new StandardMaterial("mat1", scene);
-	mat1.roughness = 0.3;
-
-	const groundMat = new PBRMaterial("groundMat", scene);
-	groundMat.albedoColor = new Color3(1, 1, 1);
-	groundMat.roughness = 0.15;
-	groundMat.maxSimultaneousLights = 8;
-
-	const ground = MeshBuilder.CreateGround
-	(
-		"ground", 
-		{ width: playArea.width * 2, height: playArea.height * 2 }, 
-		scene
-	);
-	ground.material = groundMat;
-	ground.position.y = playArea.y - getBallSize() * 0.5;
-	ground.position.x = playArea.width / 2;
-	ground.position.z = 0;
-
-	const ceiling = MeshBuilder.CreateGround
-	(
-		"ceiling", 
-		{ width: playArea.width * 2, height: playArea.height * 2 }, 
-		scene
-	);
-	ceiling.material = groundMat;
-	ceiling.position.y = playArea.y + playArea.height + 1;
-	ceiling.position.x = playArea.width / 2;
-	ceiling.position.z = 0;
-	ceiling.rotation.x = Math.PI;
-
-	const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-	light.intensity = 0.8;
-
-	const blackMat = new StandardMaterial("black", scene);
-	blackMat.diffuseColor = new Color3(0.95, 0.89, 0.89);
-
-
-	const paddle1Mat = new StandardMaterial("paddle1Mat", scene);
-	paddle1Mat.diffuseColor = Color3.FromHexString("#FEF018");
-	paddle1Mat.emissiveColor = paddle1Mat.diffuseColor.scale(0.3);
-
-	const paddle2Mat = new StandardMaterial("paddle2Mat", scene);
-	paddle2Mat.diffuseColor = Color3.FromHexString("#0489C2");
-	paddle2Mat.emissiveColor = paddle2Mat.diffuseColor.scale(0.3);
-	
-	scene.ambientColor = new Color3(1, 1, 1);
-	
-	var light1 = new HemisphericLight("hemiLight", new Vector3(1, -1, 0), scene);
-	light1.diffuse = new Color3(1, 0, 0);
-	light1.specular = new Color3(0, 1, 0);
-	light1.groundColor = new Color3(0, 1, 0);
-	
-	var ballMat = new StandardMaterial("redMat", scene);
-	ballMat.ambientColor = new Color3(1, 1, 1);
-
-	const ballSize = Math.max(playArea.width * 0.015, 20);
-	ball.mesh = MeshBuilder.CreateSphere("ball", { diameter: ballSize }, scene);
-	ball.mesh.material = ballMat;
-	
-	const paddleWidth = Math.max(getPaddleWidth(), 15);
-	const paddleHeight = Math.max(getPaddleHeight(), 80);
-	
-	paddle1.mesh = MeshBuilder.CreateBox("paddle1", { 
-		width: paddleWidth, 
-		height: paddleHeight, 
-		depth: 8 
-	}, scene);
-  	paddle1.mesh.material = paddle1Mat;
-	paddle1.mesh.position.x = paddleWidth / 2;
-	paddle1.mesh.position.y = playArea.y + (playArea.height / 2);
-	
-	paddle2.mesh = MeshBuilder.CreateBox("paddle2", { 
-		width: paddleWidth, 
-		height: paddleHeight, 
-		depth: 8 
-	}, scene);
-  	paddle2.mesh.material = paddle2Mat;
-	paddle2.mesh.position.x = playArea.width - (paddleWidth / 2);
-	paddle2.mesh.position.y = playArea.y + (playArea.height / 2);
-
-	mat1.maxSimultaneousLights = 8;
-	blackMat.maxSimultaneousLights = 8;
-	paddle1Mat.maxSimultaneousLights = 8;
-	paddle2Mat.maxSimultaneousLights = 8;
 }
 
-function setupScoreUI(scene: Scene) {
-  scoreUI = GUI.AdvancedDynamicTexture.CreateFullscreenUI("ScoreUI", true, scene);
-
-  player1ScoreText = new GUI.TextBlock();
-  player1ScoreText.text = `${player1Name}: ${leftScore}`;
-  player1ScoreText.color = "white";
-  player1ScoreText.fontSize = Math.floor(playArea.height * 0.07);
-  player1ScoreText.fontWeight = "bold";
-  player1ScoreText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  player1ScoreText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  player1ScoreText.top = "20px";
-  player1ScoreText.left = "20px";
-  scoreUI.addControl(player1ScoreText);
-
-  player2ScoreText = new GUI.TextBlock();
-  player2ScoreText.text = `${player2Name}: ${rightScore}`;
-  player2ScoreText.color = "white";
-  player2ScoreText.fontSize = Math.floor(playArea.height * 0.07);
-  player2ScoreText.fontWeight = "bold";
-  player2ScoreText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-  player2ScoreText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  player2ScoreText.top = "20px";
-  player2ScoreText.left = "-20px";
-  scoreUI.addControl(player2ScoreText);
-}
+// Score UI setup is now handled by the PongScoreUI class in drawScores()
 
 
 function drawScores() {
-  if (!player1ScoreText || !player2ScoreText) return;
-  player1ScoreText.text = `${player1Name}: ${leftScore}`;
-  player2ScoreText.text = `${player2Name}: ${rightScore}`;
+  const canvas = canvasEl;
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width !== playArea.width || rect.height !== playArea.height) {
+    playArea.width = rect.width;
+    playArea.height = rect.height;
+  }
+
+  if (!pongScoreUI) {
+    pongScoreUI = new PongScoreUI(canvas, scene);
+  }
+  
+  pongScoreUI.updateScores(leftScore, rightScore);
 }
 
 export async function startPongMatch(
@@ -524,7 +328,11 @@ export async function startPongMatch(
 	ball.dy = 0;
 
 	setupPongScene(scene);
-	setupScoreUI(scene);
+	
+	// Initialize graphics if not already done
+	if (!pongGraphics) {
+		pongGraphics = new PongGraphics(scene);
+	}
 
 	paddle1.x = getPaddleWidth() / 2;
 	paddle1.y = playArea.y + (playArea.height / 2) - (getPaddleHeight() / 2);
@@ -564,8 +372,11 @@ export async function startPongMatch(
 			width: newWidth,
 			height: newHeight - newTopMargin - newBottomMargin
 		};
-		player1ScoreText.fontSize = Math.floor(playArea.height * 0.07);
-		player2ScoreText.fontSize = Math.floor(playArea.height * 0.07);
+		// Resize will be handled by recreating the score UI in drawScores()
+		if (pongScoreUI) {
+			pongScoreUI.dispose();
+			pongScoreUI = null as any;
+		}
 	};
 	
 	window.addEventListener('resize', handleResize);

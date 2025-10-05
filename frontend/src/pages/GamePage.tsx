@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { attachTouchAdapter } from '../components/attachTouchAdapter';
 import { startMenu } from '../../game/src/menu';
-import { Engine, Scene, ArcRotateCamera, HemisphericLight, Color4, Vector3 } from '@babylonjs/core';
+import { SceneManager } from '../../game/src/core/SceneManager';
+import { Color4, Vector3 } from '@babylonjs/core';
 
 export default function GamePage() {
 
@@ -13,25 +14,14 @@ export default function GamePage() {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
 
-    const engine = new Engine(canvas, true);
-    const scene = new Scene(engine);
+    const sceneManager = new SceneManager(canvas, {
+      clearColor: new Color4(0, 0, 0, 0),
+      cameraTarget: Vector3.Zero(),
+      lightDirection: new Vector3(0, 1, 0),
+      lightIntensity: 0.7
+    });
 
-      scene.clearColor = new Color4(0, 0, 0, 0);
-      
-      const camera = new ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 10, Vector3.Zero(), scene);
-      camera.attachControl(canvas, false);
-    
-      const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-      light.intensity = 0.7;
-
-      engine.runRenderLoop(() => {
-        scene.render();
-      });
-
-      const resizeHandler = () => {
-        engine.resize();
-      };
-      window.addEventListener("resize", resizeHandler);
+    const scene = sceneManager.getScene();
 
     let cleanup: (() => void) | undefined;
 
@@ -43,9 +33,7 @@ export default function GamePage() {
     })();
 
     return () => {
-      window.removeEventListener("resize", resizeHandler);
-      scene.dispose();
-      engine.dispose();
+      sceneManager.dispose();
       if (cleanup) cleanup();
     };
   }, [navigate]);
