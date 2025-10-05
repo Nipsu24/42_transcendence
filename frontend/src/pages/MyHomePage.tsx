@@ -1,12 +1,10 @@
-import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import Header           from '../components/Header'
 import BackgroundBall   from '../components/BackgroundBall'
 import DominoGrid       from '../components/DominoGrid'
 import StartGameCallout from '../components/StartGame'
 import ThePongTitle     from '../components/ThePongTitle'
 
-export default function LandingPage() {
+export default function MyHomePage() {
   const navigate = useNavigate()
   const isLoggedIn: boolean = Boolean(localStorage.getItem('jwtToken'))
 

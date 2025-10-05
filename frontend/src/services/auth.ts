@@ -73,4 +73,3 @@ export const logout = async (): Promise<void> => {
 	  delete axios.defaults.headers.common['Authorization'];
 	}
   };
-  

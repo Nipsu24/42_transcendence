@@ -19,29 +19,23 @@
 	.site-header {
 		@apply fixed w-full z-30 top-[clamp(1.3rem,8vh,3.5rem)] 
 	  }
-	
 	  .site-header .inner {
 		@apply max-w-7xl mx-auto flex items-center justify-between px-4 md:px-6;
 	  }
-  
 	.site-header .menu {
 	  @apply flex items-center gap-x-8 sm:gap-x-12 font-medium;
 	}
-  
 	.login-btn {
 	  @apply px-4 py-1.5 border border-black rounded transition bg-black text-white;
 	}
-  
 	.login-btn:hover {
 	  background-image: linear-gradient(to right, #FEF018, #FE8915, #FF4F1A);
 	  color: #000;
 	  border-color: #fff;
 	}
-
 	.mymenu-btn {
 		@apply text-sm px-4 py-1.5 border border-black rounded transition bg-black text-white;
 	  }
-
 	.mymenu-btn:hover {
 		background-image: linear-gradient(to right, #55CFD4, #26B2C5, #0489C2);
 		color: #000;
@@ -61,6 +55,7 @@
 	}
   }
 }
+
 @layer utilities {
 	.text-stroke {
 	  -webkit-text-fill-color: currentColor;
@@ -204,8 +199,6 @@
 	  
 		.domino-container {
 		  max-width: 1600px;
-		  /* padding-left: 2rem;
-		  padding-right: 2rem; */
 		}
 	  }
 
@@ -296,6 +289,3 @@
 	  }
 	}
   }
-  
-
-  

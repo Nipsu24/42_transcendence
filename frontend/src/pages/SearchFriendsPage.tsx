@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from 'react'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import defaultAvatar from '../assets/default.png'
 import { ErrorBanner } from '../components/ErrorBanner'

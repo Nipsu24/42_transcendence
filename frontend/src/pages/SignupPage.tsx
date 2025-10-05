@@ -1,10 +1,9 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react'
+import { useState, ChangeEvent, FormEvent } from 'react'
 import { AxiosError } from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { SignUpView } from '../components/SignUpView'
 import { register } from '../services/auth'
 import { login } from '../services/auth'
-import { getMe } from '../services/players'
 
 interface SignUpForm {
   name: string

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from 'react'
+import { useState, useEffect} from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import PongLoader from './components/PongLoader'
 import LandingPage from './pages/LandingPage'
@@ -42,8 +42,6 @@ export default function App() {
       <Route path="/me" element={<MyPage />} />
       <Route path="/me/edit" element={<MyEditPage />} />
       <Route path="/game" element={<GamePage />} />
-      {/* <Route path="/game" element={<Navigate to="/game/index.html" replace />} /> */}
-      {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       <Route path="/about" element={<AboutPage />} />
       <Route path="/havefun" element={<HaveFunPage />} />
       <Route path="/login" element={<LoginPage />} />

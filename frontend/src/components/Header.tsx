@@ -1,4 +1,3 @@
-import React from 'react'
 import { useNavigate, NavigateFunction } from 'react-router-dom'
 
 export default function Header() {
