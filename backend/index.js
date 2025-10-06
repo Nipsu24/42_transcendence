@@ -1,15 +1,11 @@
-require('dotenv').config()
+require('dotenv').config();
 const fastify = require('fastify')({ logger: true });
-// MODIFIED!!
-// Changed the port from 3000 to 3001 to fix backend connection in prod compile
 const PORT = parseInt(process.env.PORT, 10) || 3001;
-//
 const path = require('path');
 const fastifyStatic = require('@fastify/static');
 const playerRoutes = require('./routes/playerRoutes');
 const registrationRoute = require('./routes/registration');
-const { userLogin } = require('./routes/login')
-const { log } = require('console');
+const { userLogin } = require('./routes/login');
 const multipart = require('@fastify/multipart');
 
 // needed for handling static frontend files in test environment (not needed for production)
@@ -18,7 +14,6 @@ fastify.register(fastifyStatic, {
 	prefix: '/',
 });
 
-// NEW!!
 // Serve uploaded user files under the /uploads path (e.g., profile pictures)
 fastify.register(fastifyStatic, {
 	root: path.join(__dirname, 'uploads'),
@@ -59,12 +54,10 @@ fastify.setErrorHandler((error, request, reply) => {
 			return reply.status(400).send({ error: 'Invalid request data.' });
 	}
 	else {
-		console.log('error:', {error})
 		return reply.status(500).send({ error: 'An internal server error occurred.' });
 	}
 });
 
-// NEW!!
 // Handles client-side routing for a React SPA using BrowserRouter.
 // When users reload or directly access frontend routes (e.g. /mymenu, /profile),
 // Fastify would return 404 by default since these paths don't exist on the server.

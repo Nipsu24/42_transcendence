@@ -172,7 +172,6 @@ const updateAvatar = async (id, filePath) => {
 	})
 }
 
-// MODIFIED!!
 // updates the player info (name, e-mail, or avatar)
 const updatePlayerInfo = async (data) => {
 	const updateData = {};
@@ -180,11 +179,11 @@ const updatePlayerInfo = async (data) => {
 		updateData.name = data.name;
 	if (data.e_mail !== undefined)
 		updateData.e_mail = data.e_mail;
-	// NEW!!
+
 	// added to update avatar
 	if (data.avatar !== undefined) 
 		updateData.avatar = data.avatar;
-	//
+	
 	return await prisma.player.update({
 		where: {id: data.id },
 		data: updateData,
