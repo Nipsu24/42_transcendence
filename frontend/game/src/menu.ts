@@ -21,6 +21,8 @@ export async function startMenu(
   console.log("Player name:", player1Name);
   
   const menuSystem = new MenuSystem(canvas, scene, onQuit);
+  
+  let cleanup: () => void;
 
   async function handleSinglePlayer() {
     cleanup();
@@ -95,7 +97,7 @@ export async function startMenu(
     }
   }
 
-  const cleanup = menuSystem.createDefaultGameMenu(player1Name, {
+  cleanup = menuSystem.createDefaultGameMenu(player1Name, {
     onSinglePlayer: handleSinglePlayer,
     onTwoPlayers: handleTwoPlayers,
     onTournament: handleTournament,

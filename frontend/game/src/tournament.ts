@@ -67,22 +67,15 @@ export async function startTournament(
   isMatchInProgress = false;
   tournamentEnded = false;
 
-  // Create UI factory for consistent UI elements
   uiFactory = new UIFactory(canvas, scene, "TournamentUI");
   
-  // Create background and border
   uiFactory.createBackground();
   uiFactory.createBorder();
-  
-  // Create title
-  uiFactory.createTitle("Tournament Bracket", Math.floor(canvas.height * 0.07));
-
-  // Create bracket UI component
+	uiFactory.createTitle("Tournament Bracket", Math.floor(canvas.height * 0.07));
   bracketUI = new TournamentBracketUI(canvas, scene);
 
   drawBracketUI();
 
-  // Create tournament control buttons
   nextMatchButton = uiFactory.createButton({
     text: 'Start Match',
     top: '72%',
@@ -97,7 +90,6 @@ export async function startTournament(
     hoverColor: '#0489C2'
   });
 
-  // Set initial button visibility
   updateButtonVisibility();
   startBracketLoop();
 }

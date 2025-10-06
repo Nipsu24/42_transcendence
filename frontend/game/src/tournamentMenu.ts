@@ -50,17 +50,12 @@ export async function startTournamentMenu(
 
     console.log("User data loaded:", me.name);
 
-    // Create UI factory for consistent UI elements
     const uiFactory = new UIFactory(canvas, scene, "TournamentMenuUI");
     
-    // Create background and border
     uiFactory.createBackground();
     uiFactory.createBorder();
-    
-    // Create title
     uiFactory.createTitle("Tournament Setup", Math.floor(canvas.height * 0.07));
     
-    // Create player list UI component
     const playerListUI = new PlayerListUI(canvas, scene, [me.name]);
 
     const cleanup = () => {
@@ -95,7 +90,6 @@ export async function startTournamentMenu(
         return;
       }
       
-      // Check if player already exists
       const currentPlayers = playerListUI.getPlayers();
       let playerExists = false;
       for (let i = 0; i < currentPlayers.length; i++) {
@@ -137,36 +131,39 @@ export async function startTournamentMenu(
       startMenu(canvas, scene, onQuit);
     };
 
-    // Create buttons using UIFactory
     const startY = 0.35;
     const spacing = 0.15;
 
-    uiFactory.createButton({
-      text: "Add Friend",
-      top: `${startY * 100}%`,
-      onClick: handleAddFriend,
-      hoverColor: "#FE8915"
-    });
+    const buttonConfigs = [
+      {
+        text: "Add Friend",
+        onClick: handleAddFriend,
+        hoverColor: "#FE8915"
+      },
+      {
+        text: "Remove Last",
+        onClick: handleRemoveLast,
+        hoverColor: "#FF4F1A"
+      },
+      {
+        text: "Start Tournament",
+        onClick: handleStartTournament,
+        hoverColor: "#55CFD4"
+      },
+      {
+        text: "Back",
+        onClick: handleBack,
+        hoverColor: "#0489C2"
+      }
+    ];
 
-    uiFactory.createButton({
-      text: "Remove Last",
-      top: `${(startY + spacing) * 100}%`,
-      onClick: handleRemoveLast,
-      hoverColor: "#FF4F1A"
-    });
-
-    uiFactory.createButton({
-      text: "Start Tournament",
-      top: `${(startY + spacing * 2) * 100}%`,
-      onClick: handleStartTournament,
-      hoverColor: "#55CFD4"
-    });
-
-    uiFactory.createButton({
-      text: "Back",
-      top: `${(startY + spacing * 3) * 100}%`,
-      onClick: handleBack,
-      hoverColor: "#0489C2"
+    buttonConfigs.forEach((config, index) => {
+      uiFactory.createButton({
+        text: config.text,
+        top: `${(startY + spacing * index) * 100}%`,
+        onClick: config.onClick,
+        hoverColor: config.hoverColor
+      });
     });
 
     console.log("Tournament menu UI created successfully");
