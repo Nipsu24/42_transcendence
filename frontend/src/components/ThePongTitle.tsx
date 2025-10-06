@@ -1,4 +1,3 @@
-import React from 'react'
 import AnimatedLetters from './AnimatedLetters'
 
 export default function ThePongTitle(){
