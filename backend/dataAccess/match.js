@@ -1,10 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
-const { findPlayerById } = require('./player');
 const { findPlayerByName } = require('./player');
 const prisma = new PrismaClient();
 
-const createMatch = async (data) => {
 // creates new match record
+const createMatch = async (data) => {
 	const match = await prisma.match.create({
 		data: {
 			date: new Date().toISOString(),

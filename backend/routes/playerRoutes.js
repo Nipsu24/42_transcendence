@@ -9,18 +9,17 @@ const Player = require('../dataAccess/player');
 const Stats = require('../dataAccess/stats');
 const Match = require('../dataAccess/match');
 const { authenticate } = require('./login');
-const { arrayResponseSchema, objectResponseSchema, putReqResSchema, postReqResSchema, postDivReqResSchema, putDivReqResSchema } = require('./schemaHelpers');
+const { arrayResponseSchema, objectResponseSchema, postReqResSchema, postDivReqResSchema, putDivReqResSchema } = require('./schemaHelpers');
 //used for image upload:
 const fs = require('fs');
 const util = require('util');
 const { pipeline } = require('stream');
-//
-
 
 // imports player apis from './routes/playerRoutes.js, 
 // hook for checking each api call for valid JWT token via 'authenticate' function
 async function playerRoutes(fastify, options) {
 	fastify.addHook('onRequest', authenticate);
+
 /*######################################## Player ######################################## */
 
 // retrieves data from all available players
@@ -96,8 +95,7 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 			else
 				return reply.status(404).send({ error: 'E-mail is not available anymore.' });
 		}
-		// NEW!! 
-		// new added code for updating avatar
+
 		if (avatar) {
 			const updatedPlayerInfo = await Player.updatePlayerInfo({
 				id: player.id,
@@ -159,12 +157,12 @@ fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySche
 		const { playerTwoName, resultPlayerOne, resultPlayerTwo, aiOpponent } = request.body;
 
 		let playerTwo = null;
-        if (playerTwoName && !aiOpponent) {
-            playerTwo = await Player.findPlayerByName(playerTwoName);
-            if (!playerTwo) {
-                return reply.status(404).send({ error: 'PlayerTwo not found.' });
-            }
-        }
+			if (playerTwoName && !aiOpponent) {
+					playerTwo = await Player.findPlayerByName(playerTwoName);
+					if (!playerTwo) {
+							return reply.status(404).send({ error: 'PlayerTwo not found.' });
+					}
+			}
 
 		const newMatch = await Match.createMatch({
 			playerOneName: playerOne.name,
@@ -174,27 +172,27 @@ fastify.post('/api/players/me/matches', postDivReqResSchema(matchRequestBodySche
 			aiOpponent
 		});
 
-		// Updates stats based on match result
-        const playerOneWon = resultPlayerOne > resultPlayerTwo;
-        
-        // Update playerOne stats
-        await Stats.updateStats({
-            id: playerOne.stats.id,
-            victories: playerOne.stats.victories + (playerOneWon ? 1 : 0),
-            defeats: playerOne.stats.defeats + (playerOneWon ? 0 : 1)
-        });
+	// Updates stats based on match result
+			const playerOneWon = resultPlayerOne > resultPlayerTwo;
+			
+			// Update playerOne stats
+			await Stats.updateStats({
+					id: playerOne.stats.id,
+					victories: playerOne.stats.victories + (playerOneWon ? 1 : 0),
+					defeats: playerOne.stats.defeats + (playerOneWon ? 0 : 1)
+			});
 
-        // Update playerTwo stats (if not AI)
-        if (playerTwo) {
-            await Stats.updateStats({
-                id: playerTwo.stats.id,
-                victories: playerTwo.stats.victories + (playerOneWon ? 0 : 1),
-                defeats: playerTwo.stats.defeats + (playerOneWon ? 1 : 0)
-            });
-        }
+			// Update playerTwo stats (if not AI)
+			if (playerTwo) {
+					await Stats.updateStats({
+							id: playerTwo.stats.id,
+							victories: playerTwo.stats.victories + (playerOneWon ? 0 : 1),
+							defeats: playerTwo.stats.defeats + (playerOneWon ? 1 : 0)
+					});
+			}
 
-        reply.status(201).send(newMatch);
-    }
+			reply.status(201).send(newMatch);
+	}
 
 	catch (error) {
 		reply.status(500).send({ error: 'An error occured while creating the match records.' });
@@ -252,7 +250,6 @@ fastify.delete('/api/players/me/friends', async (request, reply) => {
 
 /*######################################## Avatar ######################################## */
 
-// MODIFIED!! 
 // create 'uploads' folder in backend side (with 'assets' name somehow coundn't make it work)..
 // enables upload of avatar image into './uploads' folder - new code for this part in index.js too 
 // using request.file() instead for e.g. request.file('avatar') accepts any name for field name
