@@ -1,5 +1,5 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react'
-import axios, { AxiosError } from 'axios'
+import { useState, ChangeEvent, FormEvent } from 'react'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { LoginView } from '../components/LoginView'
 import { login } from '../services/auth'

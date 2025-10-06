@@ -7,7 +7,7 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // needed f
 const bcrypt = require('bcryptjs');
 
 // Handles login of registered users, returns player object and jwt token for further api calls
-async function userLogin(fastify, options) {
+async function userLogin(fastify) {
 	fastify.post('/api/login', postDivReqResSchema(LoginReqSchema, LoginResSchema), async (request, reply) => {
 		const { e_mail, password } = request.body;
 		const user = await Player.findPlayerByEMail(e_mail);
@@ -25,7 +25,7 @@ async function userLogin(fastify, options) {
 		const token = fastify.jwt.sign({ id: user.id, name: user.name }, { expiresIn: '1h' });
 		await Player.setPlayerOnline(user);
 		reply.send({ ...user, token });
-	}); // changed so that google endpoint is not nested instide api/login endpoint
+	});
 
 	fastify.post('/api/google-signin', async (request, reply) => {
 		try {

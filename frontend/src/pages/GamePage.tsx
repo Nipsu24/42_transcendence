@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { attachTouchAdapter } from '../components/attachTouchAdapter';
 import { startMenu } from '../../game/src/menu';
@@ -39,12 +39,6 @@ export default function GamePage() {
   }, [navigate]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    return attachTouchAdapter(canvas);
-  }, []);
-
-   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     return attachTouchAdapter(canvas);

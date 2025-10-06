@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function BackgroundBall() {
   const ballRef = useRef<HTMLDivElement | null>(null);
