@@ -1,4 +1,12 @@
-import { Scene, ArcRotateCamera, HemisphericLight, MeshBuilder, Vector3, Color3, StandardMaterial, PBRMaterial, RectAreaLight } from '@babylonjs/core';
+import { Scene, 
+	ArcRotateCamera, 
+	HemisphericLight, 
+	MeshBuilder, 
+	Vector3, 
+	Color3, 
+	StandardMaterial, 
+	PBRMaterial, 
+	RectAreaLight } from '@babylonjs/core';
 import { PongScoreUI } from './ui/PongScoreUI';
 
 let pongScoreUI: PongScoreUI;

@@ -1,7 +1,7 @@
 import { startPongMatch } from './3dPong';
 import { TournamentManager } from './TournamentManager.js';
 import { Scene } from '@babylonjs/core';
-import { UIFactory, ButtonConfig } from './ui/UIFactory';
+import { UIFactory } from './ui/UIFactory';
 import { TournamentBracketUI } from './ui/TournamentBracketUI';
 
 let tm: TournamentManager;

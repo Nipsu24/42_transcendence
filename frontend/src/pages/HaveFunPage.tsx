@@ -110,7 +110,6 @@ export async function createScene(engine: Engine, canvas: HTMLCanvasElement): Pr
     const blackMat = new StandardMaterial("black", scene);
     blackMat.diffuseColor = new Color3(0.95, 0.89, 0.89);
   
-  
     const paddle1Mat = new StandardMaterial("paddle1Mat", scene);
     paddle1Mat.diffuseColor = Color3.FromHexString("#FEF018"); // yellow
   
@@ -235,105 +234,105 @@ export async function createScene(engine: Engine, canvas: HTMLCanvasElement): Pr
       paddle2.position.y = lerp(paddle2.position.y, paddle2TargetY, 0.05);
     });
 
-  const balls: { mesh: Mesh; velocity: Vector3 }[] = [];
+  	const balls: { mesh: Mesh; velocity: Vector3 }[] = [];
 
-  function addBall() {
-    if (balls.length >= 200) return;
+  	function addBall() {
+		if (balls.length >= 200) return;
 
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    const mat = new StandardMaterial("ballMat" + balls.length, scene);
-    mat.ambientColor = color;
+		const color = colors[Math.floor(Math.random() * colors.length)];
+		const mat = new StandardMaterial("ballMat" + balls.length, scene);
+		mat.ambientColor = color;
 
-    const ball = MeshBuilder.CreateSphere("ball" + balls.length, { diameter: 1 }, scene);
-    ball.material = mat;
-    ball.position = new Vector3(
-      (Math.random() - 0.5) * 10,
-      Math.random() * 5,
-      (Math.random() - 0.5) * 5
-    );
+		const ball = MeshBuilder.CreateSphere("ball" + balls.length, { diameter: 1 }, scene);
+		ball.material = mat;
+		ball.position = new Vector3(
+		(Math.random() - 0.5) * 10,
+		Math.random() * 5,
+		(Math.random() - 0.5) * 5
+		);
 
-    const velocity = new Vector3(
-      (Math.random() - 0.5) * 0.4,
-      (Math.random() - 0.5) * 0.4,
-      (Math.random() - 0.5) * 0.4
-    );
+		const velocity = new Vector3(
+		(Math.random() - 0.5) * 0.4,
+		(Math.random() - 0.5) * 0.4,
+		(Math.random() - 0.5) * 0.4
+		);
 
-    balls.push({ mesh: ball, velocity });
-  }
+		balls.push({ mesh: ball, velocity });
+  	}
 
-  canvas.addEventListener("click", addBall);
+  	canvas.addEventListener("click", addBall);
 
-  scene.onBeforeRenderObservable.add(() => {
-    const dt = engine.getDeltaTime() / 16;
-    const bounds = { x: 12, y: 6, z: 10 };
+  	scene.onBeforeRenderObservable.add(() => {
+		const dt = engine.getDeltaTime() / 16;
+		const bounds = { x: 12, y: 6, z: 10 };
 
-    for (let i = 0; i < balls.length; i++) {
-      const b = balls[i];
-      const pos = b.mesh.position;
-      const v = b.velocity;
+		for (let i = 0; i < balls.length; i++) {
+		const b = balls[i];
+		const pos = b.mesh.position;
+		const v = b.velocity;
 
-      pos.addInPlace(v.scale(dt));
+		pos.addInPlace(v.scale(dt));
 
-      if (pos.x > bounds.x || pos.x < -bounds.x) v.x *= -1;
-      if (pos.y > bounds.y || pos.y < -6) v.y *= -1;
-      if (pos.z > bounds.z || pos.z < -bounds.z) v.z *= -1;
+		if (pos.x > bounds.x || pos.x < -bounds.x) v.x *= -1;
+		if (pos.y > bounds.y || pos.y < -6) v.y *= -1;
+		if (pos.z > bounds.z || pos.z < -bounds.z) v.z *= -1;
 
-      pos.x = Math.max(-bounds.x, Math.min(bounds.x, pos.x));
-      pos.y = Math.max(-6, Math.min(bounds.y, pos.y));
-      pos.z = Math.max(-bounds.z, Math.min(bounds.z, pos.z));
-    }
+		pos.x = Math.max(-bounds.x, Math.min(bounds.x, pos.x));
+		pos.y = Math.max(-6, Math.min(bounds.y, pos.y));
+		pos.z = Math.max(-bounds.z, Math.min(bounds.z, pos.z));
+		}
 
-    for (let i = 0; i < balls.length; i++) {
-      for (let j = i + 1; j < balls.length; j++) {
-        const a = balls[i];
-        const b = balls[j];
-        const diff = a.mesh.position.subtract(b.mesh.position);
-        const dist = diff.length();
-        if (dist < 1 && dist > 0) {
-          const normal = diff.normalize();
-          const overlap = 1 - dist;
-          a.mesh.position.addInPlace(normal.scale(overlap / 2));
-          b.mesh.position.addInPlace(normal.scale(-overlap / 2));
+		for (let i = 0; i < balls.length; i++) {
+		for (let j = i + 1; j < balls.length; j++) {
+			const a = balls[i];
+			const b = balls[j];
+			const diff = a.mesh.position.subtract(b.mesh.position);
+			const dist = diff.length();
+			if (dist < 1 && dist > 0) {
+			const normal = diff.normalize();
+			const overlap = 1 - dist;
+			a.mesh.position.addInPlace(normal.scale(overlap / 2));
+			b.mesh.position.addInPlace(normal.scale(-overlap / 2));
 
-          const v1 = a.velocity;
-          const v2 = b.velocity;
-          const relVel = v1.subtract(v2);
-          const sepVel = Vector3.Dot(relVel, normal);
-          if (sepVel < 0) {
-            const impulse = normal.scale(-sepVel);
-            v1.addInPlace(impulse.scale(0.5));
-            v2.addInPlace(impulse.scale(-0.5));
-          }
-        }
-      }
-    }
-  });
+			const v1 = a.velocity;
+			const v2 = b.velocity;
+			const relVel = v1.subtract(v2);
+			const sepVel = Vector3.Dot(relVel, normal);
+			if (sepVel < 0) {
+				const impulse = normal.scale(-sepVel);
+				v1.addInPlace(impulse.scale(0.5));
+				v2.addInPlace(impulse.scale(-0.5));
+			}
+			}
+		}
+		}
+  	});
 
-  await scene.whenReadyAsync();
-  return scene;
+	await scene.whenReadyAsync();
+	return scene;
 }
 
 export default function HaveFunPage() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
 
-    const engine = new Engine(canvas, true);
+		const engine = new Engine(canvas, true);
 
-    createScene(engine, canvas).then((scene) => {
-      engine.runRenderLoop(() => scene.render());
-    });
+		createScene(engine, canvas).then((scene) => {
+		engine.runRenderLoop(() => scene.render());
+		});
 
-    const handleResize = () => engine.resize();
-    window.addEventListener("resize", handleResize);
+		const handleResize = () => engine.resize();
+		window.addEventListener("resize", handleResize);
 
-    return () => {
-      engine.dispose();
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+		return () => {
+		engine.dispose();
+		window.removeEventListener("resize", handleResize);
+		};
+  	}, []);
 
   return (
     <div className="w-full h-screen flex flex-col items-center justify-center bg-[#000000]">
