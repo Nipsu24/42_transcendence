@@ -11,7 +11,9 @@ import {
   Vector3,
   RectAreaLight,
   StandardMaterial,
-  Sound
+  Sound,
+  DynamicTexture,
+  Mesh
 } from "@babylonjs/core";
 
 function createLight(
@@ -25,12 +27,6 @@ const box = MeshBuilder.CreateBox(
             { width: 2, height: 15, depth: 0.01 },
             scene
         );
-
-        //const lightMaterial = new PBRMaterial("mat" + name, scene);
-        //lightMaterial.albedoColor = color;            // base color
-        //lightMaterial.emissiveColor = color;          // glow color
-        //lightMaterial.roughness = 1;                  // no reflections
-        //lightMaterial.metallic = 0;                   // non-metallic
 
         const lightMaterial = new StandardMaterial("mat" + name, scene);
         lightMaterial.disableLighting = true;
@@ -55,7 +51,6 @@ const box = MeshBuilder.CreateBox(
         return light;
 }
 
-// Function to create the scene
 export async function createScene(
   engine: Engine,
   canvas: HTMLCanvasElement
@@ -63,7 +58,6 @@ export async function createScene(
 	const scene = new Scene(engine);
   	scene.clearColor = new Color4(0, 0, 0);
 
-  	// Camera
   	const camera = new ArcRotateCamera(
     	"camera",
     	4.1398,
@@ -74,7 +68,6 @@ export async function createScene(
   	);
   	camera.attachControl(canvas, true);
 
-	// Colours
 	const colors = [
 		Color3.FromHexString("#FEF018"),
 		Color3.FromHexString("#FE8915"),
@@ -83,16 +76,6 @@ export async function createScene(
 		Color3.FromHexString("#26B2C5"),
 		Color3.FromHexString("#0489C2"),
 	];
-
-	// Sound effects
-	var music = new Sound("pongMusic", 
-		"frontend/src/assets/pongsounds.mp3", 
-		scene, null, {loop: true, autoplay: false});
-	music.play(undefined, 19);
-	
-	var hitSoundEffect = new Sound("pongMusic", 
-		"frontend/src/assets/bubble-pop.mp3", 
-		scene, null, {loop: false, autoplay: false});
 
 	const zBack = 15;
 	const yPos = 3;
@@ -107,11 +90,9 @@ export async function createScene(
 		lights.push(createLight(new Vector3(x, yPos - 5, zBack), color, "light" + i, scene));
 	}
 
-	// Pulse animation
 	scene.onBeforeRenderObservable.add(() => {
 		const time = performance.now() * 0.002; // scale speed
 		lights.forEach((light, i) => {
-			// Use sine wave for smooth pulsing
 			light.intensity = 0.5 + 0.5 * Math.sin(time + i); // phase shift per light
 		});
 	});
@@ -123,9 +104,7 @@ export async function createScene(
 	groundMat.albedoColor = new Color3(1, 1, 1);
 	groundMat.roughness = 0.15;
 	groundMat.maxSimultaneousLights = 6;
-	// Ground
 	const ground = MeshBuilder.CreateGround("ground", { width: 120, height: 120 }, scene);
-	//ground.material = mat1;
 	ground.material = groundMat;
 	ground.position.y = - 8;
 
@@ -152,7 +131,6 @@ export async function createScene(
 	paddle2.position.x = 10;
 	paddle2.position.y = 2;
 
-
 	var redMat = new StandardMaterial("redMat", scene);
 	redMat.ambientColor = new Color3(1, 0, 0);
 
@@ -164,26 +142,11 @@ export async function createScene(
 
 	scene.ambientColor = new Color3(1, 1, 1);
 
-	//Light direction is up and left
 	var light1 = new HemisphericLight("hemiLight", new Vector3(1, -1, 0), scene);
 	light1.diffuse = new Color3(1, 0, 0);
 	light1.specular = new Color3(0, 1, 0);
 	light1.groundColor = new Color3(0, 1, 0);
-	/* //No ambient color
-		var sphere0 = MeshBuilder.CreateSphere("sphere0", {}, scene);
-		sphere0.position.x = -1.5;  
-			
-		//Red Ambient  
-		var sphere1 = MeshBuilder.CreateSphere("sphere1", {}, scene);
-		sphere1.material = redMat;
-			
-			//Green Ambient
-			var sphere2 = MeshBuilder.CreateSphere("sphere2", {}, scene);
-			sphere2.material = greenMat;
-			sphere2.position.x = 1.5;    */
 
-
-	// Ball and paddles
 	const ball = MeshBuilder.CreateSphere("ball", { diameter: 1 }, scene);
 	ball.material = greenMat;
 
@@ -204,7 +167,6 @@ export async function createScene(
 	blackMat.maxSimultaneousLights = 8;
 	redMat.maxSimultaneousLights = 8;
 	greenMat.maxSimultaneousLights = 8;
-	// if you use these:
 	paddle1Mat.maxSimultaneousLights = 8;
 	paddle2Mat.maxSimultaneousLights = 8;
 
@@ -213,11 +175,11 @@ export async function createScene(
 	const paddleSpeed = 0.1;
 
 	setInterval(() => {
-		paddle1TargetY = ball.position.y + (Math.random() - 0.5); // small random offset
+		paddle1TargetY = ball.position.y + (Math.random() - 0.5);
 	}, 100);
 
 	setInterval(() => {
-		paddle2TargetY = ball.position.y + (Math.random() - 0.5) * 2; // larger random offset
+		paddle2TargetY = ball.position.y + (Math.random() - 0.5) * 2;
 	}, 200);
 
 	scene.onBeforeRenderObservable.add(() => {
@@ -229,13 +191,11 @@ export async function createScene(
 		}
 
 		if (frameCount % 6 === 0) {
-			// Create trail
 			const trail = MeshBuilder.CreateSphere("trail", { diameter: 1 }, scene);
 			const trailPos = ball.position.clone();
 			trailPos.z += 0.5;
 			trail.position = trailPos;
 
-			// Emissive color
 			const trailMat = new StandardMaterial("trailMat" + trailIndex, scene);
 			trailMat.emissiveColor = trailColors[trailIndex % trailColors.length];
 			trailMat.alpha = 1;
@@ -244,7 +204,6 @@ export async function createScene(
 
 			trailIndex++;
 
-			// Fade out
 			let life = 1;
 			scene.onBeforeRenderObservable.add(() => {
 				life -= 0.05;
@@ -260,13 +219,6 @@ export async function createScene(
 
 		if ((hitPaddle1 && ballVelocity.x < 0) || (hitPaddle2 && ballVelocity.x > 0)) {
 			ballVelocity.x *= -1;
-
-			const impactPosition = ball.position.clone();
-			hitSoundEffect.play();
-
-			const impactEmitter = MeshBuilder.CreateBox("impactEmitter", { size: 0.1 }, scene);
-			impactEmitter.isVisible = true;
-			impactEmitter.position = impactPosition;
 		}
 
 		if (ball.position.x < -12 || ball.position.x > 12) {
@@ -280,23 +232,110 @@ export async function createScene(
 		const paddle1TargetY = ball.position.y + paddle1Noise;
 		const paddle2TargetY = ball.position.y + paddle2Noise;
 
-		//const paddle1TargetY = 2 + ball.position.y + (Math.random() - 0.5);
-		//const paddle2TargetY = 2 + ball.position.y + (Math.random() - 0.5) * 2;
-
 		function lerp(current: number, target: number, alpha: number): number {
 			return current + (target - current) * alpha;
 		}
 
-		paddle1.position.y = lerp(paddle1.position.y, paddle1TargetY, 0.1); // more responsive
+		paddle1.position.y = lerp(paddle1.position.y, paddle1TargetY, 0.1);
 		paddle2.position.y = lerp(paddle2.position.y, paddle2TargetY, 0.05);
 	});
 
+	const textPlane = MeshBuilder.CreatePlane("aboutText", { width: 28, height: 7 }, scene);
+	const textTexture = new DynamicTexture("aboutTextTex", { width: 2048, height: 700 }, scene, false);
+	textTexture.hasAlpha = true;
+	const teamText = [
+	  "Transcendence project team:",
+	  "Erno: Pong-Game, Oponent AI",
+	  "Hanni: Front-End UI, management (frontend), multi-device-support",
+	  "Katja: 3D Graphics",
+	  "Marius: Backend with fastify framework, using SQLite DB, overall architecture (test and prod environment), user management backend",
+	  "Matti: Google Sign-in authentification, user management"
+	];
+	let y = 80;
+	teamText.forEach((line, i) => {
+	  textTexture.drawText(
+    line,
+    20,
+    y + i * 90,
+    "bold 28px Futura, Arial",
+    "#fff",
+    "transparent",
+    i === teamText.length - 1,
+    true
+  );
+});
+	const textMat = new StandardMaterial("aboutTextMat", scene);
+	textMat.diffuseTexture = textTexture;
+	textMat.diffuseTexture.hasAlpha = true;
+	textMat.useAlphaFromDiffuseTexture = true;
+	textMat.emissiveColor = new Color3(1, 1, 1);
+	textMat.alpha = 1;
+	textPlane.material = textMat;
+	textPlane.position = new Vector3(0, 7, 0);
+	textPlane.billboardMode = Mesh.BILLBOARDMODE_Y;
+
+	scene.onBeforeRenderObservable.clear();
+	scene.onBeforeRenderObservable.add(() => {
+	  const t = performance.now() * 0.00015;
+	  textPlane.position.x = Math.sin(t) * 7;
+	  textPlane.position.y = 7 + Math.cos(t * 0.7) * 1.5;
+	  textPlane.position.z = Math.cos(t * 0.5) * 3;
+	  textPlane.rotation.y = Math.sin(t * 0.6) * 0.3;
+
+	  const time = performance.now() * 0.002;
+	  lights.forEach((light, i) => {
+	    light.intensity = 0.5 + 0.5 * Math.sin(time + i);
+	  });
+
+	  frameCount++;
+	  ball.position.addInPlace(ballVelocity);
+	  if (ball.position.y > 6 || ball.position.y < -6) {
+	    ballVelocity.y *= -1;
+	  }
+	  if (frameCount % 6 === 0) {
+	    const trail = MeshBuilder.CreateSphere("trail", { diameter: 1 }, scene);
+	    const trailPos = ball.position.clone();
+	    trailPos.z += 0.5;
+	    trail.position = trailPos;
+	    const trailMat = new StandardMaterial("trailMat" + trailIndex, scene);
+	    trailMat.emissiveColor = trailColors[trailIndex % trailColors.length];
+	    trailMat.alpha = 1;
+	    trailMat.disableLighting = true;
+	    trail.material = trailMat;
+	    trailIndex++;
+	    let life = 1;
+	    scene.onBeforeRenderObservable.add(() => {
+	      life -= 0.05;
+	      trailMat.alpha = life;
+	      if (life <= 0) {
+	        trail.dispose();
+	      }
+	    });
+	  }
+	  const hitPaddle1 = ball.intersectsMesh(paddle1, false);
+	  const hitPaddle2 = ball.intersectsMesh(paddle2, false);
+	  if ((hitPaddle1 && ballVelocity.x < 0) || (hitPaddle2 && ballVelocity.x > 0)) {
+	    ballVelocity.x *= -1;
+	  }
+	  if (ball.position.x < -12 || ball.position.x > 12) {
+	    ball.position.set(0, 0, 0);
+	    ballVelocity = new Vector3(0.2 * (Math.random() > 0.5 ? 1 : -1), 0.1, 0);
+	  }
+	  const paddle1Noise = (Math.random() - 0.5) * 0.5;
+	  const paddle2Noise = (Math.random() - 0.5) * 1.2;
+	  const paddle1TargetY = ball.position.y + paddle1Noise;
+	  const paddle2TargetY = ball.position.y + paddle2Noise;
+	  function lerp(current: number, target: number, alpha: number): number {
+	    return current + (target - current) * alpha;
+	  }
+	  paddle1.position.y = lerp(paddle1.position.y, paddle1TargetY, 0.1);
+	  paddle2.position.y = lerp(paddle2.position.y, paddle2TargetY, 0.05);
+	});
 
   await scene.whenReadyAsync();
   return scene;
 }
 
-// AboutPage Component
 export default function AboutPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 

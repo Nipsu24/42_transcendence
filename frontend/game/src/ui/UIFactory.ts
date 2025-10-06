@@ -77,7 +77,7 @@ export class UIFactory {
     border.thickness = config.thickness || 3;
     border.background = config.background || "transparent";
     border.alpha = config.alpha || 1.0;
-    border.cornerRadius = config.cornerRadius || 10;
+    border.cornerRadius = 0;
     
     this.ui.addControl(border);
     return border;
@@ -88,7 +88,7 @@ export class UIFactory {
     textBlock.text = config.text;
     textBlock.color = config.color || "white";
     textBlock.fontSize = config.fontSize || Math.floor(this.canvas.height * 0.04);
-    textBlock.fontFamily = config.fontFamily || "futura-pt, sans-serif";
+    textBlock.fontFamily = config.fontFamily || "Futura PT, futura-pt, sans-serif";
     
     if (config.fontWeight) {
       textBlock.fontWeight = config.fontWeight;
@@ -127,6 +127,7 @@ export class UIFactory {
     button.thickness = config.thickness || 3;
     button.fontSize = config.fontSize || Math.floor(this.canvas.height * 0.035);
     button.fontWeight = config.fontWeight || "bold";
+    button.fontFamily = "Futura PT, futura-pt, sans-serif";
     button.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
     button.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
     
@@ -138,9 +139,9 @@ export class UIFactory {
       button.left = config.left;
     }
 
-    // Add hover effects
     const originalBackground = button.background;
     const originalColor = button.color;
+    const originalThickness = button.thickness;
     const hoverColor = config.hoverColor || "#FE8915";
     const hoverTextColor = config.hoverTextColor || "black";
 
@@ -149,6 +150,7 @@ export class UIFactory {
       button.color = hoverTextColor;
       button.scaleX = 1.05;
       button.scaleY = 1.05;
+      button.thickness = 0;
     });
 
     button.onPointerOutObservable.add(() => {
@@ -156,6 +158,7 @@ export class UIFactory {
       button.color = originalColor;
       button.scaleX = 1.0;
       button.scaleY = 1.0;
+      button.thickness = originalThickness;
     });
 
     if (config.onClick) {
@@ -179,8 +182,8 @@ export class UIFactory {
 
   public createWelcomeText(playerName: string): GUI.TextBlock {
     return this.createTextBlock({
-      text: `Welcome, ${playerName}`,
-      color: "#cccccc",
+      text: `WELCOME, ${playerName}`,
+      color: "#ffffffff",
       fontSize: Math.floor(this.canvas.height * 0.04),
       horizontalAlignment: GUI.Control.HORIZONTAL_ALIGNMENT_CENTER,
       verticalAlignment: GUI.Control.VERTICAL_ALIGNMENT_TOP,

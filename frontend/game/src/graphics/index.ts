@@ -9,4 +9,4 @@ export { PlayerListUI } from '../ui/PlayerListUI';
 export { TournamentBracketUI, Match } from '../ui/TournamentBracketUI';
 
 // Graphics modules
-export { PongGraphics, PongGameObjects, TrailEffect } from './PongGraphics';
+export { PongGraphics, PongGameObjects } from './PongGraphics';

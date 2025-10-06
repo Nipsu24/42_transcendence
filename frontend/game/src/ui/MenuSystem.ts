@@ -28,28 +28,22 @@ export class MenuSystem {
   }
 
   public createMenu(config: MenuConfig): () => void {
-    // Create background if requested
     if (config.showBackground !== false) {
       this.uiFactory.createBackground();
     }
 
-    // Create border if requested
     if (config.showBorder !== false) {
       this.uiFactory.createBorder();
     }
 
-    // Create title
     this.uiFactory.createTitle(config.title);
 
-    // Create welcome text if provided
     if (config.welcomeText) {
       this.uiFactory.createWelcomeText(config.welcomeText);
     }
 
-    // Create buttons
     this.createButtons(config.buttons);
 
-    // Return cleanup function
     return () => this.cleanup();
   }
 
@@ -80,25 +74,25 @@ export class MenuSystem {
       buttons: [
         {
           id: "singlePlayer",
-          text: "1 Player",
+          text: "1 PLAYER",
           onClick: callbacks.onSinglePlayer,
           hoverColor: "#FE8915"
         },
         {
           id: "twoPlayers",
-          text: "2 Players",
+          text: "2 PLAYER",
           onClick: callbacks.onTwoPlayers,
           hoverColor: "#FF4F1A"
         },
         {
           id: "tournament",
-          text: "Tournament",
+          text: "TOURNAMENT",
           onClick: callbacks.onTournament,
           hoverColor: "#55CFD4"
         },
         {
           id: "quit",
-          text: "Quit",
+          text: "QUIT",
           onClick: callbacks.onQuit || this.defaultQuitHandler.bind(this),
           hoverColor: "#0489C2"
         }
@@ -119,25 +113,25 @@ export class MenuSystem {
       buttons: [
         {
           id: "addPlayer",
-          text: "Add Player",
+          text: "ADD PLAYER",
           onClick: callbacks.onAddPlayer,
           hoverColor: "#55CFD4"
         },
         {
           id: "removePlayer",
-          text: "Remove Player",
+          text: "REMOVE PLAYER",
           onClick: callbacks.onRemovePlayer,
           hoverColor: "#FF4F1A"
         },
         {
           id: "startTournament",
-          text: "Start Tournament",
+          text: "START TOURNAMENT",
           onClick: callbacks.onStartTournament,
           hoverColor: "#FE8915"
         },
         {
           id: "back",
-          text: "Back",
+          text: "BACK",
           onClick: callbacks.onBack,
           hoverColor: "#0489C2"
         }
