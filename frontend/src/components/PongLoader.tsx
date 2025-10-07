@@ -15,7 +15,7 @@ export default function PongLoader() {
       </div>
 
       {/* P O N G text animation */}
-      <div className="font-(family-name:--font-heading) flex gap-0.3 text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-widest">
+      <div className="font-heading flex text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-widest">
         {['P', 'O', 'N', 'G'].map((char, i) => (
           <span
             key={i}

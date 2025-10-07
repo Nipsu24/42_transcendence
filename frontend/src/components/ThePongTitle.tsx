@@ -11,8 +11,8 @@ export default function ThePongTitle(){
             text-[1.2rem] 
 			sm:text-[clamp(1.2rem,2vw,1.8rem)]
 			title-the-lg
-			tilte-the-xl
-			tilte-the-2xl
+			title-the-xl
+			title-the-2xl
 			title-the-3xl
 			title-the-4xl
             font-light

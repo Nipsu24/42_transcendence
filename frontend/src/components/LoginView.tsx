@@ -75,7 +75,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
           Log In
         </PrimaryButton>
       </AuthForm>
-      <div className="font-body tracking-wider text-center text-sm text-gray-600 mt-0.1">
+      <div className="font-body tracking-wider text-center text-sm text-gray-600">
         Don't have an account?{' '}
         <Link to="/signup" className="font-semibold text-gray-700 hover:underline">
           Sign Up
@@ -103,7 +103,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
             navigate('/myhome'); // needed to be forwarded to correct page after login with google
           }
         }}
-        onError={() => alert('Google sign-in failed')} // changed to English:)
+        onError={() => alert('Google sign-in failed')}
       />
 </div>
     </div>

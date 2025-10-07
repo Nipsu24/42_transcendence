@@ -39,6 +39,8 @@ export default function GameMenuPage() {
   const handleMenuClick = (route: string): void => {
     if (route === '/about') {
       navigate('/about')
+	} else if (route === '/havefun') {
+		navigate('/havefun')
     } else {
       const isLoggedInNow: boolean = Boolean(localStorage.getItem('jwtToken'))
       navigate(isLoggedInNow ? route : '/login')
