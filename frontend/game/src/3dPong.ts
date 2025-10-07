@@ -1,10 +1,15 @@
-import { Scene, ArcRotateCamera, HemisphericLight, MeshBuilder, Vector3, Color3, StandardMaterial, PBRMaterial, RectAreaLight
-} from '@babylonjs/core';
-import * as GUI from '@babylonjs/gui';
+import { Scene, 
+	ArcRotateCamera, 
+	HemisphericLight, 
+	MeshBuilder, 
+	Vector3, 
+	Color3, 
+	StandardMaterial, 
+	PBRMaterial, 
+	RectAreaLight } from '@babylonjs/core';
+import { PongScoreUI } from './ui/PongScoreUI';
 
-let scoreUI: GUI.AdvancedDynamicTexture;
-let player1ScoreText: GUI.TextBlock;
-let player2ScoreText: GUI.TextBlock;
+let pongScoreUI: PongScoreUI;
 
 let isRunning = false;
 let isAi = false;
@@ -79,7 +84,6 @@ function resetBall() {
   ball.y = playArea.y + (playArea.height / 2);
   aiDecisionInterval = 1000;
 
-  // Use stored baseSpeed instead of recalculating to prevent drift
   const initialSpeed = baseSpeed || getBallSpeed();
   ball.dx = Math.random() < 0.5 ? -initialSpeed : initialSpeed;
 
@@ -239,9 +243,8 @@ function createTrailParticle() {
 function endMatch(winner: string) {
   isRunning = false;
   removeInput();
-  paddle1.dy = 0; // ensure no residual motion
+  paddle1.dy = 0;
   paddle2.dy = 0;
-  window.removeEventListener('resize', handleResize);
   if (scene.activeCamera) { scene.activeCamera.detachControl(); }
   if (winnerCallback) { winnerCallback(winner, leftScore, rightScore); winnerCallback = null; }
   if (updateObserver) { scene.onBeforeRenderObservable.remove(updateObserver); updateObserver = null; }
@@ -257,9 +260,7 @@ function endMatch(winner: string) {
   paddle1.mesh.dispose();
   paddle2.mesh.dispose();
   ball.mesh.dispose();
-  if (scoreUI) { scoreUI.dispose(); scoreUI = null as any; }
-  player1ScoreText = null as any;
-  player2ScoreText = null as any;
+  if (pongScoreUI) { pongScoreUI.dispose(); pongScoreUI = null as any; }
 }
 
 function createLight(
@@ -448,37 +449,9 @@ function setupPongScene(scene: Scene) {
 	paddle2Mat.maxSimultaneousLights = 8;
 }
 
-function setupScoreUI(scene: Scene) {
-  scoreUI = GUI.AdvancedDynamicTexture.CreateFullscreenUI("ScoreUI", true, scene);
-
-  player1ScoreText = new GUI.TextBlock();
-  player1ScoreText.text = `${player1Name}: ${leftScore}`;
-  player1ScoreText.color = "white";
-  player1ScoreText.fontSize = Math.floor(playArea.height * 0.07);
-  player1ScoreText.fontWeight = "bold";
-  player1ScoreText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  player1ScoreText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  player1ScoreText.top = "20px";
-  player1ScoreText.left = "20px";
-  scoreUI.addControl(player1ScoreText);
-
-  player2ScoreText = new GUI.TextBlock();
-  player2ScoreText.text = `${player2Name}: ${rightScore}`;
-  player2ScoreText.color = "white";
-  player2ScoreText.fontSize = Math.floor(playArea.height * 0.07);
-  player2ScoreText.fontWeight = "bold";
-  player2ScoreText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-  player2ScoreText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  player2ScoreText.top = "20px";
-  player2ScoreText.left = "-20px";
-  scoreUI.addControl(player2ScoreText);
-}
-
-
 function drawScores() {
-  if (!player1ScoreText || !player2ScoreText) return;
-  player1ScoreText.text = `${player1Name}: ${leftScore}`;
-  player2ScoreText.text = `${player2Name}: ${rightScore}`;
+  if (!pongScoreUI) return;
+  pongScoreUI.updateScores(leftScore, rightScore);
 }
 
 export async function startPongMatch(
@@ -489,13 +462,11 @@ export async function startPongMatch(
   p2: string,
   onMatchEnd: (winner: string, leftScore: number, rightScore: number) => void
 ) {
-	canvasEl = canvas;
-	scene = sceneEl;
+  canvasEl = canvas;
+  scene = sceneEl;
 
-	// Use getBoundingClientRect to get actual display size, not just canvas.width/height
 	const rect = canvasEl.getBoundingClientRect();
 	
-	// Constrain dimensions to viewport to prevent overflow
 	const viewportWidth = window.innerWidth;
 	const viewportHeight = window.innerHeight;
 	const canvasWidth = Math.min(rect.width, viewportWidth);
@@ -518,13 +489,13 @@ export async function startPongMatch(
 	leftScore = 0; 
 	rightScore = 0;
 
-	// Store the base speed for this game to prevent drift across matches
 	baseSpeed = playArea.width * 0.0075;
 	ball.dx = 0;
 	ball.dy = 0;
 
 	setupPongScene(scene);
-	setupScoreUI(scene);
+	
+	pongScoreUI = new PongScoreUI(canvasEl, scene, player1Name, player2Name);
 
 	paddle1.x = getPaddleWidth() / 2;
 	paddle1.y = playArea.y + (playArea.height / 2) - (getPaddleHeight() / 2);
@@ -552,25 +523,8 @@ export async function startPongMatch(
 	setupInput();
 
 	handleResize = () => {
-		if (!isRunning) return;
-		const rect = canvasEl.getBoundingClientRect();
-		const newWidth = rect.width;
-		const newHeight = rect.height;
-		const newTopMargin = newHeight * 0.08;
-		const newBottomMargin = newHeight * 0.08;
-		
-		playArea = {
-			y: newTopMargin,
-			width: newWidth,
-			height: newHeight - newTopMargin - newBottomMargin
-		};
-		player1ScoreText.fontSize = Math.floor(playArea.height * 0.07);
-		player2ScoreText.fontSize = Math.floor(playArea.height * 0.07);
-	};
+  };
 	
-	window.addEventListener('resize', handleResize);
-
-	// Ensure no duplicate observers from previous matches
 	if (updateObserver) { scene.onBeforeRenderObservable.remove(updateObserver); updateObserver = null; }
 	updateObserver = scene.onBeforeRenderObservable.add(() => {
 		if (!isRunning) return;
@@ -578,4 +532,8 @@ export async function startPongMatch(
 	});
 }
 
-export function stopPong() { isRunning = false; removeInput(); }
+export function stopPong() {
+  isRunning = false;
+  removeInput();
+  if (pongScoreUI) { pongScoreUI.dispose(); pongScoreUI = null as any; }
+}
