@@ -115,7 +115,7 @@ export default function MyEditPage() {
 	} else if (message.includes('E-mail is not available')) {
 	alert('E-mail is not available anymore')
 	} else {
-	alert('Oh, something went wrong!!')
+	alert('Oh, something went wrong!! Altering e-mail when signed-in with Google not possible :(')
     }
   } finally {
     setLoading(false)
