@@ -84,6 +84,11 @@ fastify.put('/api/players/me', putDivReqResSchema(playerReqInfoSchema, playerBod
 				return reply.status(404).send({ error: 'Name is not available anymore.' });
 		}
 		if (e_mail) {
+			// Prevent Google users from changing their email
+			if (player.auth === 'google' && e_mail !== player.e_mail) {
+				return reply.status(400).send({ error: 'Google users cannot change their email address.' });
+			}
+			
 			const foundPlayerByEMail = await Player.findPlayerByEMail(e_mail);
 			if (!foundPlayerByEMail || foundPlayerByEMail.id === player.id) {
 				const updatedPlayerInfo = await Player.updatePlayerInfo({
