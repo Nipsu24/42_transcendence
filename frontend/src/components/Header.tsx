@@ -16,7 +16,7 @@ export default function Header() {
 		  hover:underline transition 
 		  relative top-[3px]
 		  text-sm sm:text-base 2xl:text-[1.6rem]
-		  2xl:px-8 lg:py-1.2
+		  2xl:px-8
 		  "
         >
           Game
@@ -26,7 +26,7 @@ export default function Header() {
           className="
 		  login-btn
 		  text-sm sm:text-base 2xl:text-[1.6rem]
-		  2xl:px-7 lg:py-1.2
+		  2xl:px-7
 		  "
         >
           Login

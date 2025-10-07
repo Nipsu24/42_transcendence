@@ -18,7 +18,7 @@ export default function StartGameCallout({ onClick }: StartGameProps) {
         className="
 		fade-in font-body
 		px-6 py-2 
-		xl:px-8 xl:py-2.3
+		xl:px-8
 		2xl:text-[1.7rem]
 		2xl:px-9
 		border border-gray-700 text-gray-700 bg-white
