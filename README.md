@@ -99,6 +99,12 @@ Tournament screen:
 Have fun page:
 <img width="2880" height="1412" alt="Bildschirmfoto 2025-10-08 um 09 29 34" src="https://github.com/user-attachments/assets/b6c9ab7d-a4de-4742-ad58-36c72bf2e34e" />
 
+Mobile: Game sub-menu
+<img width="2663" height="1329" alt="mobile_menu" src="https://github.com/user-attachments/assets/356f93a6-2e51-46fc-b88b-7cc771d24401" />
+
+Mobile: Game
+<img width="2589" height="1329" alt="mobile_game" src="https://github.com/user-attachments/assets/03cb7e66-ceb7-4444-9896-a90ee7ece9e7" />
+
 
 
 ## Architecture
