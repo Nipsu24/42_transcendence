@@ -46,6 +46,7 @@ Overall Module Count: 7 Major in total
 
 ## Requirements
 - docker & docker-compose
+- ⚠️ .env files with respective secrets (e.g. API keys)
 
 ## Instructions
 
@@ -87,15 +88,23 @@ Main Game menu:
 <img width="2880" height="1506" alt="Bildschirmfoto 2025-08-21 um 15 59 43" src="https://github.com/user-attachments/assets/f4ffe1c5-1d59-4625-8280-a0d8b4f3c5e6" />
 
 Game sub-menu:
-<img width="2880" height="1506" alt="Bildschirmfoto 2025-08-21 um 15 59 57" src="https://github.com/user-attachments/assets/b3ffd012-41f7-4439-a337-0f6f7c4d7312" />
+<img width="2880" height="1554" alt="Bildschirmfoto 2025-10-08 um 09 25 51" src="https://github.com/user-attachments/assets/7ee7a8f2-dfb7-4995-9719-f15642e0a530" />
 
 Game:
-<img width="2712" height="1554" alt="Bildschirmfoto 2025-08-21 um 16 15 00" src="https://github.com/user-attachments/assets/5f84ce18-70d8-444f-85cd-ea635973c25f" />
+<img width="2880" height="1554" alt="Bildschirmfoto 2025-10-08 um 09 26 24" src="https://github.com/user-attachments/assets/d6a42c43-c231-424e-85e6-30b46d3862e9" />
+
+Tournament screen:
+<img width="2880" height="1554" alt="Bildschirmfoto 2025-10-08 um 09 27 10" src="https://github.com/user-attachments/assets/fe4cd1aa-f10b-46b8-8187-52a6dfc2bbd7" />
+
+Have fun page:
+<img width="2880" height="1412" alt="Bildschirmfoto 2025-10-08 um 09 29 34" src="https://github.com/user-attachments/assets/b6c9ab7d-a4de-4742-ad58-36c72bf2e34e" />
+
 
 
 ## Architecture
 Prod environment:
-<img width="2498" height="1800" alt="Bildschirmfoto 2025-08-21 um 16 09 24" src="https://github.com/user-attachments/assets/184c63ee-b5a7-49b5-a8bd-e4b4cc3a93ef" />
+<img width="2504" height="1794" alt="Bildschirmfoto 2025-10-08 um 09 33 53" src="https://github.com/user-attachments/assets/56a7b959-9469-4889-b0f5-0c2c8444fc48" />
+
 
 Frontend testing:
 <img width="2498" height="1800" alt="Bildschirmfoto 2025-08-21 um 16 08 35" src="https://github.com/user-attachments/assets/b21eb49c-a0e4-4b0f-a70d-722578b4a141" />
