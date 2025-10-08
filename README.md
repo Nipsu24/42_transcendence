@@ -1,5 +1,3 @@
-<h1 align="center">🤖+++WORK IN PROGRESS+++🤖</h1>
-
 <h1 align="center">Transcendence (The Pong)</h1>
 
 > Hive Helsinki (School 42) final project (Rank06/06) of core curriculum.
